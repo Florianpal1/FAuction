@@ -9,8 +9,8 @@ import java.util.Map;
 public class GlobalConfig {
 
     private String orderBy;
-    private boolean onBuyCommandUse;
-    private String onBuyCommand;
+    private boolean onBuyMessageUse;
+    private String onBuyMessage;
     private final Map<String, Integer> limitations = new HashMap<>();
     private final Map<Material, Double> minPrice = new HashMap<>();
     private int time;
@@ -18,8 +18,8 @@ public class GlobalConfig {
 
     public void load(Configuration config) {
         orderBy = config.getString("orderBy");
-        onBuyCommandUse = config.getBoolean("onBuy.sendCommand.use");
-        onBuyCommand = config.getString("onBuy.sendCommand.command");
+        onBuyMessageUse = config.getBoolean("onBuy.sendMessage.use");
+        onBuyMessage = config.getString("onBuy.sendMessage.command");
         time = config.getInt("expiration.time");
         checkEvery = config.getInt("expiration.checkEvery");
         for (String limitationGroup : config.getConfigurationSection("limitations").getKeys(false)) {
@@ -44,12 +44,12 @@ public class GlobalConfig {
         return limitations;
     }
 
-    public boolean isOnBuyCommandUse() {
-        return onBuyCommandUse;
+    public boolean isOnBuyMessageUse() {
+        return onBuyMessageUse;
     }
 
-    public String getOnBuyCommand() {
-        return onBuyCommand;
+    public String getOnBuyMessage() {
+        return onBuyMessage;
     }
 
     public Map<Material, Double> getMinPrice() {

@@ -52,6 +52,26 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>com.destroystokyo.paper:*</exclude>
+                                    <exclude>com.sk89q.worldguard:*</exclude>
+                                    <exclude>org.ow2.asm:*</exclude>
+                                    <exclude>net.kyori:*</exclude>
+                                    <exclude>aopalliance:*</exclude>
+                                    <exclude>com.google.inject:*</exclude>
+                                    <exclude>com.google.code.findbugs:*</exclude>
+                                    <exclude>org.checkerframework:*</exclude>
+                                    <exclude>com.google.guava:*</exclude>
+                                    <exclude>com.google.code.findbugs:*</exclude>
+                                    <exclude>javax.inject:*</exclude>
+                                    <exclude>org.slf4j:*</exclude>
+                                    <exclude>com.zaxxer.hikari:*</exclude>
+                                    <exclude>co.aikar.taskchain:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -63,7 +83,7 @@
         <!--Paper Repo-->
         <repository>
             <id>papermc</id>
-            <url>https://papermc.io/repo/repository/maven-public/</url>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <!--Aikar Repo-->
         <repository>
@@ -72,8 +92,8 @@
         </repository>
         <!--Vault Repo-->
         <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -131,6 +151,13 @@
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.florianpal</groupId>
+            <artifactId>MessageDif</artifactId>
+            <scope>system</scope>
+            <version>1.0</version>
+            <systemPath>${basedir}/lib/MessageDif-1.0-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 

@@ -1,8 +1,8 @@
 orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent
 onBuy:
-  sendCommand: # Command sends if item is buying
+  sendMessage: # Command sends if item is buying
     use: false
-    command: "pxe mail {OwnerName} &aVous avez vendu &3 {Amount} &ex&3{ItemName} &aà &d{BuyerName} &apour &e{ItemPrice} &6Suns &aà l'hôtel des ventes"
+    message: "&aVous avez vendu &3 {Amount} &ex&3{ItemName} &aà &d{BuyerName} &apour &e{ItemPrice} &6Suns &aà l'hôtel des ventes"
 expiration:
   time: 3600 #In seconds
   checkEvery: 72000 #In ticks
