@@ -43,6 +43,7 @@ acf-minecraft:
 
 acf-core:
   permission_denied: "Vous n'avez pas la permission d'exécuter cette commande !"
+  permission_denied_parameter: "Vous n'avez pas la permission d'effectuer cette commande."
   error_generic_logged: "Une erreur est survenue ! Ce problème a été enregistré. Désolé pour le dérangement."
   unknown_command: "Commande inconnue, merci de faire  <c2>/help </c2>!"
   invalid_syntax: "Syntaxe invalide ! Usage: <c2>{command} </c2>{syntax}."
@@ -66,4 +67,3 @@ acf-core:
   help_detailed_command_format: "<c2>{command}</c2> {parameters} <c2>{separator}</c2> {description}"
   help_detailed_parameter_format: "<c2>{name}:</c2> {description}"
   help_search_header: "Résultats de la recherche pour <c2>{commandprefix}{command}</c2>: <c2>{search}</c2>"
-  permission_denied_parameter: "Vous n'avez pas la permission d'effectuer cette commande."

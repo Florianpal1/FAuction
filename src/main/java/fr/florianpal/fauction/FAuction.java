@@ -1,3 +1,19 @@
+
+/*
+ * Copyright (C) 2022 Florianpal
+ *
+ * This program is free software;
+ * you can redistribute it and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation; either version 3
+ * of the License, or (at your option) any later version.
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, see <http://www.gnu.org/licenses/>.
+ *
+ * Last modification : 07/01/2022 23:07
+ *
+ *  @author Florianpal.
+ */
+
 package fr.florianpal.fauction;
 
 import co.aikar.taskchain.BukkitTaskChainFactory;
@@ -52,10 +68,11 @@ public class FAuction extends JavaPlugin {
 
         taskChainFactory = BukkitTaskChainFactory.create(this);
 
-        File languageFile = new File(getDataFolder(), "lang_fr.yml");
-        createDefaultConfiguration(languageFile, "lang_fr.yml");
-
         configurationManager = new ConfigurationManager(this);
+
+        File languageFile = new File(getDataFolder(), "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
+        createDefaultConfiguration(languageFile, "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
+
         commandManager = new CommandManager(this);
         commandManager.registerDependency(ConfigurationManager.class, configurationManager);
 
