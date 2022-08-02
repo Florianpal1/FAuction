@@ -204,10 +204,16 @@ block:
     title: "-"
     description: {}
   '52':
-    utility: barrier
-    material: AIR
-    title: "-"
-    description: {}
+    utility: player
+    material: NETHER_STAR
+    title: "&5Mes Items"
+    description:
+      - "&eCliquez ici pour voir vos items en vente"
+    replacement:
+      material: NETHER_STAR
+      title: "&5Retour à l'hotel des ventes"
+      description:
+        - "&eCliquez ici pour retourner à l'hotel des ventes"
   '53':
     utility: close
     material: BARRIER

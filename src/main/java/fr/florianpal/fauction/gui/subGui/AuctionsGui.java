@@ -20,6 +20,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.AuctionConfig;
+import fr.florianpal.fauction.enums.ViewType;
 import fr.florianpal.fauction.gui.AbstractGui;
 import fr.florianpal.fauction.gui.GuiInterface;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -45,18 +46,26 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
     private List<Auction> auctions = new ArrayList<>();
     protected final AuctionCommandManager auctionCommandManager;
     private final AuctionConfig auctionConfig;
+    private final ViewType viewType;
 
-    public AuctionsGui(FAuction plugin, Player player, int page) {
+    public AuctionsGui(FAuction plugin, Player player, ViewType viewType, int page) {
         super(plugin, player, page);
         this.auctionConfig = plugin.getConfigurationManager().getAuctionConfig();
         this.auctionCommandManager = new AuctionCommandManager(plugin);
+        this.viewType = viewType;
         initGui(auctionConfig.getNameGui(), 27);
     }
 
     public void initializeItems() {
-        TaskChain<ArrayList<Auction>> chain = auctionCommandManager.getAuctions();
-        chain.sync(() -> {
-                    this.auctions = chain.getTaskData("auctions");
+        TaskChain<ArrayList<Auction>> chain = null;
+        if (viewType == ViewType.ALL) {
+            chain = auctionCommandManager.getAuctions();
+        } else if (viewType == ViewType.PLAYER) {
+            chain = auctionCommandManager.getAuctions(player.getUniqueId());
+        }
+        TaskChain<ArrayList<Auction>> finalChain = chain;
+        finalChain.sync(() -> {
+                    this.auctions = finalChain.getTaskData("auctions");
 
                     String titleInv = auctionConfig.getNameGui();
                     titleInv = titleInv.replace("{Page}", String.valueOf(this.page));
@@ -93,12 +102,18 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
                             inv.setItem(next.getRemplacement().getIndex(), createGuiItem(next.getRemplacement().getMaterial(), next.getRemplacement().getTitle(), next.getRemplacement().getDescription()));
                         }
                     }
-                     for (Barrier close : auctionConfig.getCloseBlocks()) {
-                         inv.setItem(close.getIndex(), createGuiItem(close.getMaterial(), close.getTitle(), close.getDescription()));
+
+                     for (Barrier player : auctionConfig.getPlayerBlocks()) {
+                         if (viewType == ViewType.ALL) {
+                             inv.setItem(player.getIndex(), createGuiItem(player.getMaterial(), player.getTitle(), player.getDescription()));
+                         } else if (viewType == ViewType.PLAYER){
+                             inv.setItem(player.getRemplacement().getIndex(), createGuiItem(player.getRemplacement().getMaterial(), player.getRemplacement().getTitle(), player.getRemplacement().getDescription()));
+                         }
+                     }
+
+                    for (Barrier close : auctionConfig.getCloseBlocks()) {
+                        inv.setItem(close.getIndex(), createGuiItem(close.getMaterial(), close.getTitle(), close.getDescription()));
                     }
-
-
-
 
                     int id = (this.auctionConfig.getAuctionBlocks().size() * this.page) - this.auctionConfig.getAuctionBlocks().size();
                     for (int index : auctionConfig.getAuctionBlocks()) {
@@ -194,14 +209,14 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
 
         for (Barrier previous : auctionConfig.getPreviousBlocks()) {
             if (e.getRawSlot() == previous.getIndex() && this.page > 1) {
-                AuctionsGui gui = new AuctionsGui(plugin, player, this.page - 1);
+                AuctionsGui gui = new AuctionsGui(plugin, player, viewType,this.page - 1);
                 gui.initializeItems();
                 return;
             }
         }
         for (Barrier next : auctionConfig.getNextBlocks()) {
             if (e.getRawSlot() == next.getIndex() && ((this.auctionConfig.getAuctionBlocks().size() * this.page) - this.auctionConfig.getAuctionBlocks().size() < auctions.size() - this.auctionConfig.getAuctionBlocks().size()) && next.getMaterial() != next.getRemplacement().getMaterial()) {
-                AuctionsGui gui = new AuctionsGui(plugin, player, this.page + 1);
+                AuctionsGui gui = new AuctionsGui(plugin, player, viewType,this.page + 1);
                 gui.initializeItems();
                 return;
             }
@@ -219,7 +234,18 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
                 return;
             }
         }
-
+        for (Barrier expire : auctionConfig.getPlayerBlocks()) {
+            if (e.getRawSlot() == expire.getIndex()) {
+                if(viewType == ViewType.ALL) {
+                    AuctionsGui gui = new AuctionsGui(plugin, player, ViewType.PLAYER, 1);
+                    gui.initializeItems();
+                } else if (viewType == ViewType.PLAYER) {
+                    AuctionsGui gui = new AuctionsGui(plugin, player, ViewType.ALL, 1);
+                    gui.initializeItems();
+                }
+                return;
+            }
+        }
         for (int index : auctionConfig.getAuctionBlocks()) {
             if (index == e.getRawSlot()) {
                 int nb0 = auctionConfig.getAuctionBlocks().get(0);
@@ -248,7 +274,7 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
                         CommandIssuer issuerTarget = plugin.getCommandManager().getCommandIssuer(player);
                         issuerTarget.sendInfo(MessageKeys.REMOVE_AUCTION_SUCCESS);
                         inv.close();
-                        AuctionsGui gui = new AuctionsGui(plugin, player, page);
+                        AuctionsGui gui = new AuctionsGui(plugin, player, viewType, page);
                         gui.initializeItems();
 
                     }).execute();

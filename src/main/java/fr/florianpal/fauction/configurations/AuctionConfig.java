@@ -30,6 +30,7 @@ public class AuctionConfig {
     private List<Barrier> expireBlocks = new ArrayList<>();
     private  List<Integer> auctionBlocks = new ArrayList<>();
     private List<Barrier> closeBlocks = new ArrayList<>();
+    private List<Barrier> playerBlocks = new ArrayList<>();
     private int size = 27;
     private String title = "";
     private List<String> description = new ArrayList<>();
@@ -43,6 +44,7 @@ public class AuctionConfig {
         expireBlocks = new ArrayList<>();
         auctionBlocks = new ArrayList<>();
         closeBlocks = new ArrayList<>();
+        playerBlocks = new ArrayList<>();
         description = new ArrayList<>();
 
         for (String index : config.getConfigurationSection("block").getKeys(false)) {
@@ -84,6 +86,21 @@ public class AuctionConfig {
                         config.getStringList("block." + index + ".description")
                 );
                 expireBlocks.add(barrier);
+            } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("player")) {
+                Barrier barrier = new Barrier(
+                        Integer.parseInt(index),
+                        Material.getMaterial(config.getString("block." + index + ".material")),
+                        config.getString("block." + index + ".title"),
+                        config.getStringList("block." + index + ".description"),
+                        new Barrier(
+                                Integer.parseInt(index),
+                                Material.getMaterial(config.getString("block." + index + ".replacement.material")),
+                                config.getString("block." + index + ".replacement.title"),
+                                config.getStringList("block." + index + ".replacement.description")
+                        )
+
+                );
+                playerBlocks.add(barrier);
             } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("barrier")) {
                 Barrier barrier = new Barrier(
                         Integer.parseInt(index),
@@ -149,5 +166,9 @@ public class AuctionConfig {
 
     public int getSize() {
         return size;
+    }
+
+    public List<Barrier> getPlayerBlocks() {
+        return playerBlocks;
     }
 }

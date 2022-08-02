@@ -20,6 +20,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.ExpireGuiConfig;
+import fr.florianpal.fauction.enums.ViewType;
 import fr.florianpal.fauction.gui.AbstractGui;
 import fr.florianpal.fauction.gui.GuiInterface;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -216,7 +217,6 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
             }
         }
 
-
         for (Barrier previous : expireGuiConfig.getPreviousBlocks()) {
             if (e.getRawSlot() == previous.getIndex() && this.page > 1) {
                 ExpireGui gui = new ExpireGui(plugin, p, this.page - 1);
@@ -235,7 +235,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
         }
         for (Barrier auctionGui : expireGuiConfig.getAuctionGuiBlocks()) {
             if (e.getRawSlot() == auctionGui.getIndex()) {
-                AuctionsGui gui = new AuctionsGui(plugin, p, 1);
+                AuctionsGui gui = new AuctionsGui(plugin, p, ViewType.ALL,1);
                 gui.initializeItems();
                 break;
             }
