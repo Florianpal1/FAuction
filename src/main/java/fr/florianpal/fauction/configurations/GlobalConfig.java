@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class GlobalConfig {
 
-    private String lang;
+    private String lang = "en";
     private String orderBy;
     private boolean onBuyCommandUse;
     private String onBuyCommand;

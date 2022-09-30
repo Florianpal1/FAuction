@@ -58,7 +58,7 @@ public class AuctionConfirmGui extends AbstractGui implements GuiInterface {
         super(plugin, player, page);
         this.auction = auction;
         this.auctionConfirmConfig = plugin.getConfigurationManager().getAuctionConfirmConfig();
-        this.auctionCommandManager = new AuctionCommandManager(plugin);
+        this.auctionCommandManager = plugin.getAuctionCommandManager();
         initGui(auctionConfirmConfig.getNameGui(), 27);
     }
 

@@ -60,7 +60,7 @@ public class AuctionCommand extends BaseCommand {
     @Description("{@@fauction.auction_list_help_description}")
     public void onList(Player playerSender){
         CommandIssuer issuerTarget = commandManager.getCommandIssuer(playerSender);
-        AuctionsGui gui = new AuctionsGui(plugin, playerSender, ViewType.PLAYER,1);
+        AuctionsGui gui = new AuctionsGui(plugin, playerSender, ViewType.ALL,1);
         gui.initializeItems();
         issuerTarget.sendInfo(MessageKeys.AUCTION_OPEN);
     }

@@ -51,7 +51,7 @@ public class AuctionsGui extends AbstractGui implements GuiInterface {
     public AuctionsGui(FAuction plugin, Player player, ViewType viewType, int page) {
         super(plugin, player, page);
         this.auctionConfig = plugin.getConfigurationManager().getAuctionConfig();
-        this.auctionCommandManager = new AuctionCommandManager(plugin);
+        this.auctionCommandManager = plugin.getAuctionCommandManager();
         this.viewType = viewType;
         initGui(auctionConfig.getNameGui(), 27);
     }
