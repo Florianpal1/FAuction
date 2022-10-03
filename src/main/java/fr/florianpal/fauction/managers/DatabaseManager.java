@@ -25,19 +25,19 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class DatabaseManager {
-    private final HikariConfig config = new HikariConfig();
     private final HikariDataSource ds;
     private final FAuction plugin;
     private final ArrayList<IDatabaseTable> repositories = new ArrayList<>();
     public DatabaseManager(FAuction plugin) {
         this.plugin = plugin;
+        HikariConfig config = new HikariConfig();
         config.setJdbcUrl(  plugin.getConfigurationManager().getDatabase().getUrl() );
         config.setUsername( plugin.getConfigurationManager().getDatabase().getUser() );
         config.setPassword(  plugin.getConfigurationManager().getDatabase().getPassword() );
         config.addDataSourceProperty( "cachePrepStmts" , "true" );
         config.addDataSourceProperty( "prepStmtCacheSize" , "250" );
         config.addDataSourceProperty( "prepStmtCacheSqlLimit" , "2048" );
-        ds = new HikariDataSource( config );
+        ds = new HikariDataSource(config);
     }
 
 

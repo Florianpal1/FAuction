@@ -100,10 +100,8 @@ public class AuctionCommand extends BaseCommand {
                     if(im.getBlockState() instanceof ShulkerBox) {
                         ShulkerBox shulker = (ShulkerBox) im.getBlockState();
                         for (ItemStack itemIn : shulker.getInventory().getContents()) {
-                            if (itemIn != null) {
-                                if (itemIn.getType() != Material.AIR && plugin.getConfigurationManager().getGlobalConfig().getMinPrice().containsKey(itemIn.getType())) {
-                                    minPrice = minPrice + itemIn.getAmount() * plugin.getConfigurationManager().getGlobalConfig().getMinPrice().get(itemIn.getType());
-                                }
+                            if (itemIn != null && itemIn.getType() != Material.AIR && plugin.getConfigurationManager().getGlobalConfig().getMinPrice().containsKey(itemIn.getType())) {
+                                minPrice = minPrice + itemIn.getAmount() * plugin.getConfigurationManager().getGlobalConfig().getMinPrice().get(itemIn.getType());
                             }
                         }
                         if (minPrice > price) {

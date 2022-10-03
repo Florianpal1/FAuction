@@ -24,28 +24,27 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LimitationManager {
 
     private final FAuction plugin;
-    private ArrayList<Auction> auctions;
-    private boolean canHaveNewAuction = false;
     public LimitationManager(FAuction plugin) {
         this.plugin = plugin;
     }
 
     public boolean canHaveNewAuction(Player player) throws InterruptedException {
-        auctions = new ArrayList<>();
-        canHaveNewAuction = false;
+        ArrayList[] auctions = new ArrayList[]{new ArrayList<>()};
+        AtomicBoolean canHaveNewAuction = new AtomicBoolean(false);
         TaskChain<ArrayList<Auction>> chain = plugin.getAuctionCommandManager().getAuctions(player.getUniqueId());
         chain.sync(() -> {
-            auctions = chain.getTaskData("auctions");
-            if(getAuctionLimitation(player) <= auctions.size()) {
-                canHaveNewAuction = true;
+            auctions[0] = chain.getTaskData("auctions");
+            if(getAuctionLimitation(player) <= auctions[0].size()) {
+                canHaveNewAuction.set(true);
             }
         }).execute();
         chain.wait();
-        return canHaveNewAuction;
+        return canHaveNewAuction.get();
     }
 
     public int getAuctionLimitation(Player player) {
@@ -55,17 +54,13 @@ public class LimitationManager {
         int limit = limitations.get("default");
         if (perms != null) {
             String primaryGroup = perms.getPrimaryGroup(player);
-            if(limitations.containsKey(primaryGroup)) {
-                if(limit < limitations.get(primaryGroup)) {
-                    limit = limitations.get(primaryGroup);
-                }
+            if(limitations.containsKey(primaryGroup) && limit < limitations.get(primaryGroup)) {
+                limit = limitations.get(primaryGroup);
             }
             playerGroup = perms.getPlayerGroups(player);
             for(String s : playerGroup) {
-                if(limitations.containsKey(s)) {
-                    if(limit < limitations.get(s)) {
-                        limit = limitations.get(s);
-                    }
+                if(limitations.containsKey(s) && limit < limitations.get(s)) {
+                    limit = limitations.get(s);
                 }
             }
         }
