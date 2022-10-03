@@ -64,9 +64,9 @@ public class FAuction extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        PaperLib.suggestPaper(this);
-
         taskChainFactory = BukkitTaskChainFactory.create(this);
+
+        PaperLib.suggestPaper(this);
 
         configurationManager = new ConfigurationManager(this);
 
@@ -120,8 +120,8 @@ public class FAuction extends JavaPlugin {
     public void createDefaultConfiguration(File actual, String defaultName) {
         // Make parent directories
         File parent = actual.getParentFile();
-        if (!parent.exists()) {
-            parent.mkdirs();
+        if (!parent.exists() && !parent.mkdirs()) {
+            return;
         }
 
         if (actual.exists()) {
@@ -129,8 +129,7 @@ public class FAuction extends JavaPlugin {
         }
 
         InputStream input = null;
-        try {
-            JarFile file = new JarFile(this.getFile());
+        try (JarFile file = new JarFile(this.getFile())) {
             ZipEntry copy = file.getEntry(defaultName);
             if (copy == null) throw new FileNotFoundException();
             input = file.getInputStream(copy);
@@ -139,10 +138,7 @@ public class FAuction extends JavaPlugin {
         }
 
         if (input != null) {
-            FileOutputStream output = null;
-
-            try {
-                output = new FileOutputStream(actual);
+            try (FileOutputStream output = new FileOutputStream(actual)){
                 byte[] buf = new byte[8192];
                 int length;
                 while ((length = input.read(buf)) > 0) {
@@ -155,14 +151,8 @@ public class FAuction extends JavaPlugin {
             } finally {
                 try {
                     input.close();
-                } catch (IOException ignored) {
-                }
-
-                try {
-                    if (output != null) {
-                        output.close();
-                    }
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
