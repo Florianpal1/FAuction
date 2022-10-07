@@ -26,7 +26,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 
 public class ExpireCommandManager {
@@ -36,27 +35,27 @@ public class ExpireCommandManager {
         this.expireQueries = plugin.getExpireQueries();
     }
 
-    public TaskChain<ArrayList<Auction>> getAuctions() {
+    public TaskChain<ArrayList<Auction>> getExpires() {
         return expireQueries.getAuctions();
     }
 
-    public TaskChain<ArrayList<Auction>> getAuctions(UUID uuid) {
+    public TaskChain<ArrayList<Auction>> getExpires(UUID uuid) {
         return expireQueries.getAuctions(uuid);
     }
 
-    public void addAuction(Player player, ItemStack item, double price)  {
+    public void addExpire(Player player, ItemStack item, double price)  {
         expireQueries.addAuction(player.getUniqueId(), player.getName(),item.serializeAsBytes(), price, Calendar.getInstance().getTime());
     }
 
-    public void addAuction(Auction auction)  {
+    public void addExpire(Auction auction)  {
         expireQueries.addAuction(auction.getPlayerUuid(), auction.getPlayerName(), auction.getItemStack().serializeAsBytes(), auction.getPrice(), auction.getDate());
     }
 
-    public void deleteAuction(int id) {
+    public void deleteExpire(int id) {
         expireQueries.deleteAuctions(id);
     }
 
-    public TaskChain<Auction> auctionExist(int id) {
+    public TaskChain<Auction> expireExist(int id) {
         return expireQueries.getAuction(id);
     }
 }

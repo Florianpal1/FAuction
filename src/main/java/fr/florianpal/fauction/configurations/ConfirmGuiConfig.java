@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AuctionConfirmGuiConfig {
-    private String title_true = "";
-    private String title_false = "";
+public class ConfirmGuiConfig {
+    private String titleTrue;
+    private String titleFalse;
     private List<String> description = new ArrayList<>();
     private String nameGui = "";
     private Integer size = 27;
@@ -36,8 +36,8 @@ public class AuctionConfirmGuiConfig {
     private Map<Integer, Confirm> confirmBlocks = new HashMap<>();
 
     public void load(Configuration config) {
-        title_true = config.getString("gui.title-true");
-        title_false = config.getString("gui.title-false");
+        titleTrue = config.getString("gui.title-true");
+        titleFalse = config.getString("gui.title-false");
         nameGui = config.getString("gui.name");
         description = config.getStringList("gui.description");
         size = config.getInt("gui.size");
@@ -80,11 +80,11 @@ public class AuctionConfirmGuiConfig {
         return confirmBlocks;
     }
 
-    public String getTitle_true() {
-        return title_true;
+    public String getTitleTrue() {
+        return titleTrue;
     }
 
-    public String getTitle_false() {
-        return title_false;
+    public String getTitleFalse() {
+        return titleFalse;
     }
 }

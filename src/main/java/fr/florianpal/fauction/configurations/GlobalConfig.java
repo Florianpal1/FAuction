@@ -19,6 +19,7 @@ package fr.florianpal.fauction.configurations;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,52 +27,69 @@ public class GlobalConfig {
 
     private String lang = "en";
     private String orderBy;
-    private boolean onBuyCommandUse;
-    private String onBuyCommand;
-    private Map<String, Integer> limitations = new HashMap<>();
-    private Map<Material, Double> minPrice = new HashMap<>();
-    private int time;
-    private int checkEvery;
+
+    private Map<Material, Double> minPrice = new EnumMap<>(Material.class);
+
+    private boolean auctionOnBuyCommandUse;
+    private String auctionOnBuyCommand;
+    private Map<String, Integer> auctionLimitations = new HashMap<>();
+    private int auctionTime;
+    private int auctionCheckEvery;
+
+    private boolean billOnBuyCommandUse;
+    private String billOnBuyCommand;
+    private Map<String, Integer> billLimitations = new HashMap<>();
+    private int billTime;
+    private int billCheckEvery;
 
     public void load(Configuration config) {
-        lang = config.getString("lang");
-        orderBy = config.getString("orderBy");
-        onBuyCommandUse = config.getBoolean("onBuy.sendCommand.use");
-        onBuyCommand = config.getString("onBuy.sendCommand.command");
-        time = config.getInt("expiration.time");
-        checkEvery = config.getInt("expiration.checkEvery");
+        lang = config.getString("global.lang");
+        orderBy = config.getString("global.orderBy");
 
-        limitations = new HashMap<>();
-        for (String limitationGroup : config.getConfigurationSection("limitations").getKeys(false)) {
-            limitations.put(limitationGroup, config.getInt("limitations." + limitationGroup));
+        minPrice = new EnumMap<>(Material.class);
+        for (String material : config.getConfigurationSection("global.min-price").getKeys(false)) {
+            minPrice.put(Material.valueOf(material), config.getDouble("global.min-price." + material));
         }
 
-        minPrice = new HashMap<>();
-        for (String material : config.getConfigurationSection("min-price").getKeys(false)) {
-            minPrice.put(Material.valueOf(material), config.getDouble("min-price." + material));
+        auctionOnBuyCommandUse = config.getBoolean("auction.onBuy.sendCommand.use");
+        auctionOnBuyCommand = config.getString("auction.onBuy.sendCommand.command");
+        auctionTime = config.getInt("auction.expiration.time");
+        auctionCheckEvery = config.getInt("auction.expiration.checkEvery");
+
+        auctionLimitations = new HashMap<>();
+        for (String limitationGroup : config.getConfigurationSection("auction.limitations").getKeys(false)) {
+            auctionLimitations.put(limitationGroup, config.getInt("auction.limitations." + limitationGroup));
+        }
+
+        billOnBuyCommandUse = config.getBoolean("bill.onBuy.sendCommand.use");
+        billOnBuyCommand = config.getString("bill.onBuy.sendCommand.command");
+        billTime = config.getInt("bill.expiration.time");
+        billCheckEvery = config.getInt("bill.expiration.checkEvery");
+
+        billLimitations = new HashMap<>();
+        for (String limitationGroup : config.getConfigurationSection("bill.limitations").getKeys(false)) {
+            billLimitations.put(limitationGroup, config.getInt("bill.limitations." + limitationGroup));
         }
     }
 
-    public void save(Configuration config) {}
-
-    public int getTime() {
-        return time;
+    public int getAuctionTime() {
+        return auctionTime;
     }
 
-    public int getCheckEvery() {
-        return checkEvery;
+    public int getAuctionCheckEvery() {
+        return auctionCheckEvery;
     }
 
-    public Map<String, Integer> getLimitations() {
-        return limitations;
+    public Map<String, Integer> getAuctionLimitations() {
+        return auctionLimitations;
     }
 
-    public boolean isOnBuyCommandUse() {
-        return onBuyCommandUse;
+    public boolean isAuctionOnBuyCommandUse() {
+        return auctionOnBuyCommandUse;
     }
 
-    public String getOnBuyCommand() {
-        return onBuyCommand;
+    public String getAuctionOnBuyCommand() {
+        return auctionOnBuyCommand;
     }
 
     public Map<Material, Double> getMinPrice() {
@@ -84,5 +102,25 @@ public class GlobalConfig {
 
     public String getLang() {
         return lang;
+    }
+
+    public boolean isBillOnBuyCommandUse() {
+        return billOnBuyCommandUse;
+    }
+
+    public String getBillOnBuyCommand() {
+        return billOnBuyCommand;
+    }
+
+    public int getBillTime() {
+        return billTime;
+    }
+
+    public int getBillCheckEvery() {
+        return billCheckEvery;
+    }
+
+    public Map<String, Integer> getBillLimitations() {
+        return billLimitations;
     }
 }

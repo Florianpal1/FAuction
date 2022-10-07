@@ -39,6 +39,17 @@ public enum MessageKeys implements MessageKeyProvider {
 
     REMOVE_EXPIRE_SUCCESS,
 
+    MAX_BILL,
+    BILL_ADD_SUCCESS,
+    NO_BILL,
+
+    BILL_ALREADY_SELL,
+
+    MAKE_OFFER_BILL_SUCCESS,
+
+    BUY_BILL_CANCELLED,
+    REMOVE_BILL_SUCCESS,
+
     DATABASEERROR;
 
     private static final String PREFIX = "fauction";

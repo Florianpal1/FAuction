@@ -1,13 +1,25 @@
-lang: "en"
-orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent
-onBuy:
-  sendCommand: # Command sends if item is buying
-    use: false
-    command: ""
-expiration:
-  time: 3600 #In seconds
-  checkEvery: 72000 #In ticks
-limitations: # Number of auction per rank
-  default: 5
-min-price: # Min price per item. Ex : 1 CobbleStone at 0.5. Set {} to disable it
-  COBBLESTONE: 0.5
+global:
+  lang: "en"
+  orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent
+  min-price: # Min price per item. Ex : 1 CobbleStone at 0.5. Set {} to disable it
+    COBBLESTONE: 0.5
+auction:
+  onBuy:
+    sendCommand: # Command sends if item is buying
+      use: false
+      command: ""
+  expiration:
+    time: 3600 #In seconds
+    checkEvery: 72000 #In ticks
+  limitations: # Number of auction per rank
+    default: 5
+bill:
+  onBuy:
+    sendCommand: # Command sends if item is buying
+      use: false
+      command: ""
+  expiration:
+    time: 3600 #In seconds
+    checkEvery: 72000 #In ticks
+  limitations: # Number of auction per rank
+    default: 5

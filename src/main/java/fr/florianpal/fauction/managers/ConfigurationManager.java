@@ -27,14 +27,14 @@ public class ConfigurationManager {
     private final DatabaseConfig database = new DatabaseConfig();
     private final FileConfiguration databaseConfig;
 
-    private final AuctionConfig auctionConfig = new AuctionConfig();
-    private final FileConfiguration auctionConfiguration;
+    private final MainGuiConfig mainGuiConfig = new MainGuiConfig();
+    private final FileConfiguration mainGuiConfiguration;
 
-    private final ExpireGuiConfig expireConfig = new ExpireGuiConfig();
-    private final FileConfiguration expireConfiguration;
+    private final ExpireGuiConfig expireGuiConfig = new ExpireGuiConfig();
+    private final FileConfiguration expireGuiConfiguration;
 
-    private final AuctionConfirmGuiConfig auctionConfirmConfig = new AuctionConfirmGuiConfig();
-    private final FileConfiguration auctionConfirmConfiguration;
+    private final ConfirmGuiConfig confirmConfig = new ConfirmGuiConfig();
+    private final FileConfiguration confirmConfiguration;
 
     private final GlobalConfig globalConfig = new GlobalConfig();
     private final FileConfiguration globalConfiguration;
@@ -45,34 +45,34 @@ public class ConfigurationManager {
         core.createDefaultConfiguration(databaseFile, "database.yml");
         databaseConfig = YamlConfiguration.loadConfiguration(databaseFile);
 
-        File auctionFile = new File(core.getDataFolder(), "auction.yml");
-        core.createDefaultConfiguration(auctionFile, "auction.yml");
-        auctionConfiguration = YamlConfiguration.loadConfiguration(auctionFile);
+        File mainGuiFile = new File(core.getDataFolder(), "mainGui.yml");
+        core.createDefaultConfiguration(mainGuiFile, "mainGui.yml");
+        mainGuiConfiguration = YamlConfiguration.loadConfiguration(mainGuiFile);
 
-        File expireFile = new File(core.getDataFolder(), "expire.yml");
-        core.createDefaultConfiguration(expireFile, "expire.yml");
-        expireConfiguration = YamlConfiguration.loadConfiguration(expireFile);
+        File expireGuiFile = new File(core.getDataFolder(), "expireGui.yml");
+        core.createDefaultConfiguration(expireGuiFile, "expireGui.yml");
+        expireGuiConfiguration = YamlConfiguration.loadConfiguration(expireGuiFile);
 
-        File auctionConfirmFile = new File(core.getDataFolder(), "auctionConfirm.yml");
-        core.createDefaultConfiguration(auctionConfirmFile, "auctionConfirm.yml");
-        auctionConfirmConfiguration = YamlConfiguration.loadConfiguration(auctionConfirmFile);
+        File confirmFile = new File(core.getDataFolder(), "confirmGui.yml");
+        core.createDefaultConfiguration(confirmFile, "confirmGui.yml");
+        confirmConfiguration = YamlConfiguration.loadConfiguration(confirmFile);
 
         File globalFile = new File(core.getDataFolder(), "config.yml");
         core.createDefaultConfiguration(globalFile, "config.yml");
         globalConfiguration = YamlConfiguration.loadConfiguration(globalFile);
 
         globalConfig.load(globalConfiguration);
-        auctionConfig.load(auctionConfiguration);
-        auctionConfirmConfig.load(auctionConfirmConfiguration);
-        expireConfig.load(expireConfiguration);
+        mainGuiConfig.load(mainGuiConfiguration);
+        confirmConfig.load(confirmConfiguration);
+        expireGuiConfig.load(expireGuiConfiguration);
         database.load(databaseConfig);
     }
 
     public void reload() {
         globalConfig.load(globalConfiguration);
-        auctionConfig.load(auctionConfiguration);
-        auctionConfirmConfig.load(auctionConfirmConfiguration);
-        expireConfig.load(expireConfiguration);
+        mainGuiConfig.load(mainGuiConfiguration);
+        confirmConfig.load(confirmConfiguration);
+        expireGuiConfig.load(expireGuiConfiguration);
         database.load(databaseConfig);
     }
 
@@ -80,19 +80,19 @@ public class ConfigurationManager {
         return database;
     }
 
-    public AuctionConfig getAuctionConfig() {
-        return auctionConfig;
+    public MainGuiConfig getMainGuiConfig() {
+        return mainGuiConfig;
     }
 
     public GlobalConfig getGlobalConfig() {
         return globalConfig;
     }
 
-    public AuctionConfirmGuiConfig getAuctionConfirmConfig() {
-        return auctionConfirmConfig;
+    public ConfirmGuiConfig getConfirmConfig() {
+        return confirmConfig;
     }
 
-    public ExpireGuiConfig getExpireConfig() {
-        return expireConfig;
+    public ExpireGuiConfig getExpireGuiConfig() {
+        return expireGuiConfig;
     }
 }

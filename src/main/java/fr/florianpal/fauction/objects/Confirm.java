@@ -20,6 +20,8 @@ import org.bukkit.Material;
 
 public class Confirm {
     private Auction auction;
+
+    private Bill bill;
     private Material material;
     private final boolean value;
 
@@ -47,5 +49,13 @@ public class Confirm {
 
     public boolean isValue() {
         return value;
+    }
+
+    public Bill getBill() {
+        return bill;
+    }
+
+    public void setBill(Bill bill) {
+        this.bill = bill;
     }
 }

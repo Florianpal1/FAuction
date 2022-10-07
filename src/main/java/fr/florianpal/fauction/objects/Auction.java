@@ -25,7 +25,7 @@ public class Auction {
     private final int id;
     private final UUID playerUuid;
     private final String playerName;
-    private double price;
+    private final double price;
     private final ItemStack itemStack;
     private final Date date;
 
@@ -48,10 +48,6 @@ public class Auction {
 
     public double getPrice() {
         return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public ItemStack getItemStack() {

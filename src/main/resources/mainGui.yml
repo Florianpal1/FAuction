@@ -1,6 +1,15 @@
 gui:
   size: 54
   name: "Hôtel des ventes {Page}/{TotalPage}"
+auction:
+  title: "&eItem : &6{ItemName}"
+  description:
+    - "&5Vendu par : &6{ProprietaireName}"
+    - "&5Prix : &6{Price}"
+    - "&5Expirera le : &6{ExpireTime}"
+    - "&5Lore :"
+    - "{lore}"
+bill:
   title: "&eItem : &6{ItemName}"
   description:
     - "&5Vendu par : &6{ProprietaireName}"
@@ -60,19 +69,19 @@ block:
     title: "-"
     description: {}
   '10':
-    utility: auction
+    utility: item
   '11':
-    utility: auction
+    utility: item
   '12':
-    utility: auction
+    utility: item
   '13':
-    utility: auction
+    utility: item
   '14':
-    utility: auction
+    utility: item
   '15':
-    utility: auction
+    utility: item
   '16':
-    utility: auction
+    utility: item
   '17':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -84,19 +93,19 @@ block:
     title: "-"
     description: {}
   '19':
-    utility: auction
+    utility: item
   '20':
-    utility: auction
+    utility: item
   '21':
-    utility: auction
+    utility: item
   '22':
-    utility: auction
+    utility: item
   '23':
-    utility: auction
+    utility: item
   '24':
-    utility: auction
+    utility: item
   '25':
-    utility: auction
+    utility: item
   '26':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -108,19 +117,19 @@ block:
     title: "-"
     description: {}
   '28':
-    utility: auction
+    utility: item
   '29':
-    utility: auction
+    utility: item
   '30':
-    utility: auction
+    utility: item
   '31':
-    utility: auction
+    utility: item
   '32':
-    utility: auction
+    utility: item
   '33':
-    utility: auction
+    utility: item
   '34':
-    utility: auction
+    utility: item
   '35':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -132,19 +141,19 @@ block:
     title: "-"
     description: {}
   '37':
-    utility: auction
+    utility: item
   '38':
-    utility: auction
+    utility: item
   '39':
-    utility: auction
+    utility: item
   '40':
-    utility: auction
+    utility: item
   '41':
-    utility: auction
+    utility: item
   '42':
-    utility: auction
+    utility: item
   '43':
-    utility: auction
+    utility: item
   '44':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -156,10 +165,14 @@ block:
     title: "&cRécuperer vos items expirés"
     description: {}
   '46':
-    utility: barrier
-    material: AIR
-    title: "-"
+    utility: bill
+    material: GLOW_BERRIES
+    title: "&cAccèdez aux enchères"
     description: {}
+    replacement:
+      material: GLOW_BERRIES
+      title: "&cAccèdez aux ventes"
+      description: { }
   '47':
     utility: barrier
     material: AIR

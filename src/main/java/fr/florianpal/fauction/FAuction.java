@@ -20,14 +20,12 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import fr.florianpal.fauction.commands.AuctionCommand;
+import fr.florianpal.fauction.managers.commandManagers.*;
+import fr.florianpal.fauction.queries.BillQueries;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.managers.ConfigurationManager;
 import fr.florianpal.fauction.managers.DatabaseManager;
 import fr.florianpal.fauction.managers.VaultIntegrationManager;
-import fr.florianpal.fauction.managers.commandManagers.AuctionCommandManager;
-import fr.florianpal.fauction.managers.commandManagers.CommandManager;
-import fr.florianpal.fauction.managers.commandManagers.ExpireCommandManager;
-import fr.florianpal.fauction.managers.commandManagers.LimitationManager;
 import fr.florianpal.fauction.queries.AuctionQueries;
 import fr.florianpal.fauction.queries.ExpireQueries;
 import io.papermc.lib.PaperLib;
@@ -45,7 +43,7 @@ public class FAuction extends JavaPlugin {
     private ConfigurationManager configurationManager;
     private AuctionQueries auctionQueries;
     private ExpireQueries expireQueries;
-
+    private BillQueries billQueries;
     private CommandManager commandManager;
     private VaultIntegrationManager vaultIntegrationManager;
     private DatabaseManager databaseManager;
@@ -53,6 +51,7 @@ public class FAuction extends JavaPlugin {
 
     private AuctionCommandManager auctionCommandManager;
     private ExpireCommandManager expireCommandManager;
+    private BillCommandManager billCommandManager;
 
     public static <T> TaskChain<T> newChain() {
         return taskChainFactory.newChain();
@@ -83,18 +82,21 @@ public class FAuction extends JavaPlugin {
         databaseManager = new DatabaseManager(this);
         auctionQueries = new AuctionQueries(this);
         expireQueries = new ExpireQueries(this);
+        billQueries = new BillQueries(this);
 
         databaseManager.addRepository(expireQueries);
         databaseManager.addRepository(auctionQueries);
+        databaseManager.addRepository(billQueries);
         databaseManager.initializeTables();
 
         auctionCommandManager = new AuctionCommandManager(this);
+        billCommandManager = new BillCommandManager(this);
         expireCommandManager = new ExpireCommandManager(this);
 
         commandManager.registerCommand(new AuctionCommand(this));
 
         ExpireSchedule expireSchedule = new ExpireSchedule(this);
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, expireSchedule, configurationManager.getGlobalConfig().getCheckEvery(), configurationManager.getGlobalConfig().getCheckEvery());
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, expireSchedule, configurationManager.getGlobalConfig().getAuctionCheckEvery(), configurationManager.getGlobalConfig().getAuctionCheckEvery());
     }
 
     public ConfigurationManager getConfigurationManager() {
@@ -120,8 +122,8 @@ public class FAuction extends JavaPlugin {
     public void createDefaultConfiguration(File actual, String defaultName) {
         // Make parent directories
         File parent = actual.getParentFile();
-        if (!parent.exists() && !parent.mkdirs()) {
-            return;
+        if (!parent.exists()) {
+            parent.mkdirs();
         }
 
         if (actual.exists()) {
@@ -129,7 +131,8 @@ public class FAuction extends JavaPlugin {
         }
 
         InputStream input = null;
-        try (JarFile file = new JarFile(this.getFile())) {
+        try {
+            JarFile file = new JarFile(this.getFile());
             ZipEntry copy = file.getEntry(defaultName);
             if (copy == null) throw new FileNotFoundException();
             input = file.getInputStream(copy);
@@ -138,7 +141,9 @@ public class FAuction extends JavaPlugin {
         }
 
         if (input != null) {
-            try (FileOutputStream output = new FileOutputStream(actual)){
+            FileOutputStream output;
+            try {
+                output = new FileOutputStream(actual);
                 byte[] buf = new byte[8192];
                 int length;
                 while ((length = input.read(buf)) > 0) {
@@ -177,5 +182,13 @@ public class FAuction extends JavaPlugin {
 
     public ExpireCommandManager getExpireCommandManager() {
         return expireCommandManager;
+    }
+
+    public BillQueries getBillQueries() {
+        return billQueries;
+    }
+
+    public BillCommandManager getBillCommandManager() {
+        return billCommandManager;
     }
 }

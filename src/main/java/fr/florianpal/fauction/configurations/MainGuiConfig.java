@@ -23,18 +23,22 @@ import org.bukkit.configuration.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuctionConfig {
+public class MainGuiConfig {
     private List<Barrier> barrierBlocks = new ArrayList<>();
     private List<Barrier> previousBlocks = new ArrayList<>();
     private List<Barrier> nextBlocks = new ArrayList<>();
     private List<Barrier> expireBlocks = new ArrayList<>();
-    private  List<Integer> auctionBlocks = new ArrayList<>();
+    private  List<Integer> itemBlocks = new ArrayList<>();
     private List<Barrier> closeBlocks = new ArrayList<>();
     private List<Barrier> playerBlocks = new ArrayList<>();
+
+    private List<Barrier> billBlocks = new ArrayList<>();
     private int size = 27;
-    private String title = "";
-    private List<String> description = new ArrayList<>();
     private String nameGui = "";
+    private String titleAuction = "";
+    private List<String> descriptionAuction = new ArrayList<>();
+    private String titleBill = "";
+    private List<String> descriptionBill = new ArrayList<>();
 
 
     public void load(Configuration config) {
@@ -42,10 +46,12 @@ public class AuctionConfig {
         previousBlocks = new ArrayList<>();
         nextBlocks = new ArrayList<>();
         expireBlocks = new ArrayList<>();
-        auctionBlocks = new ArrayList<>();
+        itemBlocks = new ArrayList<>();
         closeBlocks = new ArrayList<>();
+        billBlocks = new ArrayList<>();
         playerBlocks = new ArrayList<>();
-        description = new ArrayList<>();
+        descriptionAuction = new ArrayList<>();
+        descriptionBill = new ArrayList<>();
 
         for (String index : config.getConfigurationSection("block").getKeys(false)) {
             if (config.getString("block." + index + ".utility").equalsIgnoreCase("previous")) {
@@ -109,8 +115,8 @@ public class AuctionConfig {
                         config.getStringList("block." + index + ".description")
                 );
                 barrierBlocks.add(barrier);
-            } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("auction")) {
-                auctionBlocks.add(Integer.valueOf(index));
+            } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("item")) {
+                itemBlocks.add(Integer.valueOf(index));
             } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("close")) {
                 Barrier barrier = new Barrier(
                         Integer.parseInt(index),
@@ -119,21 +125,38 @@ public class AuctionConfig {
                         config.getStringList("block." + index + ".description")
                 );
                 closeBlocks.add(barrier);
+            } else if (config.getString("block." + index + ".utility").equalsIgnoreCase("bill")) {
+                Barrier barrier = new Barrier(
+                        Integer.parseInt(index),
+                        Material.getMaterial(config.getString("block." + index + ".material")),
+                        config.getString("block." + index + ".title"),
+                        config.getStringList("block." + index + ".description"),
+                        new Barrier(
+                                Integer.parseInt(index),
+                                Material.getMaterial(config.getString("block." + index + ".replacement.material")),
+                                config.getString("block." + index + ".replacement.title"),
+                                config.getStringList("block." + index + ".replacement.description")
+                        )
+
+                );
+                billBlocks.add(barrier);
             }
         }
         size = config.getInt("gui.size");
         nameGui = config.getString("gui.name");
-        title = config.getString("gui.title");
-        description.addAll(config.getStringList("gui.description"));
+        titleAuction = config.getString("auction.title");
+        descriptionAuction.addAll(config.getStringList("auction.description"));
+        titleBill = config.getString("bill.title");
+        descriptionBill.addAll(config.getStringList("bill.description"));
 
     }
 
-    public String getTitle() {
-        return title;
+    public String getTitleAuction() {
+        return titleAuction;
     }
 
-    public List<String> getDescription() {
-        return description;
+    public List<String> getDescriptionAuction() {
+        return descriptionAuction;
     }
 
     public String getNameGui() {
@@ -156,8 +179,8 @@ public class AuctionConfig {
         return nextBlocks;
     }
 
-    public List<Integer> getAuctionBlocks() {
-        return auctionBlocks;
+    public List<Integer> getItemBlocks() {
+        return itemBlocks;
     }
 
     public List<Barrier> getCloseBlocks() {
@@ -170,5 +193,17 @@ public class AuctionConfig {
 
     public List<Barrier> getPlayerBlocks() {
         return playerBlocks;
+    }
+
+    public List<Barrier> getBillBlocks() {
+        return billBlocks;
+    }
+
+    public String getTitleBill() {
+        return titleBill;
+    }
+
+    public List<String> getDescriptionBill() {
+        return descriptionBill;
     }
 }

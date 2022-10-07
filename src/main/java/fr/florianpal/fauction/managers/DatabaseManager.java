@@ -55,8 +55,7 @@ public class DatabaseManager {
                 String[] tableInformation = repository.getTable();
 
                 if (!tableExists(tableInformation[0])) {
-                    try {
-                        Statement statement = connection.createStatement();
+                    try (Statement statement = connection.createStatement()) {
                         statement.executeUpdate("CREATE TABLE IF NOT EXISTS `" + tableInformation[0] + "` (" + tableInformation[1] + ") " + tableInformation[2] + ";");
                         plugin.getLogger().info("The table " + tableInformation[0] + " did not exist and was created !");
                     } catch (SQLException e) {

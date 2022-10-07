@@ -20,6 +20,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.ExpireGuiConfig;
+import fr.florianpal.fauction.enums.InterfaceType;
 import fr.florianpal.fauction.enums.ViewType;
 import fr.florianpal.fauction.gui.AbstractGui;
 import fr.florianpal.fauction.gui.GuiInterface;
@@ -28,6 +29,7 @@ import fr.florianpal.fauction.managers.commandManagers.ExpireCommandManager;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Barrier;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,17 +53,17 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
 
     public ExpireGui(FAuction plugin, Player player, int page) {
         super(plugin, player, page);
-        this.expireGuiConfig = plugin.getConfigurationManager().getExpireConfig();
+        this.expireGuiConfig = plugin.getConfigurationManager().getExpireGuiConfig();
         this.expireCommandManager = plugin.getExpireCommandManager();
         initGui(expireGuiConfig.getNameGui(), expireGuiConfig.getSize());
     }
 
     public void initializeItems() {
-        TaskChain<ArrayList<Auction>> chain = expireCommandManager.getAuctions(player.getUniqueId());
+        TaskChain<ArrayList<Auction>> chain = expireCommandManager.getExpires(player.getUniqueId());
 
         chain.sync(() -> {
             this.auctions = chain.getTaskData("auctions");
-            if (this.auctions.size() == 0) {
+            if (this.auctions.isEmpty()) {
                 CommandIssuer issuerTarget = plugin.getCommandManager().getCommandIssuer(player);
                 issuerTarget.sendInfo(MessageKeys.NO_AUCTION);
                 return;
@@ -92,8 +94,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
 
             int id = (this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size();
             for (int index : expireGuiConfig.getExpireBlocks()) {
-                String ownerName = this.auctions.get(id).getPlayerName();
-                inv.setItem(index, createGuiItem(auctions.get(id), ownerName));
+                inv.setItem(index, createGuiItem(auctions.get(id)));
                 id++;
                 if (id >= (auctions.size())) break;
             }
@@ -103,7 +104,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
     }
 
 
-    private ItemStack createGuiItem(Auction auction, String playerName) {
+    private ItemStack createGuiItem(Auction auction) {
         ItemStack item = auction.getItemStack().clone();
         ItemMeta meta = item.getItemMeta();
         String title = expireGuiConfig.getTitle();
@@ -112,7 +113,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
         } else {
             title = title.replace("{ItemName}", item.getItemMeta().getDisplayName());
         }
-        title = title.replace("{ProprietaireName}", playerName);
+        title = title.replace("{ProprietaireName}", auction.getPlayerName());
         title = title.replace("{Price}", String.valueOf(auction.getPrice()));
         title = format(title);
         DecimalFormat df = new DecimalFormat();
@@ -125,10 +126,10 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
             } else {
                 desc = desc.replace("{ItemName}", item.getItemMeta().getDisplayName());
             }
-            Date expireDate = new Date((auction.getDate().getTime() + globalConfig.getTime() * 1000L));
+            Date expireDate = new Date((auction.getDate().getTime() + globalConfig.getAuctionTime() * 1000L));
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy 'a' HH:mm");
             desc = desc.replace("{ExpireTime}", formatter.format(expireDate));
-            desc = desc.replace("{ProprietaireName}", playerName);
+            desc = desc.replace("{ProprietaireName}", auction.getPlayerName());
             desc = desc.replace("{Price}", String.valueOf(auction.getPrice()));
             if (desc.contains("lore")) {
                 if (item.getLore() != null) {
@@ -168,28 +169,23 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
-        if (inv.getHolder() != this) {
+        if (inv.getHolder() != this || e.getInventory() != inv || player != e.getWhoClicked()) {
             return;
         }
 
-        if (!(e.getInventory() == inv)) {
-            return;
-        }
-        if (player != e.getWhoClicked()) {
-            return;
-        }
         e.setCancelled(true);
         Player p = (Player) e.getWhoClicked();
+
         ItemStack clickedItem = e.getCurrentItem();
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
         for (int index : expireGuiConfig.getExpireBlocks()) {
             if (index == e.getRawSlot()) {
                 int nb0 = expireGuiConfig.getExpireBlocks().get(0);
-                int nb = ((e.getRawSlot() - nb0)) / 9;
+                int nb = (e.getRawSlot() - nb0) / 9;
                 Auction auction = auctions.get((e.getRawSlot() - nb0) + ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size()) - nb * 2);
 
                 if (e.isLeftClick()) {
-                    TaskChain<Auction> chainAuction = expireCommandManager.auctionExist(auction.getId());
+                    TaskChain<Auction> chainAuction = expireCommandManager.expireExist(auction.getId());
                     chainAuction.sync(() -> {
 
                         if (chainAuction.getTaskData("auction") == null) {
@@ -206,7 +202,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
                             player.getInventory().addItem(auction.getItemStack());
                         }
 
-                        expireCommandManager.deleteAuction(auction.getId());
+                        expireCommandManager.deleteExpire(auction.getId());
                         auctions.remove(auction);
                         CommandIssuer issuerTarget = plugin.getCommandManager().getCommandIssuer(player);
                         issuerTarget.sendInfo(MessageKeys.REMOVE_EXPIRE_SUCCESS);
@@ -235,7 +231,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
         }
         for (Barrier auctionGui : expireGuiConfig.getAuctionGuiBlocks()) {
             if (e.getRawSlot() == auctionGui.getIndex()) {
-                AuctionsGui gui = new AuctionsGui(plugin, p, ViewType.ALL,1);
+                MainGui gui = new MainGui(plugin, p, ViewType.ALL,1, InterfaceType.AUCTION);
                 gui.initializeItems();
                 break;
             }
@@ -252,10 +248,10 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
                 String replace = color;
                 color = color.replace("{", "");
                 color = color.replace("}", "");
-                msg = msg.replace(replace, net.md_5.bungee.api.ChatColor.of(color) + "");
+                msg = msg.replace(replace, ChatColor.getByChar(color) + "");
                 match = pattern.matcher(msg);
             }
         }
-        return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg);
+        return ChatColor.translateAlternateColorCodes('&', msg);
     }
 }
