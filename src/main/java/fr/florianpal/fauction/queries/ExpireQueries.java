@@ -94,9 +94,9 @@ public class ExpireQueries implements IDatabaseTable {
         }).execute();
     }
 
-    public TaskChain<ArrayList<Auction>> getAuctions() {
+    public TaskChain<ArrayList<Auction>> getExpires() {
         List<Auction> auctions = new ArrayList<>();
-        final TaskChain<ArrayList<Auction>> chain = FAuction.getTaskChainFactory().newSharedChain("getAuctions");
+        final TaskChain<ArrayList<Auction>> chain = FAuction.getTaskChainFactory().newSharedChain("getExpires");
         chain.asyncFirst(() -> {
             PreparedStatement statement = null;
             ResultSet result = null;
@@ -116,7 +116,7 @@ public class ExpireQueries implements IDatabaseTable {
 
                     auctions.add(new Auction(id, playerUuid, playerName, price, item, date));
                 }
-                chain.setTaskData("auctions", auctions);
+                chain.setTaskData("expires", auctions);
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
@@ -136,9 +136,9 @@ public class ExpireQueries implements IDatabaseTable {
         return chain;
     }
 
-    public TaskChain<ArrayList<Auction>> getAuctions(UUID playerUuid) {
+    public TaskChain<ArrayList<Auction>> getExpires(UUID playerUuid) {
 
-        final TaskChain<ArrayList<Auction>> chain = FAuction.getTaskChainFactory().newSharedChain("getAuctions");
+        final TaskChain<ArrayList<Auction>> chain = FAuction.getTaskChainFactory().newSharedChain("getExpires");
         chain.asyncFirst(() -> {
             PreparedStatement statement = null;
             ResultSet result = null;
@@ -158,7 +158,7 @@ public class ExpireQueries implements IDatabaseTable {
 
                     auctions.add(new Auction(id, playerUuid, playerName, price, item, date));
                 }
-                chain.setTaskData("auctions", auctions);
+                chain.setTaskData("expires", auctions);
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
@@ -178,7 +178,7 @@ public class ExpireQueries implements IDatabaseTable {
         return chain;
     }
 
-    public TaskChain<Auction> getAuction(int id) {
+    public TaskChain<Auction> getExpire(int id) {
         final TaskChain<Auction> chain = FAuction.newChain();
         chain.asyncFirst(() -> {
             PreparedStatement statement = null;
@@ -196,9 +196,9 @@ public class ExpireQueries implements IDatabaseTable {
                     long date = result.getLong(6);
 
 
-                    chain.setTaskData("auction", new Auction(id, playerUuid, playerName, price, item, date));
+                    chain.setTaskData("expire", new Auction(id, playerUuid, playerName, price, item, date));
                 } else {
-                    chain.setTaskData("auction", null);
+                    chain.setTaskData("expire", null);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();

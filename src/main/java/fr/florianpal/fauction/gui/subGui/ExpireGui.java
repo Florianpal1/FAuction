@@ -46,7 +46,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExpireGui extends AbstractGui implements GuiInterface {
-    private List<Auction> auctions = new ArrayList<>();
+    private List<Auction> expires = new ArrayList<>();
 
     private final ExpireGuiConfig expireGuiConfig;
     private final ExpireCommandManager expireCommandManager;
@@ -62,8 +62,8 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
         TaskChain<ArrayList<Auction>> chain = expireCommandManager.getExpires(player.getUniqueId());
 
         chain.sync(() -> {
-            this.auctions = chain.getTaskData("auctions");
-            if (this.auctions.isEmpty()) {
+            this.expires = chain.getTaskData("expires");
+            if (this.expires.isEmpty()) {
                 CommandIssuer issuerTarget = plugin.getCommandManager().getCommandIssuer(player);
                 issuerTarget.sendInfo(MessageKeys.NO_AUCTION);
                 return;
@@ -84,7 +84,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
             }
 
             for (Barrier next : expireGuiConfig.getNextBlocks()) {
-                if ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size() < auctions.size() - this.expireGuiConfig.getExpireBlocks().size()) {
+                if ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size() < expires.size() - this.expireGuiConfig.getExpireBlocks().size()) {
                     inv.setItem(next.getIndex(), createGuiItem(next.getMaterial(), next.getTitle(), next.getDescription()));
                 } else {
                     inv.setItem(next.getRemplacement().getIndex(), createGuiItem(next.getRemplacement().getMaterial(), next.getRemplacement().getTitle(), next.getRemplacement().getDescription()));
@@ -94,9 +94,9 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
 
             int id = (this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size();
             for (int index : expireGuiConfig.getExpireBlocks()) {
-                inv.setItem(index, createGuiItem(auctions.get(id)));
+                inv.setItem(index, createGuiItem(expires.get(id)));
                 id++;
-                if (id >= (auctions.size())) break;
+                if (id >= (expires.size())) break;
             }
             openInventory(player);
         }).execute();
@@ -182,13 +182,13 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
             if (index == e.getRawSlot()) {
                 int nb0 = expireGuiConfig.getExpireBlocks().get(0);
                 int nb = (e.getRawSlot() - nb0) / 9;
-                Auction auction = auctions.get((e.getRawSlot() - nb0) + ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size()) - nb * 2);
+                Auction auction = expires.get((e.getRawSlot() - nb0) + ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size()) - nb * 2);
 
                 if (e.isLeftClick()) {
                     TaskChain<Auction> chainAuction = expireCommandManager.expireExist(auction.getId());
                     chainAuction.sync(() -> {
 
-                        if (chainAuction.getTaskData("auction") == null) {
+                        if (chainAuction.getTaskData("expire") == null) {
                             return;
                         }
 
@@ -203,7 +203,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
                         }
 
                         expireCommandManager.deleteExpire(auction.getId());
-                        auctions.remove(auction);
+                        expires.remove(auction);
                         CommandIssuer issuerTarget = plugin.getCommandManager().getCommandIssuer(player);
                         issuerTarget.sendInfo(MessageKeys.REMOVE_EXPIRE_SUCCESS);
                         ExpireGui gui = new ExpireGui(plugin, player, 1);
@@ -222,7 +222,7 @@ public class ExpireGui extends AbstractGui implements GuiInterface {
             }
         }
         for (Barrier next : expireGuiConfig.getNextBlocks()) {
-            if (e.getRawSlot() == next.getIndex() && ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size() < auctions.size() - this.expireGuiConfig.getExpireBlocks().size()) && next.getMaterial() != next.getRemplacement().getMaterial()) {
+            if (e.getRawSlot() == next.getIndex() && ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size() < expires.size() - this.expireGuiConfig.getExpireBlocks().size()) && next.getMaterial() != next.getRemplacement().getMaterial()) {
                 ExpireGui gui = new ExpireGui(plugin, p, this.page + 1);
                 gui.initializeItems();
                 gui.openInventory(p);

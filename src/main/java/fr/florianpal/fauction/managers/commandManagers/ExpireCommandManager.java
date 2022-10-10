@@ -36,11 +36,11 @@ public class ExpireCommandManager {
     }
 
     public TaskChain<ArrayList<Auction>> getExpires() {
-        return expireQueries.getAuctions();
+        return expireQueries.getExpires();
     }
 
     public TaskChain<ArrayList<Auction>> getExpires(UUID uuid) {
-        return expireQueries.getAuctions(uuid);
+        return expireQueries.getExpires(uuid);
     }
 
     public void addExpire(Player player, ItemStack item, double price)  {
@@ -56,6 +56,6 @@ public class ExpireCommandManager {
     }
 
     public TaskChain<Auction> expireExist(int id) {
-        return expireQueries.getAuction(id);
+        return expireQueries.getExpire(id);
     }
 }
