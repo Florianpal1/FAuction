@@ -28,6 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -38,6 +39,8 @@ public class BillQueries implements IDatabaseTable {
     private static final String GET_BILLS_BY_UUID = "SELECT * FROM bills WHERE playerOwnerUuid=?";
     private static final String ADD_BILL = "INSERT INTO bills (playerOwnerUuid, playerOwnerName, item, basePrice, date) VALUES(?,?,?,?,?)";
     private static final String DELETE_BILL = "DELETE FROM bills WHERE id=?";
+
+    private static final String UPDATE_BILL_BIDDER = "UPDATE bills SET playerBidderUuid=?, playerBidderName=?, bet=?, betDate=? WHERE id=?";
 
     private final DatabaseManager databaseManager;
     private final GlobalConfig globalConfig;
@@ -81,6 +84,34 @@ public class BillQueries implements IDatabaseTable {
             try (Connection connection = databaseManager.getConnection()) {
                 statement = connection.prepareStatement(DELETE_BILL);
                 statement.setInt(1, id);
+                statement.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if (statement != null) {
+                    try {
+                        statement.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null;
+        }).execute();
+    }
+
+    public void updateBidder(int id, UUID playerUUID, String playerName, double bid) {
+        final TaskChain<Void> chain = FAuction.newChain();
+        chain.asyncFirst(() -> {
+            PreparedStatement statement = null;
+            try (Connection connection = databaseManager.getConnection()) {
+                statement = connection.prepareStatement(UPDATE_BILL_BIDDER);
+
+                statement.setString(1, playerUUID.toString());
+                statement.setString(2, playerName);
+                statement.setDouble(3, bid);
+                statement.setLong(4, Calendar.getInstance().getTime().getTime());
+                statement.setInt(5, id);
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();

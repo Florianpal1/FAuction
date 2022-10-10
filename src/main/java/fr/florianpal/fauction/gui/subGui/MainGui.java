@@ -235,6 +235,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
     }
 
     private ItemStack createGuiItem(Bill bill) {
+        SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy 'a' HH:mm");
         ItemStack item = bill.getItemStack().clone();
         ItemMeta meta = item.getItemMeta();
         String title = mainGuiConfig.getTitleBill();
@@ -247,8 +248,12 @@ public class MainGui extends AbstractGui implements GuiInterface {
         title = title.replace("{Price}", String.valueOf(bill.getPrice()));
         if(bill.getPlayerBidderName() != null) {
             title = title.replace("{BidderName}", bill.getPlayerBidderName());
+            title = title.replace("{Bet}", String.valueOf(bill.getBet()));
+            title = title.replace("{BetDate}",  formater.format(bill.getBetDate()));
         } else {
             title = title.replace("{BidderName}", "Personne");
+            title = title.replace("{Bet}", String.valueOf(bill.getPrice()));
+            title = title.replace("{BetDate}", formater.format(bill.getDate()));
         }
 
         title = format(title);
@@ -267,13 +272,16 @@ public class MainGui extends AbstractGui implements GuiInterface {
             desc = desc.replace("{ProprietaireName}", bill.getPlayerName());
             if(bill.getPlayerBidderName() != null) {
                 desc = desc.replace("{BidderName}", bill.getPlayerBidderName());
+                desc = desc.replace("{Bet}", String.valueOf(bill.getBet()));
+                desc = desc.replace("{BetDate}",  formater.format(bill.getBetDate()));
             } else {
                 desc = desc.replace("{BidderName}", "Personne");
+                desc = desc.replace("{Bet}", String.valueOf(bill.getPrice()));
+                desc = desc.replace("{BetDate}",  formater.format(bill.getDate()));
             }
 
             desc = desc.replace("{Price}", String.valueOf(bill.getPrice()));
             Date expireDate = new Date((bill.getDate().getTime() + globalConfig.getAuctionTime() * 1000L));
-            SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yyyy 'a' HH:mm");
             desc = desc.replace("{ExpireTime}", formater.format(expireDate));
             if (desc.contains("lore")) {
                 if (item.getLore() != null) {
@@ -313,7 +321,6 @@ public class MainGui extends AbstractGui implements GuiInterface {
         return item;
     }
 
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
         if (inv.getHolder() != this || e.getInventory() != inv) {
@@ -331,6 +338,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 return;
             }
         }
+
         for (Barrier next : mainGuiConfig.getNextBlocks()) {
             if (e.getRawSlot() == next.getIndex() && ((this.mainGuiConfig.getItemBlocks().size() * this.page) - this.mainGuiConfig.getItemBlocks().size() < auctions.size() - this.mainGuiConfig.getItemBlocks().size()) && next.getMaterial() != next.getRemplacement().getMaterial()) {
                 this.page = this.page + 1;
@@ -338,6 +346,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 return;
             }
         }
+
         for (Barrier expire : mainGuiConfig.getExpireBlocks()) {
             if (e.getRawSlot() == expire.getIndex()) {
                 ExpireGui gui = new ExpireGui(plugin, player, 1);
@@ -345,6 +354,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 return;
             }
         }
+
         for (Barrier close : mainGuiConfig.getCloseBlocks()) {
             if (e.getRawSlot() == close.getIndex()) {
                 inv.close();
@@ -364,6 +374,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 return;
             }
         }
+
         for (Barrier expire : mainGuiConfig.getPlayerBlocks()) {
             if (e.getRawSlot() == expire.getIndex()) {
                 if(viewType == ViewType.ALL) {
@@ -464,8 +475,10 @@ public class MainGui extends AbstractGui implements GuiInterface {
                             issuerTarget.sendInfo(MessageKeys.NO_HAVE_MONEY);
                             return;
                         }
-                        ConfirmGui confirmGui = new ConfirmGui(plugin, player, page, bill, interfaceType);
-                        confirmGui.initializeItems();
+
+                        inv.close();
+                        AmountGui amountGui = new AmountGui(plugin, player, page, bill);
+                        amountGui.initializeItems();
                     }
                 }
                 break;
@@ -487,6 +500,6 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 match = pattern.matcher(msg);
             }
         }
-        return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg);
+        return ChatColor.translateAlternateColorCodes('&', msg);
     }
 }

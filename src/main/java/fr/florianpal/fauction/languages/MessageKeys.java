@@ -48,7 +48,10 @@ public enum MessageKeys implements MessageKeyProvider {
     MAKE_OFFER_BILL_SUCCESS,
 
     BUY_BILL_CANCELLED,
+
     REMOVE_BILL_SUCCESS,
+
+    AMOUNT_LESS_THAN_BET,
 
     DATABASEERROR;
 

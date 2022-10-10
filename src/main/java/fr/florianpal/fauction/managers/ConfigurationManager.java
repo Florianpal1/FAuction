@@ -39,6 +39,9 @@ public class ConfigurationManager {
     private final GlobalConfig globalConfig = new GlobalConfig();
     private final FileConfiguration globalConfiguration;
 
+    private final AmountGuiConfig amountGuiConfig = new AmountGuiConfig();
+    private final FileConfiguration amountGuiConfiguration;
+
     public ConfigurationManager(FAuction core) {
 
         File databaseFile = new File(core.getDataFolder(), "database.yml");
@@ -61,7 +64,12 @@ public class ConfigurationManager {
         core.createDefaultConfiguration(globalFile, "config.yml");
         globalConfiguration = YamlConfiguration.loadConfiguration(globalFile);
 
+        File amountGuiFile = new File(core.getDataFolder(), "amountGui.yml");
+        core.createDefaultConfiguration(amountGuiFile, "amountGui.yml");
+        amountGuiConfiguration = YamlConfiguration.loadConfiguration(amountGuiFile);
+
         globalConfig.load(globalConfiguration);
+        amountGuiConfig.load(amountGuiConfiguration);
         mainGuiConfig.load(mainGuiConfiguration);
         confirmConfig.load(confirmConfiguration);
         expireGuiConfig.load(expireGuiConfiguration);
@@ -70,6 +78,7 @@ public class ConfigurationManager {
 
     public void reload() {
         globalConfig.load(globalConfiguration);
+        amountGuiConfig.load(amountGuiConfiguration);
         mainGuiConfig.load(mainGuiConfiguration);
         confirmConfig.load(confirmConfiguration);
         expireGuiConfig.load(expireGuiConfiguration);
@@ -94,5 +103,9 @@ public class ConfigurationManager {
 
     public ExpireGuiConfig getExpireGuiConfig() {
         return expireGuiConfig;
+    }
+
+    public AmountGuiConfig getAmountGuiConfig() {
+        return amountGuiConfig;
     }
 }

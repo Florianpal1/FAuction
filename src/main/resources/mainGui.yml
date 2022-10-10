@@ -15,6 +15,9 @@ bill:
     - "&5Vendu par : &6{ProprietaireName}"
     - "&5Prix : &6{Price}"
     - "&5Expirera le : &6{ExpireTime}"
+    - "&5Dernier enchérisseur : &6{BidderName}"
+    - "&5Dernière enchère : &6{Bet}"
+    - "&5Date de la dernière enchère : &6{BetDate}"
     - "&5Lore :"
     - "{lore}"
 block:

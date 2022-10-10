@@ -47,8 +47,8 @@ public class BillCommandManager {
         billQueries.addBill(player.getUniqueId(), player.getName(),item.serializeAsBytes(), price, Calendar.getInstance().getTime());
     }
 
-    public void makeOffer(int id, Player player) {
-        
+    public void makeOffer(int id, Player player, double newBet) {
+        billQueries.updateBidder(id, player.getUniqueId(), player.getName(), newBet);
     }
 
 

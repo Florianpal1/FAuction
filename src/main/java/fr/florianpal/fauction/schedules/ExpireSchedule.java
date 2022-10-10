@@ -70,8 +70,13 @@ public class ExpireSchedule implements Runnable {
 
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(bill.getPlayerBidderUuid());
 
+
                     if (offlinePlayer.isOnline()) {
                         Player player = offlinePlayer.getPlayer();
+
+                        if(player == null) {
+                            return;
+                        }
 
                         plugin.getVaultIntegrationManager().getEconomy().withdrawPlayer(player, bill.getPrice());
                         EconomyResponse economyResponse4 = plugin.getVaultIntegrationManager().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(bill.getPlayerUuid()), bill.getPrice());

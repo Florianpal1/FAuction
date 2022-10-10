@@ -31,6 +31,12 @@ public class Confirm {
         this.value = value;
     }
 
+    public Confirm(Bill bill, Material material, boolean value) {
+        this.bill = bill;
+        this.material = material;
+        this.value = value;
+    }
+
     public Auction getAuction() {
         return auction;
     }

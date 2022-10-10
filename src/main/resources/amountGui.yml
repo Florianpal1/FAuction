@@ -1,10 +1,6 @@
 gui:
-  name: "Confirmation d'achat d'un item."
-  title-true: "&eConfirmer l'achat de {Item}."
-  title-false: "&eAnnuler."
-  description:
-    - "&5Vendu par : &6{ProprietaireName}"
-    - "&5Prix : &6{Price}"
+  size: 27
+  name: "Montant de votre enchère {Amount}"
 block:
   '0':
     utility: barrier
@@ -57,85 +53,94 @@ block:
     title: "-"
     description: {}
   '10':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
-    description: { }
-  '11':
-    utility: confirm
+    utility: amount
     material: RED_WOOL
-    value: false
+    title: "Pour diminuer de 1000$"
+    description: { }
+    amount: -1000
+  '11':
+    utility: amount
+    material: RED_WOOL
+    title: "Pour diminuer de 100$"
+    description: { }
+    amount: -100
   '12':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
-    description: {}
+    utility: amount
+    material: RED_WOOL
+    title: "Pour diminuer de 10$"
+    description: { }
+    amount: -10
   '13':
     utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
-    description: {}
+    material: NETHER_STAR
+    title: "Informations"
+    description:
+      - "&7Le montant actuel de votre offre est de {Amount}"
   '14':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
-    description: {}
-  '15':
-    utility: confirm
+    utility: amount
     material: GREEN_WOOL
-    value: true
+    title: "Pour augmenter de 10$"
+    description: { }
+    amount: 10
+  '15':
+    utility: amount
+    material: GREEN_WOOL
+    title: "Pour augmenter de 100$"
+    description: { }
+    amount: 100
   '16':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
-    description: {}
+    utility: amount
+    material: GREEN_WOOL
+    title: "Pour augmenter de 1000$"
+    description: { }
+    amount: 1000
   '17':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    utility: confirm
+    material: GOLD_BLOCK
+    title: "Pour accepter la demande"
     description: {}
   '18':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '19':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '20':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '21':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '22':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '23':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '24':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '25':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
     title: "-"
-    description: {}
+    description: { }
   '26':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    utility: close
+    material: BARRIER
+    title: "Fermer"
     description: {}

@@ -54,6 +54,8 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
     private Auction auction;
 
     private Bill bill;
+
+    private double newBet;
     protected final ConfirmGuiConfig confirmConfig;
     private final AuctionCommandManager auctionCommandManager;
     private final BillCommandManager billCommandManager;
@@ -72,13 +74,14 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
         initGui(confirmConfig.getNameGui(), 27);
     }
 
-    ConfirmGui(FAuction plugin, Player player, int page, Bill bill, InterfaceType interfaceType) {
+    ConfirmGui(FAuction plugin, Player player, int page, Bill bill, double newBet, InterfaceType interfaceType) {
         super(plugin, player, page);
         this.bill = bill;
         this.confirmConfig = plugin.getConfigurationManager().getConfirmConfig();
         this.auctionCommandManager = plugin.getAuctionCommandManager();
         this.billCommandManager = plugin.getBillCommandManager();
         this.interfaceType = interfaceType;
+        this.newBet = newBet;
         initGui(confirmConfig.getNameGui(), 27);
     }
 
@@ -91,7 +94,7 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
         int id = 0;
         for (Map.Entry<Integer, Confirm> entry : confirmConfig.getConfirmBlocks().entrySet()) {
             Confirm confirm;
-            if(this.auction != null) {
+            if(interfaceType == InterfaceType.AUCTION) {
                 confirm = new Confirm(this.auction, entry.getValue().getMaterial(), entry.getValue().isValue());
             } else {
                 confirm = new Confirm(this.bill, entry.getValue().getMaterial(), entry.getValue().isValue());
@@ -149,20 +152,30 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
             } else {
                 title = title.replace("{Item}", itemStack.getItemMeta().getDisplayName());
             }
-            title = title.replace("{Price}", df.format(confirm.getBill().getPrice()));
+            title = title.replace("{Price}", df.format(newBet));
             title = title.replace("{ProprietaireName}", confirm.getBill().getPlayerName());
-            title = title.replace("{BidderName}", confirm.getBill().getPlayerBidderName());
+            if(bill.getPlayerBidderName() != null) {
+                title = title.replace("{BidderName}", bill.getPlayerBidderName());
+            } else {
+                title = title.replace("{BidderName}", "Personne");
+            }
             title = ChatColor.translateAlternateColorCodes('&', title);
 
             for (String desc : confirmConfig.getDescription()) {
-                desc = desc.replace("{Price}", df.format(confirm.getBill().getPrice()));
+
                 if (confirm.getBill().getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("")) {
                     desc = desc.replace("{Item}", confirm.getBill().getItemStack().getType().toString());
                 } else {
                     desc = desc.replace("{Item}", confirm.getBill().getItemStack().getItemMeta().getDisplayName());
                 }
                 desc = desc.replace("{ProprietaireName}", confirm.getBill().getPlayerName());
-                desc = desc.replace("{BidderName}", confirm.getBill().getPlayerBidderName());
+                desc = desc.replace("{Price}", df.format(newBet));
+
+                if(bill.getPlayerBidderName() != null) {
+                    desc = desc.replace("{BidderName}", bill.getPlayerBidderName());
+                } else {
+                    desc = desc.replace("{BidderName}", "Personne");
+                }
 
                 desc = ChatColor.translateAlternateColorCodes('&', desc);
                 listDescription.add(desc);
@@ -281,21 +294,29 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
                         return;
                     }
 
-                    TaskChain<Bill> chainAuction = billCommandManager.billExist(this.bill.getId());
-                    chainAuction.sync(() -> {
-                        if (chainAuction.getTaskData("bill") == null) {
-                            issuerTarget.sendInfo(MessageKeys.NO_AUCTION);
+                    TaskChain<Bill> chainBet = billCommandManager.billExist(this.bill.getId());
+                    chainBet.sync(() -> {
+                        if (chainBet.getTaskData("bill") == null) {
+                            issuerTarget.sendInfo(MessageKeys.NO_BILL);
                             return;
                         }
-                        TaskChain<Bill> chainAuction2 = billCommandManager.billExist(this.bill.getId());
-                        chainAuction2.sync(() -> {
-                            if (chainAuction2.getTaskData("bill") == null) {
+
+                        if(newBet <= this.bill.getBet()) {
+                            issuerTarget.sendInfo(MessageKeys.AMOUNT_LESS_THAN_BET, "{Offer}", String.valueOf(newBet), "{Bet}", String.valueOf(this.bill.getBet()));
+                            return;
+                        }
+
+                        TaskChain<Bill> chainBet2 = billCommandManager.billExist(this.bill.getId());
+                        chainBet2.sync(() -> {
+
+                            if (chainBet2.getTaskData("bill") == null) {
                                 issuerTarget.sendInfo(MessageKeys.BILL_ALREADY_SELL);
                                 return;
                             }
-                            issuerTarget.sendInfo(MessageKeys.MAKE_OFFER_BILL_SUCCESS);
 
+                            issuerTarget.sendInfo(MessageKeys.MAKE_OFFER_BILL_SUCCESS, "{Offer}", String.valueOf(newBet));
 
+                            billCommandManager.makeOffer(bill.getId(), player, newBet);
 
                             Bukkit.getLogger().info("Player : " + player.getName() + " make offer for " + bill.getItemStack().getI18NDisplayName() + " at " + bill.getPlayerName());
 
