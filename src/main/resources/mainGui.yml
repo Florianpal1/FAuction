@@ -165,7 +165,7 @@ block:
   '45':
     utility: expire
     material: CHEST_MINECART
-    title: "&cRécuperer vos items expirés"
+    title: "&cRécuperer vos items expirés/enchères"
     description: {}
   '46':
     utility: bill

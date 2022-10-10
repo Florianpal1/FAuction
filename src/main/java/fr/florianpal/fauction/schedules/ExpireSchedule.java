@@ -36,6 +36,7 @@ public class ExpireSchedule implements Runnable {
     private final FAuction plugin;
     private List<Auction> auctions = new ArrayList<>();
     private List<Bill> bills = new ArrayList<>();
+
     public ExpireSchedule(FAuction plugin) {
         this.plugin = plugin;
     }
@@ -70,39 +71,31 @@ public class ExpireSchedule implements Runnable {
 
                     OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(bill.getPlayerBidderUuid());
 
+                    if (!offlinePlayer.hasPlayedBefore()) {
+                        return;
+                    }
 
-                    if (offlinePlayer.isOnline()) {
-                        Player player = offlinePlayer.getPlayer();
+                    plugin.getVaultIntegrationManager().getEconomy().withdrawPlayer(offlinePlayer, bill.getBet());
+                    EconomyResponse economyResponse4 = plugin.getVaultIntegrationManager().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(bill.getPlayerUuid()), bill.getBet());
+                    if (!economyResponse4.transactionSuccess()) {
+                        return;
+                    }
 
-                        if(player == null) {
-                            return;
-                        }
+                    plugin.getBillCommandManager().deleteBill(bill.getId());
+                    plugin.getExpireCommandManager().addExpire(bill, bill.getPlayerBidderUuid());
 
-                        plugin.getVaultIntegrationManager().getEconomy().withdrawPlayer(player, bill.getPrice());
-                        EconomyResponse economyResponse4 = plugin.getVaultIntegrationManager().getEconomy().depositPlayer(Bukkit.getOfflinePlayer(bill.getPlayerUuid()), bill.getPrice());
-                        if (!economyResponse4.transactionSuccess()) {
-                            return;
-                        }
-
-                        if (player.getInventory().firstEmpty() == -1) {
-                            player.getWorld().dropItem(player.getLocation(), bill.getItemStack());
+                    if (plugin.getConfigurationManager().getGlobalConfig().isBillOnBuyCommandUse()) {
+                        String command = plugin.getConfigurationManager().getGlobalConfig().getBillOnBuyCommand();
+                        command = command.replace("{OwnerName}", bill.getPlayerName());
+                        command = command.replace("{Amount}", String.valueOf(bill.getItemStack().getAmount()));
+                        if (!bill.getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("")) {
+                            command = command.replace("{ItemName}", bill.getItemStack().getItemMeta().getDisplayName());
                         } else {
-                            player.getInventory().addItem(bill.getItemStack());
+                            command = command.replace("{ItemName}", bill.getItemStack().getType().name().replace('_', ' ').toLowerCase());
                         }
-
-                        if (plugin.getConfigurationManager().getGlobalConfig().isBillOnBuyCommandUse()) {
-                            String command = plugin.getConfigurationManager().getGlobalConfig().getBillOnBuyCommand();
-                            command = command.replace("{OwnerName}", bill.getPlayerName());
-                            command = command.replace("{Amount}", String.valueOf(bill.getItemStack().getAmount()));
-                            if (!bill.getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-                                command = command.replace("{ItemName}", bill.getItemStack().getItemMeta().getDisplayName());
-                            } else {
-                                command = command.replace("{ItemName}", bill.getItemStack().getType().name().replace('_', ' ').toLowerCase());
-                            }
-                            command = command.replace("{BuyerName}", player.getName());
-                            command = command.replace("{ItemPrice}", String.valueOf(bill.getPrice()));
-                            getServer().dispatchCommand(getServer().getConsoleSender(), command);
-                        }
+                        command = command.replace("{BuyerName}", bill.getPlayerBidderName());
+                        command = command.replace("{ItemPrice}", String.valueOf(bill.getPrice()));
+                        getServer().dispatchCommand(getServer().getConsoleSender(), command);
                     }
                 } else if (cal.getTime().getTime() <= Calendar.getInstance().getTime().getTime()) {
                     plugin.getExpireCommandManager().addExpire(bill);

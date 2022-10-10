@@ -51,6 +51,10 @@ public class ExpireCommandManager {
         expireQueries.addAuction(auction.getPlayerUuid(), auction.getPlayerName(), auction.getItemStack().serializeAsBytes(), auction.getPrice(), auction.getDate());
     }
 
+    public void addExpire(Auction auction, UUID newOwner)  {
+        expireQueries.addAuction(newOwner, auction.getPlayerName(), auction.getItemStack().serializeAsBytes(), auction.getPrice(), auction.getDate());
+    }
+
     public void deleteExpire(int id) {
         expireQueries.deleteAuctions(id);
     }
