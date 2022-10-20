@@ -60,9 +60,15 @@
     </build>
 
     <repositories>
+
         <!--Paper Repo-->
         <repository>
             <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <!--Paper Repo-->
+        <repository>
+            <id>paperlib</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <!--Aikar Repo-->
@@ -89,7 +95,7 @@
         <dependency>
             <groupId>io.papermc</groupId>
             <artifactId>paperlib</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.7</version>
             <scope>compile</scope>
         </dependency>
         <!--ACF-->

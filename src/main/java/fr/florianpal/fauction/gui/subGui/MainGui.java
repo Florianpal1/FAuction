@@ -253,7 +253,7 @@ public class MainGui extends AbstractGui implements GuiInterface {
         } else {
             title = title.replace("{BidderName}", "Personne");
             title = title.replace("{Bet}", String.valueOf(bill.getPrice()));
-            title = title.replace("{BetDate}", formater.format(bill.getDate()));
+            title = title.replace("{BetDate}", "");
         }
 
         title = format(title);
