@@ -103,6 +103,12 @@ public class AmountGui extends AbstractGui implements GuiInterface {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent e) {
+
+        if (inv.getHolder() != this || e.getInventory() != inv) {
+            return;
+        }
+        e.setCancelled(true);
+
         for (Barrier close : amountGuiConfig.getCloseBlocks()) {
             if (e.getRawSlot() == close.getIndex()) {
                 inv.close();

@@ -130,7 +130,7 @@ public class BillQueries implements IDatabaseTable {
 
     public TaskChain<ArrayList<Bill>> getBills() {
 
-        final TaskChain<ArrayList<Bill>> chain = FAuction.getTaskChainFactory().newSharedChain("getAuctions");
+        final TaskChain<ArrayList<Bill>> chain = FAuction.getTaskChainFactory().newChain();
         chain.asyncFirst(() -> {
             PreparedStatement statement = null;
             ResultSet result = null;

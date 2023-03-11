@@ -27,7 +27,7 @@ import java.util.List;
 public class AmountGuiConfig {
     private List<Barrier> barrierBlocks = new ArrayList<>();
 
-    private  List<AmountBarrier> amountBlocks = new ArrayList<>();
+    private List<AmountBarrier> amountBlocks = new ArrayList<>();
     private List<Barrier> closeBlocks = new ArrayList<>();
 
     private List<Barrier> confirmBlocks = new ArrayList<>();

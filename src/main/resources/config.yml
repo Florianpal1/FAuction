@@ -5,7 +5,7 @@ global:
     COBBLESTONE: 0.5
 auction:
   onBuy:
-    sendCommand: # Command sends if item is buying
+    sendMessage: # Command sends if item is buying
       use: false
       command: ""
   expiration:
@@ -15,7 +15,7 @@ auction:
     default: 5
 bill:
   onBuy:
-    sendCommand: # Command sends if item is buying
+    sendMessage: # Command sends if item is buying
       use: false
       command: ""
   expiration:

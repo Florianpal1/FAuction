@@ -275,9 +275,9 @@ public class MainGui extends AbstractGui implements GuiInterface {
                 desc = desc.replace("{Bet}", String.valueOf(bill.getBet()));
                 desc = desc.replace("{BetDate}",  formater.format(bill.getBetDate()));
             } else {
-                desc = desc.replace("{BidderName}", "Personne");
-                desc = desc.replace("{Bet}", String.valueOf(bill.getPrice()));
-                desc = desc.replace("{BetDate}",  formater.format(bill.getDate()));
+                desc = desc.replace("{BidderName}", "");
+                desc = desc.replace("{Bet}", "");
+                desc = desc.replace("{BetDate}",  "");
             }
 
             desc = desc.replace("{Price}", String.valueOf(bill.getPrice()));

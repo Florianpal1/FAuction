@@ -1,6 +1,6 @@
 gui:
   size: 27
-  name: "Montant de votre enchère {Amount}"
+  name: "Définir le montant de votre enchère"
 block:
   '0':
     utility: barrier

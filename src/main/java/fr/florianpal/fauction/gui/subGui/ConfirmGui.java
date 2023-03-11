@@ -31,6 +31,7 @@ import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Barrier;
 import fr.florianpal.fauction.objects.Bill;
 import fr.florianpal.fauction.objects.Confirm;
+import fr.florianpal.messagedif.MessageDif;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -257,17 +258,17 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
                             }
 
                             if (plugin.getConfigurationManager().getGlobalConfig().isAuctionOnBuyCommandUse()) {
-                                String command = plugin.getConfigurationManager().getGlobalConfig().getAuctionOnBuyCommand();
-                                command = command.replace("{OwnerName}", auction.getPlayerName());
-                                command = command.replace("{Amount}", String.valueOf(auction.getItemStack().getAmount()));
+                                String message = plugin.getConfigurationManager().getGlobalConfig().getAuctionOnBuyMessage();
+                                message = message.replace("{OwnerName}", auction.getPlayerName());
+                                message = message.replace("{Amount}", String.valueOf(auction.getItemStack().getAmount()));
                                 if (!auction.getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-                                    command = command.replace("{ItemName}", auction.getItemStack().getItemMeta().getDisplayName());
+                                    message = message.replace("{ItemName}", auction.getItemStack().getItemMeta().getDisplayName());
                                 } else {
-                                    command = command.replace("{ItemName}", auction.getItemStack().getType().name().replace('_', ' ').toLowerCase());
+                                    message = message.replace("{ItemName}", auction.getItemStack().getType().name().replace('_', ' ').toLowerCase());
                                 }
-                                command = command.replace("{BuyerName}", player.getName());
-                                command = command.replace("{ItemPrice}", String.valueOf(auction.getPrice()));
-                                getServer().dispatchCommand(getServer().getConsoleSender(), command);
+                                message = message.replace("{BuyerName}", player.getName());
+                                message = message.replace("{ItemPrice}", String.valueOf(auction.getPrice()));
+                                MessageDif.newMessage(auction.getPlayerUuid(), message);
                             }
 
                             Bukkit.getLogger().info("Player : " + player.getName() + " buy " + auction.getItemStack().getI18NDisplayName() + " at " + auction.getPlayerName());

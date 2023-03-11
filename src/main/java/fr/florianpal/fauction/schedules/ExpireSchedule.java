@@ -20,6 +20,7 @@ import co.aikar.taskchain.TaskChain;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Bill;
+import fr.florianpal.messagedif.MessageDif;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -85,21 +86,21 @@ public class ExpireSchedule implements Runnable {
                     plugin.getExpireCommandManager().addExpire(bill, bill.getPlayerBidderUuid());
 
                     if (plugin.getConfigurationManager().getGlobalConfig().isBillOnBuyCommandUse()) {
-                        String command = plugin.getConfigurationManager().getGlobalConfig().getBillOnBuyCommand();
-                        command = command.replace("{OwnerName}", bill.getPlayerName());
-                        command = command.replace("{Amount}", String.valueOf(bill.getItemStack().getAmount()));
+                        String message = plugin.getConfigurationManager().getGlobalConfig().getBillOnBuyMessage();
+                        message = message.replace("{OwnerName}", bill.getPlayerName());
+                        message = message.replace("{Amount}", String.valueOf(bill.getItemStack().getAmount()));
                         if (!bill.getItemStack().getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-                            command = command.replace("{ItemName}", bill.getItemStack().getItemMeta().getDisplayName());
+                            message = message.replace("{ItemName}", bill.getItemStack().getItemMeta().getDisplayName());
                         } else {
-                            command = command.replace("{ItemName}", bill.getItemStack().getType().name().replace('_', ' ').toLowerCase());
+                            message = message.replace("{ItemName}", bill.getItemStack().getType().name().replace('_', ' ').toLowerCase());
                         }
-                        command = command.replace("{BuyerName}", bill.getPlayerBidderName());
-                        command = command.replace("{ItemPrice}", String.valueOf(bill.getPrice()));
-                        getServer().dispatchCommand(getServer().getConsoleSender(), command);
+                        message = message.replace("{BuyerName}", bill.getPlayerBidderName());
+                        message = message.replace("{ItemPrice}", String.valueOf(bill.getPrice()));
+                        MessageDif.newMessage(bill.getPlayerUuid(), message);
                     }
                 } else if (cal.getTime().getTime() <= Calendar.getInstance().getTime().getTime()) {
                     plugin.getExpireCommandManager().addExpire(bill);
-                    plugin.getAuctionCommandManager().deleteAuction(bill.getId());
+                    plugin.getBillCommandManager().deleteBill(bill.getId());
                 }
             }
         }).execute();

@@ -31,13 +31,13 @@ public class GlobalConfig {
     private Map<Material, Double> minPrice = new EnumMap<>(Material.class);
 
     private boolean auctionOnBuyCommandUse;
-    private String auctionOnBuyCommand;
+    private String auctionOnBuyMessage;
     private Map<String, Integer> auctionLimitations = new HashMap<>();
     private int auctionTime;
     private int auctionCheckEvery;
 
     private boolean billOnBuyCommandUse;
-    private String billOnBuyCommand;
+    private String billOnBuyMessage;
     private Map<String, Integer> billLimitations = new HashMap<>();
     private int billTime;
     private int billCheckEvery;
@@ -51,8 +51,8 @@ public class GlobalConfig {
             minPrice.put(Material.valueOf(material), config.getDouble("global.min-price." + material));
         }
 
-        auctionOnBuyCommandUse = config.getBoolean("auction.onBuy.sendCommand.use");
-        auctionOnBuyCommand = config.getString("auction.onBuy.sendCommand.command");
+        auctionOnBuyCommandUse = config.getBoolean("auction.onBuy.sendMessage.use");
+        auctionOnBuyMessage = config.getString("auction.onBuy.sendMessage.command");
         auctionTime = config.getInt("auction.expiration.time");
         auctionCheckEvery = config.getInt("auction.expiration.checkEvery");
 
@@ -61,8 +61,8 @@ public class GlobalConfig {
             auctionLimitations.put(limitationGroup, config.getInt("auction.limitations." + limitationGroup));
         }
 
-        billOnBuyCommandUse = config.getBoolean("bill.onBuy.sendCommand.use");
-        billOnBuyCommand = config.getString("bill.onBuy.sendCommand.command");
+        billOnBuyCommandUse = config.getBoolean("bill.onBuy.sendMessage.use");
+        billOnBuyMessage = config.getString("bill.onBuy.sendMessage.command");
         billTime = config.getInt("bill.expiration.time");
         billCheckEvery = config.getInt("bill.expiration.checkEvery");
 
@@ -88,10 +88,6 @@ public class GlobalConfig {
         return auctionOnBuyCommandUse;
     }
 
-    public String getAuctionOnBuyCommand() {
-        return auctionOnBuyCommand;
-    }
-
     public Map<Material, Double> getMinPrice() {
         return minPrice;
     }
@@ -108,10 +104,6 @@ public class GlobalConfig {
         return billOnBuyCommandUse;
     }
 
-    public String getBillOnBuyCommand() {
-        return billOnBuyCommand;
-    }
-
     public int getBillTime() {
         return billTime;
     }
@@ -122,5 +114,13 @@ public class GlobalConfig {
 
     public Map<String, Integer> getBillLimitations() {
         return billLimitations;
+    }
+
+    public String getBillOnBuyMessage() {
+        return billOnBuyMessage;
+    }
+
+    public String getAuctionOnBuyMessage() {
+        return auctionOnBuyMessage;
     }
 }

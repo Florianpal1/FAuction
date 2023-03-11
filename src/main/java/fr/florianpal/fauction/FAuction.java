@@ -20,15 +20,14 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import fr.florianpal.fauction.commands.AuctionCommand;
-import fr.florianpal.fauction.managers.commandManagers.*;
-import fr.florianpal.fauction.queries.BillQueries;
-import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.managers.ConfigurationManager;
 import fr.florianpal.fauction.managers.DatabaseManager;
 import fr.florianpal.fauction.managers.VaultIntegrationManager;
+import fr.florianpal.fauction.managers.commandManagers.*;
 import fr.florianpal.fauction.queries.AuctionQueries;
+import fr.florianpal.fauction.queries.BillQueries;
 import fr.florianpal.fauction.queries.ExpireQueries;
-import io.papermc.lib.PaperLib;
+import fr.florianpal.fauction.schedules.ExpireSchedule;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -64,8 +63,6 @@ public class FAuction extends JavaPlugin {
     @Override
     public void onEnable() {
         taskChainFactory = BukkitTaskChainFactory.create(this);
-
-        PaperLib.suggestPaper(this);
 
         configurationManager = new ConfigurationManager(this);
 

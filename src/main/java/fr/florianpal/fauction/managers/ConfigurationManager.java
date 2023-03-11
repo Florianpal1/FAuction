@@ -82,7 +82,6 @@ public class ConfigurationManager {
         mainGuiConfig.load(mainGuiConfiguration);
         confirmConfig.load(confirmConfiguration);
         expireGuiConfig.load(expireGuiConfiguration);
-        database.load(databaseConfig);
     }
 
     public DatabaseConfig getDatabase() {
