@@ -24,6 +24,19 @@ fauction:
   auction_reload: "The plugin configuration has been reloaded."
 
   remove_expire_success: "You have recovered one of your expired items."
+
+  max_bill: "You have already reached the maximum number of bids you can make simultaneously."
+  bill_add_success: "You have added a successful auction."
+  no_bill: "There is currently no auction."
+
+  bill_already_sell: "The auction you want to buy has already been sold."
+
+  make_offer_bill_success: "You have successfully bid for ${Offer}."
+
+  buy_bill_cancelled: "You didn’t bid on the auction."
+  remove_bill_success: "You took that auction out of the sale."
+  bill_add_help_description: "Add a new auction."
+  amount_less_than_bet: "You cannot make a {Offer} that is less than the current amount of {Bet}."
 acf-minecraft:
   invalid_world: "Error: That world does not exist."
   you_must_be_holding_item: "Error: You must be holding an item in your main hand."
