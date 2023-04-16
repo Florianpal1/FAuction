@@ -31,6 +31,7 @@ import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Barrier;
 import fr.florianpal.fauction.objects.Bill;
 import fr.florianpal.fauction.objects.Confirm;
+import fr.florianpal.fauction.utils.FormatUtil;
 import fr.florianpal.messagedif.MessageDif;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
@@ -132,7 +133,7 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
             title = title.replace("{Price}", df.format(confirm.getAuction().getPrice()));
             title = title.replace("{ProprietaireName}", confirm.getAuction().getPlayerName());
 
-            title = ChatColor.translateAlternateColorCodes('&', title);
+            title = FormatUtil.format(title);
 
             for (String desc : confirmConfig.getDescription()) {
                 desc = desc.replace("{Price}", df.format(confirm.getAuction().getPrice()));
@@ -143,7 +144,7 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
                 }
                 desc = desc.replace("{ProprietaireName}", confirm.getAuction().getPlayerName());
 
-                desc = ChatColor.translateAlternateColorCodes('&', desc);
+                desc = FormatUtil.format(desc);
                 listDescription.add(desc);
             }
         } else if (interfaceType == InterfaceType.BILL) {
@@ -160,7 +161,7 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
             } else {
                 title = title.replace("{BidderName}", "Personne");
             }
-            title = ChatColor.translateAlternateColorCodes('&', title);
+            title = FormatUtil.format(title);
 
             for (String desc : confirmConfig.getDescription()) {
 
@@ -178,7 +179,7 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
                     desc = desc.replace("{BidderName}", "Personne");
                 }
 
-                desc = ChatColor.translateAlternateColorCodes('&', desc);
+                desc = FormatUtil.format(desc);
                 listDescription.add(desc);
             }
         }
@@ -194,10 +195,10 @@ public class ConfirmGui extends AbstractGui implements GuiInterface {
     public ItemStack createGuiItem(Material material, String name, List<String> description) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
-        name = ChatColor.translateAlternateColorCodes('&', name);
+        name = FormatUtil.format(name);
         List<String> descriptions = new ArrayList<>();
         for (String desc : description) {
-            desc = ChatColor.translateAlternateColorCodes('&', desc);
+            desc = FormatUtil.format(desc);
             descriptions.add(desc);
         }
         if (meta != null) {

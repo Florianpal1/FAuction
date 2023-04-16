@@ -10,6 +10,7 @@ import fr.florianpal.fauction.languages.MessageKeys;
 import fr.florianpal.fauction.objects.AmountBarrier;
 import fr.florianpal.fauction.objects.Barrier;
 import fr.florianpal.fauction.objects.Bill;
+import fr.florianpal.fauction.utils.FormatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -65,11 +66,11 @@ public class AmountGui extends AbstractGui implements GuiInterface {
     public ItemStack createGuiItem(Material material, String name, List<String> description) {
         ItemStack item = new ItemStack(material, 1);
         ItemMeta meta = item.getItemMeta();
-        name = ChatColor.translateAlternateColorCodes('&', name);
+        name = FormatUtil.format(name);
         name = name.replace("{Amount}", String.valueOf(amount));
         List<String> descriptions = new ArrayList<>();
         for (String desc : description) {
-            desc = ChatColor.translateAlternateColorCodes('&', desc);
+            desc = FormatUtil.format(desc);
             desc = desc.replace("{Amount}", String.valueOf(amount));
             descriptions.add(desc);
         }
@@ -84,11 +85,11 @@ public class AmountGui extends AbstractGui implements GuiInterface {
     public ItemStack createGuiItem(AmountBarrier amountBarrier) {
         ItemStack item = new ItemStack(amountBarrier.getMaterial(), 1);
         ItemMeta meta = item.getItemMeta();
-        String name = ChatColor.translateAlternateColorCodes('&', amountBarrier.getTitle());
+        String name = FormatUtil.format(amountBarrier.getTitle());
         name = name.replace("{Offer}", String.valueOf(amountBarrier.getAmount()));
         List<String> descriptions = new ArrayList<>();
         for (String desc : amountBarrier.getDescription()) {
-            desc = ChatColor.translateAlternateColorCodes('&', desc);
+            desc = FormatUtil.format(desc);
             desc = desc.replace("{Offer}", String.valueOf(amountBarrier.getAmount()));
             descriptions.add(desc);
         }
