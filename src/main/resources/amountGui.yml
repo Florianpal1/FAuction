@@ -5,52 +5,52 @@ block:
   '0':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '1':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '2':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '3':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '4':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '5':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '6':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '7':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '8':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '9':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: {}
   '10':
     utility: amount
@@ -102,42 +102,42 @@ block:
   '18':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '19':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '20':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '21':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '22':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '23':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '24':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '25':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
-    title: "-"
+    title: " "
     description: { }
   '26':
     utility: close
