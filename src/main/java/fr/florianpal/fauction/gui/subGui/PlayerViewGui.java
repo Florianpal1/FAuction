@@ -16,12 +16,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     private final PlayerViewConfig playerViewConfig;
+    private static final Set<Integer> processingAuctions = new HashSet<>();
 
     public PlayerViewGui(FAuction plugin, Player player, List<Auction> auctions, int page, Category category) {
         super(plugin, player, page, auctions, category, plugin.getConfigurationManager().getPlayerViewConfig());
@@ -80,14 +83,17 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                 Auction auction = auctions.get((e.getRawSlot() - nb0) + ((this.playerViewConfig.getBaseBlocks().size() * this.page) - this.playerViewConfig.getBaseBlocks().size()) - nb * 2);
 
                 if (e.isRightClick()) {
-                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(auction.getId())).syncLast(a -> {
-                        if (a == null) {
-                            return;
-                        }
-
-                        if (!a.getPlayerUUID().equals(player.getUniqueId())) {
-                            return;
-                        }
+                    int auctionId = auction.getId();
+                    // Prevent processing the same auction multiple times
+                    if (processingAuctions.contains(auctionId)) {
+                        return;
+                    }
+                    processingAuctions.add(auctionId);
+                    
+                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(auctionId))
+                        .abortIfNull()
+                        .abortIf(a -> !a.getPlayerUUID().equals(player.getUniqueId()))
+                        .syncLast(a -> {
 
                         try {
                             auctionCommandManager.deleteAuction(a.getId());
@@ -111,10 +117,12 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                         player.closeInventory();
 
                         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+                            processingAuctions.remove(auctionId);
                             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, this.page, category);
                             gui.initialize();
                         }).execute();
-                    }).execute();
+                    }).abortIfNull()
+                      .execute(() -> processingAuctions.remove(auctionId));
                 }
                 break;
             }
