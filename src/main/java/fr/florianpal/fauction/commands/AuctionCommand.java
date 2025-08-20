@@ -162,7 +162,7 @@ public class AuctionCommand extends BaseCommand {
             return;
         }
 
-        if (!haveCorrectMinPrice(itemToSell, playerSender, playerSender, price)) {
+        if (!haveCorrectMinPrice(itemToSell, playerSender, price)) {
             resetItem(playerSender, itemToSell);
             return;
         }
@@ -239,10 +239,10 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    public boolean haveCorrectMinPrice(ItemStack itemToSell, Player player, Player playerSender, double price) {
+    public boolean haveCorrectMinPrice(ItemStack itemToSell, Player player, double price) {
 
         if (globalConfig.getMinPrice().containsKey(itemToSell.getType())) {
-            double minPrice = playerSender.getInventory().getItemInMainHand().getAmount() * globalConfig.getMinPrice().get(itemToSell.getType());
+            double minPrice = itemToSell.getAmount() * globalConfig.getMinPrice().get(itemToSell.getType());
             if (minPrice > price) {
                 MessageUtil.sendMessage(plugin, player, MessageKeys.MIN_PRICE, "{minPrice}", String.valueOf(ceil(minPrice)));
                 return false;
