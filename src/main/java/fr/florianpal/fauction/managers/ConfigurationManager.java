@@ -72,7 +72,6 @@ public class ConfigurationManager {
 
             auctionConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/auction.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/gui/auction.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(false).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
@@ -80,7 +79,6 @@ public class ConfigurationManager {
 
             historicConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/historic.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/gui/historic.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(false).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
@@ -88,7 +86,6 @@ public class ConfigurationManager {
 
             playerViewConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/playerView.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/gui/playerView.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(false).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
@@ -96,7 +93,6 @@ public class ConfigurationManager {
 
             expireConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/expire.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/gui/expire.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(false).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
@@ -104,7 +100,6 @@ public class ConfigurationManager {
 
             auctionConfirmConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/auctionConfirm.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/gui/auctionConfirm.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(false).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
@@ -112,7 +107,6 @@ public class ConfigurationManager {
 
             globalConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "config.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
-                    GeneralSettings.builder().setUseDefaults(false).build(),
                     LoaderSettings.builder().setAutoUpdate(true).build(),
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
