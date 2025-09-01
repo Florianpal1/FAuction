@@ -30,7 +30,7 @@ public class CurrencyPendingQueries implements IDatabaseTable {
     private static final String DELETE_CURRENCY_PENDING = "DELETE FROM fa_currency_pending WHERE id=?";
 
 
-    private String autoIncrement = "AUTO_INCREMENT";
+    private String autoIncrement = "INTEGER PRIMARY KEY AUTO_INCREMENT";
 
     private String parameters = "DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
 
@@ -39,7 +39,10 @@ public class CurrencyPendingQueries implements IDatabaseTable {
         this.databaseManager = plugin.getDatabaseManager();
         this.globalConfig = plugin.getConfigurationManager().getGlobalConfig();
         if (plugin.getConfigurationManager().getDatabase().getSqlType() == SQLType.SQLite) {
-            autoIncrement = "AUTOINCREMENT";
+            autoIncrement = "INTEGER PRIMARY KEY AUTOINCREMENT";
+            parameters = "";
+        } else if (plugin.getConfigurationManager().getDatabase().getSqlType() == SQLType.PostgreSQL) {
+            autoIncrement = "SERIAL PRIMARY KEY";
             parameters = "";
         }
     }
@@ -103,7 +106,7 @@ public class CurrencyPendingQueries implements IDatabaseTable {
     @Override
     public String[] getTable() {
         return new String[]{"fa_currency_pending",
-                "`id` INTEGER PRIMARY KEY " + autoIncrement + ", " +
+                "`id` " + autoIncrement + ", " +
                         "`playerUuid` VARCHAR(36) NOT NULL, " +
                         "`currencyType` VARCHAR(36) NOT NULL, " +
                         "`amount` DOUBLE NOT NULL",

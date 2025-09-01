@@ -29,7 +29,7 @@ public class HistoricQueries implements IDatabaseTable {
     private static final String DELETE_ALL = "DELETE FROM fa_auctions_historic";
     private static final String ALTER_BUY_DATE = "ALTER TABLE fa_auctions_historic ADD buyDate long;";
 
-    private String autoIncrement = "AUTO_INCREMENT";
+    private String autoIncrement = "INTEGER PRIMARY KEY AUTO_INCREMENT";
 
     private String parameters = "DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci";
 
@@ -39,7 +39,10 @@ public class HistoricQueries implements IDatabaseTable {
 
         this.globalConfig = plugin.getConfigurationManager().getGlobalConfig();
         if (plugin.getConfigurationManager().getDatabase().getSqlType() == SQLType.SQLite) {
-            autoIncrement = "AUTOINCREMENT";
+            autoIncrement = "INTEGER PRIMARY KEY AUTOINCREMENT";
+            parameters = "";
+        } else if (plugin.getConfigurationManager().getDatabase().getSqlType() == SQLType.PostgreSQL) {
+            autoIncrement = "SERIAL PRIMARY KEY";
             parameters = "";
         }
     }
@@ -220,7 +223,7 @@ public class HistoricQueries implements IDatabaseTable {
     @Override
     public String[] getTable() {
         return new String[]{"fa_auctions_historic",
-                "`id` INTEGER PRIMARY KEY " + autoIncrement + ", " +
+                "`id` " + autoIncrement + ", " +
                         "`playerUuid` VARCHAR(36) NOT NULL, " +
                         "`playerName` VARCHAR(36) NOT NULL, " +
                         "`playerBuyerUuid` VARCHAR(36) NOT NULL, " +
