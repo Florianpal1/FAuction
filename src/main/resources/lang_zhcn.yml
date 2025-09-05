@@ -6,6 +6,7 @@ fauction:
   auction_add_help_description: "添加新促销"
   reload_help_description: "重载插件配置."
   transfert_bdd_help_description: "将 bdd 数据在 Paper 与 Spigot 之间互转"
+  auction_search_help_description: "Search for an item"
 
   buy_auction_success: "你购买了一个物品."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -15,6 +16,7 @@ fauction:
   remove_auction_success: "你下架了一件物品."
   buy_your_item: "你不能拍下自己的物品."
   item_air: "你的手中尚未持有物品."
+  search_air: "You cannot research air."
   no_have_money: "你没有足够的钱购买这个物品."
   auction_expire: "你的一件或多件促销物品已经到期."
   auction_already_sell: "你要购买的物品已经被他人买下."

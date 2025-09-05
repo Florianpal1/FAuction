@@ -3,12 +3,14 @@ package fr.florianpal.fauction.utils;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Historic;
+import fr.florianpal.fauction.objects.Sort;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,24 @@ public class ListUtil {
 
     public static List<Auction> historicToAuction(List<Historic> historics) {
         return new ArrayList<>(historics);
+    }
+
+    public static List<Auction> applySorting(List<Auction> auctions, Sort sort) {
+        switch (sort.getType()) {
+            case DATE_NEWER_TO_OLDER -> {
+                return auctions.stream().sorted(Comparator.comparing(Auction::getDate)).collect(Collectors.toList());
+            }
+            case DATE_OLDER_TO_NEWER -> {
+                return auctions.stream().sorted(Comparator.comparing(Auction::getDate)).collect(Collectors.toList()).reversed();
+            }
+            case PRICE_HIGHER_TO_LOWER -> {
+                return auctions.stream().sorted(Comparator.comparing(Auction::getPrice)).collect(Collectors.toList()).reversed();
+            }
+            case PRICE_LOWER_TO_HIGHER -> {
+                return auctions.stream().sorted(Comparator.comparing(Auction::getPrice)).collect(Collectors.toList());
+            }
+        }
+        return auctions;
     }
 
     public static List<Auction> getAuctionByCategory(List<Auction> auctions, Category category) {

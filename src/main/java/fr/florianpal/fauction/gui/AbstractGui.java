@@ -200,7 +200,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         if (auctionGuiBarrierOptional.isPresent()) {
 
             FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, auctionGuiBarrierOptional.get().getCategory());
+                AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, auctionGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
             return true;
@@ -210,7 +210,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         if (expireGuiBarrierOptional.isPresent()) {
 
             FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(auctions -> {
-                ExpireGui gui = new ExpireGui(plugin, player, auctions, 1, expireGuiBarrierOptional.get().getCategory());
+                ExpireGui gui = new ExpireGui(plugin, player, auctions, 1, expireGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
             return true;
@@ -234,7 +234,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         if (playerGuiBarrierOptional.isPresent()) {
 
             FAuction.newChain().asyncFirst(() ->  auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
-                PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, 1, playerGuiBarrierOptional.get().getCategory());
+                PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, 1, playerGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
             return true;
@@ -244,7 +244,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         if (historicGuiBarrierOptional.isPresent()) {
 
             FAuction.newChain().asyncFirst(() -> historicCommandManager.getHistorics(player.getUniqueId())).syncLast(historics -> {
-                HistoricGui gui = new HistoricGui(plugin, player, ListUtil.historicToAuction(historics), 1, historicGuiBarrierOptional.get().getCategory());
+                HistoricGui gui = new HistoricGui(plugin, player, ListUtil.historicToAuction(historics), 1, historicGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
             return true;

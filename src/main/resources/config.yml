@@ -13,7 +13,7 @@ feature-flipping:
 
 decimalFormat: "0.00"
 
-orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent
+orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent || Deprecated use sort.yml
 dateFormat: "dd/MM/yyyy ':' HH:mm"
 remainingDateFormat: "MMM ddd HHh mmm sss"
 securityForSpammingPacket: true

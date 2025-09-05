@@ -8,6 +8,7 @@ fauction:
   transfert_bdd_help_description: "Transfert des données de la bdd vers spigot->paper ou paper->spigot"
   clear_cache_help_description: "Pour vider le cache"
   migrate_help_description: "Faire une migration vers une autre version."
+  auction_search_help_description: "Rechercher un item"
 
   buy_auction_success: "Vous venez d'acheter un item."
   buy_auction_target_success: "Le joueur {player} a acheté l'item {item} au prix de {price}."
@@ -17,6 +18,7 @@ fauction:
   remove_auction_success: "Vous avez bien annulé votre vente."
   buy_your_item: "Vous ne pouvez pas acheter votre propre item."
   item_air: "Vous n'avez actuellement aucun item dans votre main."
+  search_air: "Vous ne pouvez pas rechercher de l'air."
   no_have_money: "Vous n'avez pas assez d'argent pour effectuer cet achat."
   auction_expire: "Un de vos item mis en vente dans le ah vient d'expirer."
   auction_already_sell: "L'item que vous voulez acheter est déjà vendu."

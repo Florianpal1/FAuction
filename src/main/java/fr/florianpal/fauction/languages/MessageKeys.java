@@ -13,6 +13,7 @@ public enum MessageKeys implements MessageKeyProvider {
     REMOVE_AUCTION_SUCCESS,
     BUY_YOUR_ITEM,
     ITEM_AIR,
+    SEARCH_AIR,
     NO_HAVE_MONEY,
     BUY_AUCTION_SUCCESS,
     AUCTION_EXPIRE,

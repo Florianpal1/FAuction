@@ -23,6 +23,8 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
     protected List<Barrier> categoriesBlocks = new ArrayList<>();
 
+    protected List<Barrier> sortingBlocks = new ArrayList<>();
+
     protected List<Confirm> confirmBlocks = new ArrayList<>();
 
     protected String title = "";
@@ -31,6 +33,7 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
     protected List<String> description = new ArrayList<>();
 
+    @Override
     public void load(FAuction plugin, YamlDocument config, String baseBlock) {
 
         super.load(plugin, config, baseBlock);
@@ -40,6 +43,7 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
         baseBlocks = new ArrayList<>();
         description = new ArrayList<>();
         categoriesBlocks = new ArrayList<>();
+        sortingBlocks = new ArrayList<>();
         confirmBlocks = new ArrayList<>();
 
         for (Object indexObject : config.getSection("block").getKeys()) {
@@ -104,6 +108,17 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
                         config.getInt("block." + index + ".customModelData", 0)
                 );
                 categoriesBlocks.add(barrier);
+            } else if (SORTING.equalsIgnoreCase(currentUtility)) {
+                Barrier barrier = new Barrier(
+                        Integer.parseInt(index),
+                        Material.getMaterial(config.getString("block." + index + ".material", Material.BARRIER.toString())),
+                        config.getString("block." + index + ".title"),
+                        config.getStringList("block." + index + ".description"),
+                        null,
+                        config.getString("block." + index + ".texture", ""),
+                        config.getInt("block." + index + ".customModelData", 0)
+                );
+                sortingBlocks.add(barrier);
             } else if (baseBlock.equalsIgnoreCase(currentUtility)) {
                 baseBlocks.add(Integer.valueOf(index));
             } else if (CONFIRM.equalsIgnoreCase(currentUtility)) {
@@ -146,5 +161,9 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
     public List<Barrier> getCategoriesBlocks() {
         return categoriesBlocks;
+    }
+
+    public List<Barrier> getSortingBlocks() {
+        return sortingBlocks;
     }
 }

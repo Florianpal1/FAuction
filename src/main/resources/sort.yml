@@ -1,0 +1,14 @@
+version: 1
+sort:
+    'DEFAULT':
+      displayName: "By date (Newer to Older)"
+      type: DATE_NEWER_TO_OLDER
+    'DATE_OLDER_TO_NEWER':
+      displayName: "By date (Older to Newer)"
+      type: DATE_OLDER_TO_NEWER
+    'PRICE_LOWER_TO_HIGHER':
+      displayName: "By price (Lower to Higher)"
+      type: PRICE_LOWER_TO_HIGHER
+    'PRICE_HIGHER_TO_LOWER':
+      displayName: "By price (Higher to Lower)"
+      type: PRICE_HIGHER_TO_LOWER

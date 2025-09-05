@@ -2,10 +2,7 @@ package fr.florianpal.fauction.gui;
 
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.gui.AbstractGuiWithAuctionsConfig;
-import fr.florianpal.fauction.objects.Auction;
-import fr.florianpal.fauction.objects.Barrier;
-import fr.florianpal.fauction.objects.Category;
-import fr.florianpal.fauction.objects.Historic;
+import fr.florianpal.fauction.objects.*;
 import fr.florianpal.fauction.utils.FormatUtil;
 import fr.florianpal.fauction.utils.ListUtil;
 import fr.florianpal.fauction.utils.PlaceholderUtil;
@@ -30,17 +27,23 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
 
     protected Category category;
 
+    protected Sort sort;
+
     protected AbstractGuiWithAuctionsConfig abstractGuiWithAuctionsConfig;
 
-    protected AbstractGuiWithAuctions(FAuction plugin, Player player, int page, List<Auction> auctions, Category category, AbstractGuiWithAuctionsConfig abstractGuiWithAuctionsConfig) {
+    protected AbstractGuiWithAuctions(FAuction plugin, Player player, int page, List<Auction> auctions, Category category, Sort sort, AbstractGuiWithAuctionsConfig abstractGuiWithAuctionsConfig) {
         super(plugin, player, page, abstractGuiWithAuctionsConfig);
         this.auctions = auctions;
         this.abstractGuiWithAuctionsConfig = abstractGuiWithAuctionsConfig;
 
         if (category == null) category = plugin.getConfigurationManager().getCategoriesConfig().getDefault();
+        if (sort == null) sort = plugin.getConfigurationManager().getSortConfig().getDefault();
         this.category = category;
+        this.sort = sort;
 
         this.auctions = ListUtil.getAuctionByCategory(auctions, category);
+        this.auctions = ListUtil.applySorting(this.auctions, sort);
+
     }
 
     @Override
@@ -75,6 +78,10 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
 
         for (Barrier categoryBlock : abstractGuiWithAuctionsConfig.getCategoriesBlocks()) {
             inv.setItem(categoryBlock.getIndex(), createGuiItem(getItemStack(categoryBlock, false)));
+        }
+
+        for (Barrier sortBlock : abstractGuiWithAuctionsConfig.getSortingBlocks()) {
+            inv.setItem(sortBlock.getIndex(), createGuiItem(getItemStack(sortBlock, false)));
         }
 
         super.initBarrier();
@@ -207,12 +214,14 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
                 desc = FormatUtil.format(desc);
                 desc = PlaceholderUtil.parsePlaceholder(plugin.isPlaceholderAPIEnabled(), player, desc);
                 desc = desc.replace("{categoryDisplayName}", category != null ? category.getDisplayName() : "");
+                desc = desc.replace("{sortDisplayName}", category != null ? sort.getDisplayName() : "");
                 descriptions.add(desc);
             }
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
                 String name = barrier.getTitle().replace("{categoryDisplayName}", category != null ? category.getDisplayName() : "");
+                name = name.replace("{sortDisplayName}", category != null ? category.getDisplayName() : "");
                 name = PlaceholderUtil.parsePlaceholder(plugin.isPlaceholderAPIEnabled(), player, name);
                 meta.setDisplayName(FormatUtil.format(name));
                 meta.setLore(descriptions);
@@ -252,6 +261,14 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
             return true;
         }
 
+        boolean isSorting = abstractGuiWithAuctionsConfig.getSortingBlocks().stream().anyMatch(c -> e.getRawSlot() == c.getIndex());
+        if (isSorting) {
+
+            Sort nextSort = plugin.getConfigurationManager().getSortConfig().getNext(sort);
+            sortingAction(nextSort);
+            return true;
+        }
+
         return super.guiClick(e);
     }
 
@@ -260,6 +277,8 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
     protected abstract void nextAction();
 
     protected abstract void categoryAction(Category nextCategory);
+
+    protected abstract void sortingAction(Sort nextSort);
 
     @Override
     public Inventory getInventory() {

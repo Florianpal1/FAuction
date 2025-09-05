@@ -5,20 +5,16 @@ import fr.florianpal.fauction.configurations.gui.AuctionConfirmGuiConfig;
 import fr.florianpal.fauction.enums.Gui;
 import fr.florianpal.fauction.events.AuctionBuyEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
-import fr.florianpal.fauction.gui.visualization.InventoryVisualization;
 import fr.florianpal.fauction.languages.MessageKeys;
 import fr.florianpal.fauction.objects.*;
 import fr.florianpal.fauction.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +32,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
     private final Map<Integer, Confirm> confirmList = new HashMap<>();
 
     public AuctionConfirmGui(FAuction plugin, Player player, int page, Auction auction) {
-        super(plugin, player, page, Collections.singletonList(auction), null, plugin.getConfigurationManager().getAuctionConfirmConfig());
+        super(plugin, player, page, Collections.singletonList(auction), null, null, plugin.getConfigurationManager().getAuctionConfirmConfig());
         this.auction = auction;
         this.auctionConfirmConfig = plugin.getConfigurationManager().getAuctionConfirmConfig();
     }
@@ -150,6 +146,10 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
 
     }
 
+    @Override
+    protected void sortingAction(Sort nextSort) {
+    }
+
     private ItemStack createGuiItem(Confirm confirm) {
         ItemStack item = new ItemStack(confirm.getMaterial(), 1);
         ItemMeta meta = item.getItemMeta();
@@ -232,7 +232,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                 if (!confirm.isValue()) {
                     MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_CANCELLED);
                     FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                        AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null);
+                        AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                         gui.initialize();
                     }).execute();
                     return;
@@ -293,7 +293,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                         plugin.getLogger().info("Player : " + player.getName() + " buy " + auctionGood.getItemStack().getItemMeta().getDisplayName() + " at " + auctionGood.getPlayerName());
 
                         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null);
+                            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                             gui.initialize();
                         }).execute();
                     }).execute();

@@ -150,10 +150,10 @@ block:
   '43':
     utility: historic
   '44':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: " "
-    description: {}
+    utility: auctionGui
+    material: CHEST
+    title: "&cReturn to the auction house."
+    description: { }
   '45':
     utility: expireGui
     material: CHEST_MINECART
@@ -210,10 +210,12 @@ block:
       - "&eClick here to change filter"
       - "&eCurrent filter : {categoryDisplayName}"
   '52':
-    utility: auctionGui
-    material: CHEST
-    title: "&cReturn to the auction house."
-    description: { }
+    utility: sorting
+    material: BOOK
+    title: "&5Sort."
+    description:
+      - "&eClick here to sort item"
+      - "&eCurrent sort : {sortDisplayName}"
   '53':
     utility: close
     material: BARRIER

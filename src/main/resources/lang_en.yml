@@ -7,6 +7,7 @@ fauction:
   reload_help_description: "Reload the plugin configuration."
   transfert_bdd_help_description: "Transfert bdd data to spigot->paper or paper->spigot"
   clear_cache_help_description: "To clear the cache"
+  auction_search_help_description: "Search for an item"
   migrate_help_description: "Migrate to another version."
 
   buy_auction_success: "You just bought an item."
@@ -17,6 +18,7 @@ fauction:
   remove_auction_success: "You did cancel your sale."
   buy_your_item: "You cannot buy your own item."
   item_air: "You currently have no items in your hand."
+  search_air: "You cannot research air."
   no_have_money: "You do not have enough money to make this purchase."
   auction_expire: "One of your items on sale in the ah has just expired."
   auction_already_sell: "The item you want to buy is already sold."

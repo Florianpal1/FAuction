@@ -10,6 +10,7 @@ import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.CategoriesConfig;
 import fr.florianpal.fauction.configurations.DatabaseConfig;
 import fr.florianpal.fauction.configurations.GlobalConfig;
+import fr.florianpal.fauction.configurations.SortConfig;
 import fr.florianpal.fauction.configurations.gui.*;
 
 import java.io.File;
@@ -39,13 +40,15 @@ public class ConfigurationManager {
     private final GlobalConfig globalConfig = new GlobalConfig();
     private YamlDocument globalConfiguration;
 
-
     private final CategoriesConfig categoriesConfig = new CategoriesConfig();
     private YamlDocument categoriesConfiguration;
 
+    private final SortConfig sortConfig = new SortConfig();
+    private YamlDocument sortConfiguration;
+
     private final MenuConfig menuConfig = new MenuConfig();
 
-    public ConfigurationManager(FAuction plugin, File pluginFile) {
+    public ConfigurationManager(FAuction plugin) {
 
         try {
             databaseConfig = YamlDocument.create(new File(plugin.getDataFolder(), "database.yml"),
@@ -119,12 +122,21 @@ public class ConfigurationManager {
                     DumperSettings.DEFAULT,
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
             );
+
+            sortConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "sort.yml"),
+                    Objects.requireNonNull(getClass().getResourceAsStream("/sort.yml")),
+                    GeneralSettings.builder().setUseDefaults(false).build(),
+                    LoaderSettings.builder().setAutoUpdate(true).build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
+            );
         } catch (IOException e) {
             plugin.getLogger().severe("Error in configuration load : " + e.getMessage());
             throw new RuntimeException(e);
         }
 
         categoriesConfig.load(categoriesConfiguration);
+        sortConfig.load(sortConfiguration);
         globalConfig.load(globalConfiguration);
         auctionConfig.load(plugin, auctionConfiguration);
         historicConfig.load(plugin, historicConfiguration);
@@ -174,5 +186,9 @@ public class ConfigurationManager {
 
     public MenuConfig getMenuConfig() {
         return menuConfig;
+    }
+
+    public SortConfig getSortConfig() {
+        return sortConfig;
     }
 }

@@ -159,10 +159,11 @@ block:
     title: "&cCollect your expired items"
     description: {}
   '46':
-    utility: barrier
-    material: AIR
-    title: " "
-    description: {}
+    utility: auctionGui
+    material: NETHER_STAR
+    title: "&cBack to the auction house"
+    description:
+      - "&eClick here to return to the auction house"
   '47':
     utility: barrier
     material: AIR
@@ -207,11 +208,12 @@ block:
     title: " "
     description: {}
   '52':
-    utility: auctionGui
-    material: NETHER_STAR
-    title: "&cBack to the auction house"
+    utility: sorting
+    material: BOOK
+    title: "&5Sort."
     description:
-      - "&eClick here to return to the auction house"
+      - "&eClick here to sort item"
+      - "&eCurrent sort : {sortDisplayName}"
   '53':
     utility: close
     material: BARRIER

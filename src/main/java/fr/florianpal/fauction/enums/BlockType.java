@@ -14,6 +14,8 @@ public enum BlockType {
 
     CATEGORY("category"),
 
+    SORTING("sorting"),
+
     HISTORICGUI("historicGui"),
 
     EXPIREGUI("expireGui"),

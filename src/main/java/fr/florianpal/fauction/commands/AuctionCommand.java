@@ -12,6 +12,7 @@ import fr.florianpal.fauction.managers.SpamManager;
 import fr.florianpal.fauction.managers.commandmanagers.AuctionCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.ExpireCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.HistoricCommandManager;
+import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.utils.ListUtil;
 import fr.florianpal.fauction.utils.MessageUtil;
 import org.bukkit.Bukkit;
@@ -75,28 +76,28 @@ public class AuctionCommand extends BaseCommand {
         switch (globalConfig.getDefaultGui()) {
             case "AUCTION":
                 FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                    AuctionsGui auctionsGui = new AuctionsGui(plugin, playerSender, auctions, 1, null);
+                    AuctionsGui auctionsGui = new AuctionsGui(plugin, playerSender, auctions, 1, null, null);
                     auctionsGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "EXPIRE":
                 FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(expires -> {
-                    ExpireGui expireGui = new ExpireGui(plugin, playerSender, expires, 1, null);
+                    ExpireGui expireGui = new ExpireGui(plugin, playerSender, expires, 1, null, null);
                     expireGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "HISTORIC":
                 FAuction.newChain().asyncFirst(() -> historicCommandManager.getHistorics(playerSender.getUniqueId())).syncLast(historics -> {
-                    HistoricGui historicGui = new HistoricGui(plugin, playerSender, ListUtil.historicToAuction(historics), 1, null);
+                    HistoricGui historicGui = new HistoricGui(plugin, playerSender, ListUtil.historicToAuction(historics), 1, null, null);
                     historicGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "PLAYER":
                 FAuction.newChain().asyncFirst(() -> auctionCommandManager.getAuctions(playerSender.getUniqueId())).syncLast(auctions -> {
-                    PlayerViewGui playerViewGui = new PlayerViewGui(plugin, playerSender, auctions, 1, null);
+                    PlayerViewGui playerViewGui = new PlayerViewGui(plugin, playerSender, auctions, 1, null, null);
                     playerViewGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
@@ -115,6 +116,27 @@ public class AuctionCommand extends BaseCommand {
 
         }
 
+    }
+
+    @Subcommand("search")
+    @CommandPermission("fauction.search")
+    @Description("{@@fauction.auction_search_help_description}")
+    public void onSearch(Player playerSender, Material material) {
+
+        if (spamManager.spamTest(playerSender)) {
+            return;
+        }
+
+        if (material.isAir()) {
+            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.SEARCH_AIR);
+            return;
+        }
+
+        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+            AuctionsGui auctionsGui = new AuctionsGui(plugin, playerSender, auctions, 1, new Category("-1", material.name(), List.of(material.toString())), null);
+            auctionsGui.initialize();
+            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
+        }).execute();
     }
 
     @Subcommand("sell")
@@ -287,7 +309,7 @@ public class AuctionCommand extends BaseCommand {
     public void onExpire(Player playerSender) {
 
         FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(auctions -> {
-            ExpireGui gui = new ExpireGui(plugin, playerSender, auctions, 1, null);
+            ExpireGui gui = new ExpireGui(plugin, playerSender, auctions, 1, null, null);
             gui.initialize();
             MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
         }).execute();

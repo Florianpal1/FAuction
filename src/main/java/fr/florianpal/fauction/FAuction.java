@@ -85,7 +85,7 @@ public class FAuction extends JavaPlugin {
         taskChainFactory = BukkitTaskChainFactory.create(this);
 
         try {
-            configurationManager = new ConfigurationManager(this, this.getFile());
+            configurationManager = new ConfigurationManager(this);
             configurationManager.reload(this);
         } catch (RuntimeException e) {
             getLogger().severe(e.getMessage());

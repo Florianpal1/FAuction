@@ -150,10 +150,11 @@ block:
   '43':
     utility: auction
   '44':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: " "
-    description: {}
+    utility: player
+    material: NETHER_STAR
+    title: "&5My Items"
+    description:
+      - "&eClick here to see your items for sale"
   '45':
     utility: expireGui
     material: CHEST_MINECART
@@ -210,11 +211,12 @@ block:
       - "&eClick here to change filter"
       - "&eCurrent filter : {categoryDisplayName}"
   '52':
-    utility: player
-    material: NETHER_STAR
-    title: "&5My Items"
+    utility: sorting
+    material: BOOK
+    title: "&5Sort."
     description:
-      - "&eClick here to see your items for sale"
+      - "&eClick here to sort item"
+      - "&eCurrent sort : {sortDisplayName}"
   '53':
     utility: close
     material: BARRIER

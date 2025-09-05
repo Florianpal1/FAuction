@@ -6,23 +6,19 @@ import fr.florianpal.fauction.enums.CancelReason;
 import fr.florianpal.fauction.enums.Gui;
 import fr.florianpal.fauction.events.AuctionCancelEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
-import fr.florianpal.fauction.gui.visualization.InventoryVisualization;
 import fr.florianpal.fauction.languages.MessageKeys;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
+import fr.florianpal.fauction.objects.Sort;
 import fr.florianpal.fauction.utils.CurrencyUtil;
-import fr.florianpal.fauction.utils.ItemUtil;
 import fr.florianpal.fauction.utils.MessageUtil;
 import fr.florianpal.fauction.utils.VisualizationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 
 import java.util.List;
 
@@ -30,15 +26,15 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
 
     private final AuctionConfig auctionConfig;
 
-    public AuctionsGui(FAuction plugin, Player player, List<Auction> auctions, int page, Category category) {
-        super(plugin, player, page, auctions, category, plugin.getConfigurationManager().getAuctionConfig());
+    public AuctionsGui(FAuction plugin, Player player, List<Auction> auctions, int page, Category category, Sort sort) {
+        super(plugin, player, page, auctions, category, sort, plugin.getConfigurationManager().getAuctionConfig());
         this.auctionConfig = plugin.getConfigurationManager().getAuctionConfig();
     }
 
     @Override
     protected void previousAction() {
         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, this.page - 1, category);
+            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, this.page - 1, category, sort);
             gui.initialize();
         }).execute();
     }
@@ -46,7 +42,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
     @Override
     protected void nextAction() {
         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, this.page + 1, category);
+            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, this.page + 1, category, sort);
             gui.initialize();
         }).execute();
     }
@@ -54,7 +50,15 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
     @Override
     protected void categoryAction(Category nextCategory) {
         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, nextCategory);
+            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, nextCategory, sort);
+            gui.initialize();
+        }).execute();
+    }
+
+    @Override
+    protected void sortingAction(Sort nextSort) {
+        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, category, nextSort);
             gui.initialize();
         }).execute();
     }
@@ -126,7 +130,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                         player.closeInventory();
 
                         FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctionsNew -> {
-                            AuctionsGui gui = new AuctionsGui(plugin, player, auctionsNew, 1, category);
+                            AuctionsGui gui = new AuctionsGui(plugin, player, auctionsNew, 1, category, sort);
                             gui.initialize();
                         }).execute();
                     }).execute();
