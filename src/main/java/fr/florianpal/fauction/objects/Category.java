@@ -1,6 +1,7 @@
 package fr.florianpal.fauction.objects;
 
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,10 +37,42 @@ public class Category {
     }
 
     public boolean containsAll() {
-        return materials.stream().anyMatch(s -> s.equals("ALL"));
+        return materials.contains("ALL");
     }
 
     public boolean containsEnchanted() {
-        return materials.stream().anyMatch(s -> s.equals("ENCHANTED"));
+        return materials.contains("ENCHANTED");
+    }
+
+    public boolean containsWeapons() {
+        return materials.contains("WEAPONS");
+    }
+
+    public boolean containsTools() {
+        return materials.contains("TOOLS");
+    }
+
+    public boolean containsArmor() {
+        return materials.contains("ARMOR");
+    }
+
+    public boolean containsBlocks() {
+        return materials.contains("BLOCKS");
+    }
+
+    public boolean containsFood() {
+        return materials.contains("FOOD");
+    }
+
+    public boolean containsPotions() {
+        return materials.contains("POTIONS");
+    }
+
+    public boolean containsMisc() {
+        return materials.contains("MISC");
+    }
+
+    public boolean containsCustom() {
+        return materials.contains("CUSTOM");
     }
 }

@@ -38,3 +38,35 @@ categories:
         - WHITE_SHULKER_BOX
         - YELLOW_SHULKER_BOX
         - PURPLE_SHULKER_BOX
+    'weapons':
+      displayName: "Weapons"
+      materials:
+        - WEAPONS
+    'tools':
+      displayName: "Tools"
+      materials:
+        - TOOLS
+    'armor':
+      displayName: "Armor"
+      materials:
+        - ARMOR
+    'blocks':
+      displayName: "Building Blocks"
+      materials:
+        - BLOCKS
+    'food':
+      displayName: "Food & Drinks"
+      materials:
+        - FOOD
+    'potions':
+      displayName: "Potions"
+      materials:
+        - POTIONS
+    'misc':
+      displayName: "Miscellaneous"
+      materials:
+        - MISC
+    'custom':
+      displayName: "Custom Items"
+      materials:
+        - CUSTOM
