@@ -1,6 +1,9 @@
 package fr.florianpal.fauction.utils;
 
+import fr.florianpal.fauction.FAuction;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;
@@ -59,15 +62,39 @@ public class FormatUtil {
 
     public static String titleItemFormat(ItemStack item, String replacement, String title) {
         if (item.getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-            return title.replace(replacement, item.getType().name().replace('_', ' ').toLowerCase());
+            return title.replace(replacement, FAuction.getApi().getMLang().getItemStackTranslation(item));
         }
         return title.replace(replacement, item.getItemMeta().getDisplayName());
     }
 
     public static String titleItemFormat(ItemStack item) {
         if (item.getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-            return item.getType().name().replace('_', ' ').toLowerCase();
+            return FAuction.getApi().getMLang().getItemStackTranslation(item);
         }
         return item.getItemMeta().getDisplayName();
+    }
+
+    public static String formatLanguageCode(String languageCode) {
+        if (languageCode.contains("_")) {
+            return languageCode;
+        }
+
+        return switch (languageCode.toLowerCase()) {
+            case "ru" -> "ru_ru";
+            case "en" -> "en_us";
+            case "fr" -> "fr_fr";
+            case "zhcn" -> "zh_cn";
+            default -> languageCode + "_" + languageCode;
+        };
+    }
+
+    public static String formatServerVersion() {
+        String bukkitVersion = Bukkit.getServer().getBukkitVersion();
+
+        if (bukkitVersion.contains("-")) {
+            return bukkitVersion.split("-")[0];
+        }
+
+        return bukkitVersion;
     }
 }
