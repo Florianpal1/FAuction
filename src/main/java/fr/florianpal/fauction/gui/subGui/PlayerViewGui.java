@@ -9,6 +9,7 @@ import fr.florianpal.fauction.languages.MessageKeys;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Sort;
+import fr.florianpal.fauction.utils.FormatUtil;
 import fr.florianpal.fauction.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -119,7 +120,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                             auctions.remove(a);
                             Bukkit.getPluginManager().callEvent(new AuctionCancelEvent(player, a, CancelReason.PLAYER));
 
-                            MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_AUCTION_SUCCESS);
+                            MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(a.getItemStack()));
                         } catch (Exception exception) {
                             plugin.getLogger().severe(exception.toString());
                         }
