@@ -268,10 +268,10 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                             return;
                         }
 
-                        MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", String.valueOf(auctionGood.getPrice()));
+                        MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
 
                         if (offlinePlayer.isOnline()) {
-                            MessageUtil.sendMessage(plugin, offlinePlayer.getPlayer(), MessageKeys.BUY_AUCTION_TARGET_SUCCESS, "{player}", player.getName(), "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", String.valueOf(auctionGood.getPrice()));
+                            MessageUtil.sendMessage(plugin, offlinePlayer.getPlayer(), MessageKeys.BUY_AUCTION_TARGET_SUCCESS, "{player}", player.getName(), "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
                         }
 
                         auctionCommandManager.deleteAuction(auctionGood.getId());
