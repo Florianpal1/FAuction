@@ -103,6 +103,11 @@
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <!--MLang repo-->
+        <repository>
+            <id>endchest</id>
+            <url>https://repo.endchest.ru/</url>
+        </repository>
     </repositories>
 
     <dependencies>
