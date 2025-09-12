@@ -6,7 +6,7 @@
 
     <groupId>fr.florianpal</groupId>
     <artifactId>fauction</artifactId>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <properties>
         <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
         <maven.compiler.source>16</maven.compiler.source>
@@ -105,8 +105,8 @@
         </repository>
         <!--MLang repo-->
         <repository>
-            <id>endchest</id>
-            <url>https://repo.endchest.ru/</url>
+            <id>endchest-releases</id>
+            <url>https://repo.endchest.ru/releases</url>
         </repository>
     </repositories>
 
