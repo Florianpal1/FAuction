@@ -17,7 +17,9 @@ import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.utils.FileUtil;
+import fr.florianpal.fauction.utils.FormatUtil;
 import io.papermc.lib.PaperLib;
+import me.seetch.MLang;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bukkit.Bukkit;
@@ -75,6 +77,8 @@ public class FAuction extends JavaPlugin {
     public static TaskChainFactory getTaskChainFactory() {
         return taskChainFactory;
     }
+
+    private MLang mLang;
 
     @Override
     public void onEnable() {
@@ -149,6 +153,25 @@ public class FAuction extends JavaPlugin {
         api = this;
 
         initChart();
+
+        mLang = MLang.getInstance(this);
+
+        String language = FormatUtil.formatLanguageCode(configurationManager.getGlobalConfig().getLang());
+        String version = FormatUtil.formatServerVersion();
+
+        mLang.setDefaultLanguage(language);
+        mLang.setDefaultVersion(version);
+
+        mLang.loadDefaultLanguageAsync().thenAccept(success -> {
+            if (success) {
+                getLogger().info("Language " + language + " for version " + version + " loaded successfully!");
+            } else {
+                getLogger().warning("Failed to load language " + language + " for version " + version);
+            }
+        }).exceptionally(throwable -> {
+            getLogger().severe("Error loading language: " + throwable.getMessage());
+            return null;
+        });
     }
 
     @Override
@@ -276,5 +299,9 @@ public class FAuction extends JavaPlugin {
 
     public CurrencyPendingQueries getCurrencyPendingQueries() {
         return currencyPendingQueries;
+    }
+
+    public MLang getMLang() {
+        return mLang;
     }
 }
