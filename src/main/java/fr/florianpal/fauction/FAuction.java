@@ -163,7 +163,7 @@ public class FAuction extends JavaPlugin {
         mLang.setDefaultVersion(version);
 
         mLang.loadDefaultLanguageAsync().thenAccept(success -> {
-            if (success) {
+            if (Boolean.TRUE.equals(success)) {
                 getLogger().info("Language " + language + " for version " + version + " loaded successfully!");
             } else {
                 getLogger().warning("Failed to load language " + language + " for version " + version);

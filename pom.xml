@@ -66,6 +66,24 @@
                             <exclude>org.vafer:*</exclude>
                             <exclude>org.slf4j:*</exclude>
                             <exclude>org.apache.maven.plugins:*</exclude>
+                            <exclude>org.projectlombok:*</exclude>
+                            <exclude>org.vafer:*</exclude>
+                            <exclude>com.sun.istack:*</exclude>
+                            <exclude>org.glassfish.jaxb:*</exclude>
+                            <exclude>org.eclipse.angus:*</exclude>
+                            <exclude>net.bytebuddy:*</exclude>
+                            <exclude>net.kyori:*</exclude>
+                            <exclude>com.google.auto.service:*</exclude>
+                            <exclude>org.apache.maven:*</exclude>
+                            <exclude>org.apache.maven.resolver:*</exclude>
+                            <exclude>com.google.guava:*</exclude>
+                            <exclude>com.google.code.gson:*</exclude>
+                            <exclude>org.joml:*</exclude>
+                            <exclude>org.yaml:*</exclude>
+                            <exclude>it.unimi.dsi:*</exclude>
+                            <exclude>net.md-5:bungeecord-chat:*</exclude>
+                            <exclude>org.jspecify:*</exclude>
+                            <exclude>com.google.errorprone:*</exclude>
                         </excludes>
                     </artifactSet>
                 </configuration>
@@ -143,21 +161,21 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>7.0.8.Final</version>
+            <version>7.1.1.Final</version>
             <scope>provided</scope>
         </dependency>
         <!--Hibernate HikariCP-->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
-            <version>7.0.8.Final</version>
+            <version>7.1.1.Final</version>
             <scope>provided</scope>
         </dependency>
         <!--HikariCP-->
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.2</version>
             <scope>compile</scope>
         </dependency>
         <!--TaskChain-->
@@ -170,14 +188,14 @@
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
+            <version>1.7.1</version>
             <scope>provided</scope>
         </dependency>
         <!--LuckPerms-->
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
-            <version>5.4</version>
+            <version>5.5</version>
             <scope>provided</scope>
         </dependency>
         <!--BStats-->
@@ -191,7 +209,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.6.0</version>
+            <version>3.6.1</version>
         </dependency>
         <!--Boosted Yaml-->
         <dependency>
