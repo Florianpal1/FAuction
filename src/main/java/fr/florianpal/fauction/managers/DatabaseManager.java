@@ -21,7 +21,7 @@ public class DatabaseManager {
 
     private final ArrayList<IDatabaseTable> repositories = new ArrayList<>();
 
-    public DatabaseManager(FAuction plugin) {
+    public DatabaseManager(FAuction plugin) throws SQLException {
         this.plugin = plugin;
 
         config.setJdbcUrl(plugin.getConfigurationManager().getDatabase().getUrl());
