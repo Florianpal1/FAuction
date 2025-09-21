@@ -38,6 +38,10 @@ public class DatabaseManager {
             config.addDataSourceProperty("dataSource.journal_mode", "WAL");
         }
 
+        if (plugin.getConfigurationManager().getDatabase().getSqlType().equals(SQLType.MariaDB)) {
+            config.setDriverClassName("org.mariadb.jdbc.Driver");
+        }
+
         ds = new HikariDataSource(config);
     }
 

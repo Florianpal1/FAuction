@@ -1,6 +1,6 @@
 version: 1
 database:
-  type: SQLite
+  type: SQLite # SQLite, MySQL, MariaDB, PostgreSQL
   url: "jdbc:sqlite:plugins/FAuction/database.db"
   user: "root"
   password: ""

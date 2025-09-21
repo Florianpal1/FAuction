@@ -5,5 +5,7 @@ public enum SQLType {
 
     MySQL,
 
-    PostgreSQL;
+    PostgreSQL,
+
+    MariaDB;
 }
