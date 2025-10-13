@@ -9,13 +9,14 @@ import org.bukkit.Material;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static fr.florianpal.fauction.enums.BlockType.*;
 
 public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
-    protected List<Integer> baseBlocks = new ArrayList<>();
+    protected LinkedHashMap<Integer, Integer> baseBlocks = new LinkedHashMap<>();
 
     protected List<Barrier> previousBlocks = new ArrayList<>();
 
@@ -40,11 +41,12 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
         previousBlocks = new ArrayList<>();
         nextBlocks = new ArrayList<>();
-        baseBlocks = new ArrayList<>();
+        baseBlocks = new LinkedHashMap<>();
         description = new ArrayList<>();
         categoriesBlocks = new ArrayList<>();
         sortingBlocks = new ArrayList<>();
         confirmBlocks = new ArrayList<>();
+        int baseCounter = 0;
 
         for (Object indexObject : config.getSection("block").getKeys()) {
 
@@ -120,7 +122,9 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
                 );
                 sortingBlocks.add(barrier);
             } else if (baseBlock.equalsIgnoreCase(currentUtility)) {
-                baseBlocks.add(Integer.valueOf(index));
+
+                baseBlocks.put(baseCounter, Integer.valueOf(index));
+                baseCounter = baseCounter + 1;
             } else if (CONFIRM.equalsIgnoreCase(currentUtility)) {
                 confirmBlocks.add(new Confirm(Integer.parseInt(index), null,
                         Material.getMaterial(config.getString("block." + index + ".material", Material.BARRIER.toString())),
@@ -135,7 +139,7 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
         description.addAll(config.getStringList("gui.description"));
     }
 
-    public List<Integer> getBaseBlocks() {
+    public LinkedHashMap<Integer, Integer> getBaseBlocks() {
         return baseBlocks;
     }
 

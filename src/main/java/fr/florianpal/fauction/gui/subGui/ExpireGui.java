@@ -78,17 +78,16 @@ public class ExpireGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        for (int index : expireGuiConfig.getBaseBlocks()) {
-            if (index == e.getRawSlot()) {
+        for (var index : expireGuiConfig.getBaseBlocks().entrySet()) {
+            if (index.getValue() == e.getRawSlot()) {
 
                 if (auctions.isEmpty()) {
                     player.closeInventory();
                     return;
                 }
 
-                int nb0 = expireGuiConfig.getBaseBlocks().get(0);
-                int nb = (e.getRawSlot() - nb0) / 9;
-                Auction auction = auctions.get((e.getRawSlot() - nb0) + ((this.expireGuiConfig.getExpireBlocks().size() * this.page) - this.expireGuiConfig.getExpireBlocks().size()) - nb * 2);
+                int itemIndex = ((index.getKey() + 1) + (this.expireGuiConfig.getBaseBlocks().size() * (this.page - 1))) - 1;
+                Auction auction = auctions.get(itemIndex);
 
                 if (e.isLeftClick()) {
                     FAuction.newChain().asyncFirst(() -> expireCommandManager.expireExist(auction.getId())).syncLast(a -> {

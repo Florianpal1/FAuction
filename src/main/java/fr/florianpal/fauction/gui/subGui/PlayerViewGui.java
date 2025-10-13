@@ -86,11 +86,11 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        for (int index : playerViewConfig.getBaseBlocks()) {
-            if (index == e.getRawSlot()) {
-                int nb0 = playerViewConfig.getBaseBlocks().get(0);
-                int nb = (e.getRawSlot() - nb0) / 9;
-                Auction auction = auctions.get((e.getRawSlot() - nb0) + ((this.playerViewConfig.getBaseBlocks().size() * this.page) - this.playerViewConfig.getBaseBlocks().size()) - nb * 2);
+        for (var index : playerViewConfig.getBaseBlocks().entrySet()) {
+            if (index.getValue() == e.getRawSlot()) {
+
+                int itemIndex = ((index.getKey() + 1) + (this.playerViewConfig.getBaseBlocks().size() * (this.page - 1))) - 1;
+                Auction auction = auctions.get(itemIndex);
 
                 if (e.isRightClick()) {
                     int auctionId = auction.getId();

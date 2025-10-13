@@ -46,8 +46,8 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
             inv.setItem(barrier.getIndex(), getItemStack(barrier, false));
         }
 
-        for (Integer index : auctionConfirmConfig.getBaseBlocks()) {
-            inv.setItem(index, createGuiItem(auction));
+        for (var index : auctionConfirmConfig.getBaseBlocks().entrySet()) {
+            inv.setItem(index.getValue(), createGuiItem(auction));
         }
 
         int id = 0;
@@ -218,7 +218,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        boolean isBaseBlock = abstractGuiWithAuctionsConfig.getBaseBlocks().stream().anyMatch(b -> b == e.getRawSlot());
+        boolean isBaseBlock = abstractGuiWithAuctionsConfig.getBaseBlocks().values().stream().anyMatch(b -> b == e.getRawSlot());
         if (isBaseBlock) {
 
             VisualizationUtils.createVizualisation(plugin, auction, player, Gui.CONFIRM);

@@ -95,8 +95,8 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
 
         if (!auctions.isEmpty()) {
             int id = (this.abstractGuiWithAuctionsConfig.getBaseBlocks().size() * this.page) - this.abstractGuiWithAuctionsConfig.getBaseBlocks().size();
-            for (int index : abstractGuiWithAuctionsConfig.getBaseBlocks()) {
-                inv.setItem(index, createGuiItem(auctions.get(id)));
+            for (var index : abstractGuiWithAuctionsConfig.getBaseBlocks().entrySet()) {
+                inv.setItem(index.getValue(), createGuiItem(auctions.get(id)));
                 id++;
                 if (id >= (auctions.size())) break;
             }

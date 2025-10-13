@@ -6,11 +6,11 @@
 
     <groupId>fr.florianpal</groupId>
     <artifactId>fauction</artifactId>
-    <version>1.9.4</version>
+    <version>1.9.5</version>
     <properties>
         <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
     <distributionManagement>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.9-R0.1-SNAPSHOT</version>
+            <version>1.21.10-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -161,14 +161,14 @@
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>7.1.2.Final</version>
+            <version>7.1.4.Final</version>
             <scope>provided</scope>
         </dependency>
         <!--Hibernate HikariCP-->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
-            <version>7.1.2.Final</version>
+            <version>7.1.4.Final</version>
             <scope>provided</scope>
         </dependency>
         <!--HikariCP-->
