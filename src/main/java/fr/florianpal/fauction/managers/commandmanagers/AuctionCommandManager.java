@@ -16,7 +16,7 @@ public class AuctionCommandManager {
 
     private final AuctionQueries auctionQueries;
 
-    private final Map<UUID, List<Auction>> cache = new HashMap<>();
+    private Map<UUID, List<Auction>> cache = new HashMap<>();
 
     private List<Auction> sqliteCache = new ArrayList<>();
 
@@ -91,12 +91,14 @@ public class AuctionCommandManager {
     public void updateCache() {
         List<Auction> auctions = auctionQueries.getAuctions();
 
+        Map<UUID, List<Auction>> tempCache = new HashMap<>();
         for (Auction auction : auctions) {
-            if (!cache.containsKey(auction.getPlayerUUID())) {
-                cache.put(auction.getPlayerUUID(), new ArrayList<>());
+            if (!tempCache.containsKey(auction.getPlayerUUID())) {
+                tempCache.put(auction.getPlayerUUID(), new ArrayList<>());
             }
-            cache.get(auction.getPlayerUUID()).add(auction);
+            tempCache.get(auction.getPlayerUUID()).add(auction);
         }
+        this.cache = tempCache;
     }
 
     public Map<UUID, List<Auction>> getCache() {

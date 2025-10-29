@@ -13,7 +13,7 @@ public class ExpireCommandManager {
 
     private final ExpireQueries expireQueries;
 
-    private final Map<UUID, List<Auction>> cache = new HashMap<>();
+    private Map<UUID, List<Auction>> cache = new HashMap<>();
 
     private List<Auction> sqliteCache = new ArrayList<>();
 
@@ -78,12 +78,14 @@ public class ExpireCommandManager {
     public void updateCache() {
         List<Auction> expires = expireQueries.getExpires();
 
+        Map<UUID, List<Auction>> tempCache = new HashMap<>();
         for (Auction expire : expires) {
-            if (!cache.containsKey(expire.getPlayerUUID())) {
-                cache.put(expire.getPlayerUUID(), new ArrayList<>());
+            if (!tempCache.containsKey(expire.getPlayerUUID())) {
+                tempCache.put(expire.getPlayerUUID(), new ArrayList<>());
             }
-            cache.get(expire.getPlayerUUID()).add(expire);
+            tempCache.get(expire.getPlayerUUID()).add(expire);
         }
+        this.cache = tempCache;
     }
 
     public Map<UUID, List<Auction>> getCache() {

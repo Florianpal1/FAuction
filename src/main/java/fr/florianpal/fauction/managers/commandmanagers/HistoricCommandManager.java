@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class HistoricCommandManager {
     private final HistoricQueries historicQueries;
 
-    private final Map<UUID, List<Historic>> cache = new HashMap<>();
+    private Map<UUID, List<Historic>> cache = new HashMap<>();
 
     private List<Historic> sqliteCache = new ArrayList<>();
 
@@ -56,12 +56,14 @@ public class HistoricCommandManager {
     public void updateCache() {
         List<Historic> historics = historicQueries.getHistorics();
 
+        Map<UUID, List<Historic>> tempCache = new HashMap<>();
         for (Historic historic : historics) {
-            if (!cache.containsKey(historic.getPlayerUUID())) {
-                cache.put(historic.getPlayerUUID(), new ArrayList<>());
+            if (!tempCache.containsKey(historic.getPlayerUUID())) {
+                tempCache.put(historic.getPlayerUUID(), new ArrayList<>());
             }
-            cache.get(historic.getPlayerUUID()).add(historic);
+            tempCache.get(historic.getPlayerUUID()).add(historic);
         }
+        this.cache = tempCache;
     }
 
     public Map<UUID, List<Historic>> getCache() {
