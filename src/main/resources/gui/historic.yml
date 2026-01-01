@@ -5,6 +5,7 @@ gui:
   name: "Historic {Page}/{TotalPage}"
   title: "&eItem : &6{ItemName}"
   replaceTitle: false
+  hideFlag: false
   description:
     - "&5Sold by : &6{OwnerName}"
     - "&5Price : &6{Price}"

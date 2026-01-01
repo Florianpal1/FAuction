@@ -13,6 +13,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -123,6 +124,11 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
             desc = FormatUtil.format(desc);
             descriptions.add(desc);
         }
+
+        if (abstractGuiWithAuctionsConfig.isHideFlag()) {
+            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        }
+
         meta.setDisplayName(name);
         meta.setLore(descriptions);
         itemStack.setItemMeta(meta);
@@ -186,6 +192,11 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
             }
         }
         if (meta != null) {
+
+            if (abstractGuiWithAuctionsConfig.isHideFlag()) {
+                meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            }
+
             if (abstractGuiWithAuctionsConfig.isReplaceTitle()) {
                 meta.setDisplayName(title);
             }
@@ -220,6 +231,11 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
+
+                if (abstractGuiWithAuctionsConfig.isHideFlag()) {
+                    meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+                }
+
                 String name = barrier.getTitle().replace("{categoryDisplayName}", category != null ? category.getDisplayName() : "");
                 name = name.replace("{sortDisplayName}", category != null ? category.getDisplayName() : "");
                 name = PlaceholderUtil.parsePlaceholder(plugin.isPlaceholderAPIEnabled(), player, name);

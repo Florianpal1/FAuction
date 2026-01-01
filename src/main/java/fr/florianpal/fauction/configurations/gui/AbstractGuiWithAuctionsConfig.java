@@ -34,6 +34,8 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
     protected List<String> description = new ArrayList<>();
 
+    private boolean hideFlag = false;
+
     @Override
     public void load(FAuction plugin, YamlDocument config, String baseBlock) {
 
@@ -136,6 +138,7 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
         title = config.getString("gui.title");
         replaceTitle = config.getBoolean("gui.replaceTitle", true);
+        hideFlag = config.getBoolean("gui.hideFlag", false);
         description.addAll(config.getStringList("gui.description"));
     }
 
@@ -169,5 +172,9 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
 
     public List<Barrier> getSortingBlocks() {
         return sortingBlocks;
+    }
+
+    public boolean isHideFlag() {
+        return hideFlag;
     }
 }

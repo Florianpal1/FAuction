@@ -5,6 +5,7 @@ gui:
   name: "Confirmation of purchase of an item."
   title-true: "&eConfirm the purchase of {Item}."
   title-false: "&eCancel."
+  hideFlag: false
   description:
     - "&5Sold by: &6{OwnerName}"
     - "&5Price: &6{Price}"
