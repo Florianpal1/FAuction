@@ -3,7 +3,9 @@ package fr.florianpal.fauction.configurations;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.florianpal.fauction.enums.SQLType;
+import lombok.Getter;
 
+@Getter
 public class DatabaseConfig {
 
     private SQLType sqlType;
@@ -24,23 +26,4 @@ public class DatabaseConfig {
         maximumPoolSize = config.getInt("database.maximumPoolSize", 50);
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public SQLType getSqlType() {
-        return sqlType;
-    }
-
-    public int getMaximumPoolSize() {
-        return maximumPoolSize;
-    }
 }

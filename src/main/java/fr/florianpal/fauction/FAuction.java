@@ -19,6 +19,7 @@ import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.utils.FileUtil;
 import fr.florianpal.fauction.utils.FormatUtil;
 import io.papermc.lib.PaperLib;
+import lombok.Getter;
 import me.seetch.MLang;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
@@ -36,38 +37,54 @@ public class FAuction extends JavaPlugin {
 
     private static TaskChainFactory taskChainFactory;
 
+    @Getter
     private ConfigurationManager configurationManager;
 
+    @Getter
     private AuctionQueries auctionQueries;
 
+    @Getter
     private ExpireQueries expireQueries;
 
+    @Getter
     private HistoricQueries historicQueries;
 
+    @Getter
     private CurrencyPendingQueries currencyPendingQueries;
 
+    @Getter
     private CommandManager commandManager;
 
+    @Getter
     private VaultIntegrationManager vaultIntegrationManager;
 
+    @Getter
     private DatabaseManager databaseManager;
 
+    @Getter
     private LimitationManager limitationManager;
 
+    @Getter
     private AuctionCommandManager auctionCommandManager;
 
+    @Getter
     private ExpireCommandManager expireCommandManager;
 
+    @Getter
     private HistoricCommandManager historicCommandManager;
 
+    @Getter
     private SpamManager spamManager;
 
+    @Getter
     private TransfertManager transfertManager;
 
     private Metrics metrics;
 
+    @Getter
     private LuckPermsImplementation luckPermsImplementation;
 
+    @Getter
     private boolean placeholderAPIEnabled = false;
 
     public static <T> TaskChain<T> newChain() {
@@ -78,6 +95,7 @@ public class FAuction extends JavaPlugin {
         return taskChainFactory;
     }
 
+    @Getter
     private MLang mLang;
 
     @Override
@@ -228,66 +246,6 @@ public class FAuction extends JavaPlugin {
         historicCommandManager.deleteAll();
     }
 
-    public ConfigurationManager getConfigurationManager() {
-        return configurationManager;
-    }
-
-    public AuctionQueries getAuctionQueries() {
-        return auctionQueries;
-    }
-
-    public CommandManager getCommandManager() {
-        return commandManager;
-    }
-
-    public VaultIntegrationManager getVaultIntegrationManager() {
-        return vaultIntegrationManager;
-    }
-
-    public DatabaseManager getDatabaseManager() {
-        return databaseManager;
-    }
-
-    public AuctionCommandManager getAuctionCommandManager() {
-        return auctionCommandManager;
-    }
-
-    public LimitationManager getLimitationManager() {
-        return limitationManager;
-    }
-
-    public ExpireQueries getExpireQueries() {
-        return expireQueries;
-    }
-
-    public ExpireCommandManager getExpireCommandManager() {
-        return expireCommandManager;
-    }
-
-    public LuckPermsImplementation getLuckPermsImplementation() {
-        return luckPermsImplementation;
-    }
-
-    public HistoricQueries getHistoricQueries() {
-        return historicQueries;
-    }
-
-    public HistoricCommandManager getHistoricCommandManager() {
-        return historicCommandManager;
-    }
-
-    public SpamManager getSpamManager() {
-        return spamManager;
-    }
-
-    public TransfertManager getTransfertManager() {
-        return transfertManager;
-    }
-
-    public boolean isPlaceholderAPIEnabled() {
-        return placeholderAPIEnabled;
-    }
-
     public void migrate(String migrateVersion) {
 
         switch (migrateVersion) {
@@ -295,13 +253,5 @@ public class FAuction extends JavaPlugin {
                 historicQueries.addBuyDate();
                 break;
         }
-    }
-
-    public CurrencyPendingQueries getCurrencyPendingQueries() {
-        return currencyPendingQueries;
-    }
-
-    public MLang getMLang() {
-        return mLang;
     }
 }

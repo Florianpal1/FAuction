@@ -7,6 +7,7 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import fr.florianpal.fauction.FAuction;
+import lombok.Getter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 public class MenuConfig {
 
     private final Map<String, CustomMenuConfig> menus = new HashMap<>();
@@ -48,7 +50,4 @@ public class MenuConfig {
 
     }
 
-    public Map<String, CustomMenuConfig> getMenus() {
-        return menus;
-    }
 }

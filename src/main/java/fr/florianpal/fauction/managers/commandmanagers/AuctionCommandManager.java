@@ -5,6 +5,7 @@ import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.queries.AuctionQueries;
 import fr.florianpal.fauction.utils.SerializationUtil;
+import lombok.Getter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,6 +17,7 @@ public class AuctionCommandManager {
 
     private final AuctionQueries auctionQueries;
 
+    @Getter
     private Map<UUID, List<Auction>> cache = new HashMap<>();
 
     private List<Auction> sqliteCache = new ArrayList<>();
@@ -99,9 +101,5 @@ public class AuctionCommandManager {
             tempCache.get(auction.getPlayerUUID()).add(auction);
         }
         this.cache = tempCache;
-    }
-
-    public Map<UUID, List<Auction>> getCache() {
-        return cache;
     }
 }

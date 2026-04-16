@@ -3,7 +3,6 @@ package fr.florianpal.fauction.utils;
 import fr.florianpal.fauction.FAuction;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 
 import java.time.Duration;

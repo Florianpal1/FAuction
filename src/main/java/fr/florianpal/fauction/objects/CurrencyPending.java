@@ -1,9 +1,11 @@
 package fr.florianpal.fauction.objects;
 
 import fr.florianpal.fauction.enums.CurrencyType;
+import lombok.Getter;
 
 import java.util.UUID;
 
+@Getter
 public class CurrencyPending {
 
     private final int id;
@@ -19,21 +21,5 @@ public class CurrencyPending {
         this.playerUUID = playerUUID;
         this.currencyType = currencyType;
         this.amount = amount;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public UUID getPlayerUUID() {
-        return playerUUID;
-    }
-
-    public CurrencyType getCurrencyType() {
-        return currencyType;
-    }
-
-    public double getAmount() {
-        return amount;
     }
 }

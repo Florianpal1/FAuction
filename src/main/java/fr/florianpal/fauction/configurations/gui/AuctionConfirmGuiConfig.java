@@ -3,10 +3,12 @@ package fr.florianpal.fauction.configurations.gui;
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.objects.Confirm;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class AuctionConfirmGuiConfig extends AbstractGuiWithAuctionsConfig {
 
     private String titleTrue = "";
@@ -33,19 +35,4 @@ public class AuctionConfirmGuiConfig extends AbstractGuiWithAuctionsConfig {
         return confirmBlocks;
     }
 
-    public String getTitleTrue() {
-        return titleTrue;
-    }
-
-    public String getTitleFalse() {
-        return titleFalse;
-    }
-
-    public String getAuctionTitle() {
-        return auctionTitle;
-    }
-
-    public List<String> getAuctionDescription() {
-        return auctionDescription;
-    }
 }

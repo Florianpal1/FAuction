@@ -1,15 +1,17 @@
 package fr.florianpal.fauction.objects;
 
+import lombok.Getter;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Category {
 
+    @Getter
     private final String id;
 
+    @Getter
     private final String displayName;
 
     private final List<String> materials;
@@ -18,14 +20,6 @@ public class Category {
         this.id = id;
         this.displayName = displayName;
         this.materials = materials;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getDisplayName() {
-        return displayName;
     }
 
     public List<String> getMaterialsString() {

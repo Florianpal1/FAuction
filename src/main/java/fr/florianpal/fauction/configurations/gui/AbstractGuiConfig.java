@@ -6,6 +6,7 @@ import fr.florianpal.fauction.enums.BlockType;
 import fr.florianpal.fauction.objects.Barrier;
 import fr.florianpal.fauction.objects.BarrierMenu;
 import fr.florianpal.fauction.objects.BarrierWithCategory;
+import lombok.Getter;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryType;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static fr.florianpal.fauction.enums.BlockType.*;
 
+@Getter
 public abstract class AbstractGuiConfig {
 
     protected InventoryType inventoryType;
@@ -154,49 +156,5 @@ public abstract class AbstractGuiConfig {
                 commandBlocks.add(barrier);
             }
         }
-    }
-
-    public List<BarrierWithCategory> getAuctionGuiBlocks() {
-        return auctionGuiBlocks;
-    }
-
-    public List<Barrier> getCloseBlocks() {
-        return closeBlocks;
-    }
-
-    public List<BarrierWithCategory> getPlayerBlocks() {
-        return playerBlocks;
-    }
-
-    public List<BarrierWithCategory> getHistoricBlocks() {
-        return historicBlocks;
-    }
-
-    public List<Barrier> getBarrierBlocks() {
-        return barrierBlocks;
-    }
-
-    public List<BarrierWithCategory> getExpireBlocks() {
-        return expireBlocks;
-    }
-
-    public List<BarrierMenu> getMenuBlocks() {
-        return menuBlocks;
-    }
-
-    public String getNameGui() {
-        return nameGui;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public InventoryType getType() {
-        return inventoryType;
-    }
-
-    public List<Barrier> getCommandBlocks() {
-        return commandBlocks;
     }
 }

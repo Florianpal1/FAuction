@@ -2,6 +2,7 @@ package fr.florianpal.fauction.configurations;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.florianpal.fauction.objects.Category;
+import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Map;
 
 public class CategoriesConfig {
 
+    @Getter
     private LinkedHashMap<String, Category> categories;
 
     public void load(YamlDocument config) {
@@ -20,10 +22,6 @@ public class CategoriesConfig {
 
             categories.put(id.toString(), new Category(id.toString(), displayName, materials));
         }
-    }
-
-    public Map<String, Category> getCategories() {
-        return categories;
     }
 
     public Category getDefault() {

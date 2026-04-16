@@ -1,12 +1,15 @@
 package fr.florianpal.fauction.objects;
 
 import fr.florianpal.fauction.utils.SerializationUtil;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.UUID;
 
+@Getter
 public class Auction {
 
     private final int id;
@@ -15,6 +18,7 @@ public class Auction {
 
     private final String playerName;
 
+    @Setter
     private double price;
 
     private final ItemStack itemStack;
@@ -34,31 +38,4 @@ public class Auction {
         this.date = new Date(date);
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public UUID getPlayerUUID() {
-        return playerUUID;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public ItemStack getItemStack() {
-        return itemStack;
-    }
-
-    public String getPlayerName() {
-        return playerName;
-    }
-
-    public Date getDate() {
-        return date;
-    }
 }

@@ -2,12 +2,14 @@ package fr.florianpal.fauction.configurations;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.florianpal.fauction.objects.Sort;
+import lombok.Getter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SortConfig {
 
+    @Getter
     private LinkedHashMap<String, Sort> sort;
 
     public void load(YamlDocument config) {
@@ -19,10 +21,6 @@ public class SortConfig {
 
             sort.put(id.toString(), new Sort(id.toString(), displayName, type));
         }
-    }
-
-    public Map<String, Sort> getSort() {
-        return sort;
     }
 
     public Sort getDefault() {

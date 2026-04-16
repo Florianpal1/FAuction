@@ -1,14 +1,19 @@
 package fr.florianpal.fauction.managers;
 
 import fr.florianpal.fauction.FAuction;
+import lombok.Getter;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
+@Getter
 public class VaultIntegrationManager {
+
     private Permission perms;
+
     private Economy economy;
+
     public VaultIntegrationManager(FAuction plugin) {
         if (plugin.getServer().getPluginManager().getPlugin("Vault") != null) {
             if (!setupPermissions()) {
@@ -42,12 +47,5 @@ public class VaultIntegrationManager {
             perms = rsp.getProvider();
         }
         return perms != null;
-    }
-
-    public Permission getPerms() {
-        return perms;
-    }
-    public Economy getEconomy() {
-        return economy;
     }
 }

@@ -5,6 +5,7 @@ import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.queries.ExpireQueries;
 import fr.florianpal.fauction.utils.SerializationUtil;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ public class ExpireCommandManager {
 
     private final ExpireQueries expireQueries;
 
+    @Getter
     private Map<UUID, List<Auction>> cache = new HashMap<>();
 
     private List<Auction> sqliteCache = new ArrayList<>();
@@ -86,9 +88,5 @@ public class ExpireCommandManager {
             tempCache.get(expire.getPlayerUUID()).add(expire);
         }
         this.cache = tempCache;
-    }
-
-    public Map<UUID, List<Auction>> getCache() {
-        return cache;
     }
 }

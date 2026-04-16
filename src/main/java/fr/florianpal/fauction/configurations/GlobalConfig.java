@@ -2,6 +2,7 @@ package fr.florianpal.fauction.configurations;
 
 import dev.dejvokep.boostedyaml.YamlDocument;
 import fr.florianpal.fauction.enums.CurrencyType;
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Getter
 public class GlobalConfig {
 
     private String lang = "en";
@@ -130,115 +132,4 @@ public class GlobalConfig {
         }
     }
 
-    public int getTime() {
-        return time;
-    }
-
-    public int getCheckEvery() {
-        return checkEvery;
-    }
-
-    public Map<String, Integer> getLimitations() {
-        return limitations;
-    }
-
-    public boolean isOnBuyCommandUse() {
-        return onBuyCommandUse;
-    }
-
-    public String getOnBuyCommand() {
-        return onBuyCommand;
-    }
-
-    public Map<Material, Double> getMinPrice() {
-        return minPrice;
-    }
-
-    public String getOrderBy() {
-        return orderBy;
-    }
-
-    public String getLang() {
-        return lang;
-    }
-
-    public String getDateFormat() {
-        return dateFormat;
-    }
-
-    public boolean isSecurityForSpammingPacket() {
-        return securityForSpammingPacket;
-    }
-
-    public Map<Material, Double> getMaxPrice() {
-        return maxPrice;
-    }
-
-    public boolean isDefaultMaxValueEnable() {
-        return defaultMaxValueEnable;
-    }
-
-    public boolean isDefaultMinValueEnable() {
-        return defaultMinValueEnable;
-    }
-
-    public double getDefaultMinValue() {
-        return defaultMinValue;
-    }
-
-    public double getDefaultMaxValue() {
-        return defaultMaxValue;
-    }
-
-    public List<Material> getBlacklistItem() {
-        return blacklistItem;
-    }
-
-    public boolean isLimitationsUseMetaLuckperms() {
-        return limitationsUseMetaLuckperms;
-    }
-
-    public int getUpdateCacheEvery() {
-        return updateCacheEvery;
-    }
-
-    public String getRemainingDateFormat() {
-        return remainingDateFormat;
-    }
-
-    public boolean isFeatureFlippingExpiration() {
-        return featureFlippingExpiration;
-    }
-
-    public boolean isFeatureFlippingCacheUpdate() {
-        return featureFlippingCacheUpdate;
-    }
-
-    public String getDecimalFormat() {
-        return decimalFormat;
-    }
-
-    public String getDefaultGui() {
-        return defaultGui;
-    }
-
-    public CurrencyType getCurrencyType() {
-        return currencyType;
-    }
-
-    public int getTimeCurrency() {
-        return timeCurrency;
-    }
-
-    public int getCheckEveryCurrency() {
-        return checkEveryCurrency;
-    }
-
-    public boolean isFeatureFlippingMoneyFormat() {
-        return featureFlippingMoneyFormat;
-    }
-
-    public boolean isFeatureDuplicationHashCodeControl() {
-        return featureDuplicationHashCodeControl;
-    }
 }

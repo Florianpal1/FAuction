@@ -1,13 +1,18 @@
 package fr.florianpal.fauction.objects;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Material;
 
+@Getter
 public class Confirm {
 
     private final int index;
 
+    @Setter
     private Auction auction;
 
+    @Setter
     private Material material;
 
     private final String texture;
@@ -23,37 +28,5 @@ public class Confirm {
         this.texture = texture;
         this.customModelData = customModelData;
         this.value = value;
-    }
-
-    public Auction getAuction() {
-        return auction;
-    }
-
-    public void setAuction(Auction auction) {
-        this.auction = auction;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public void setMaterial(Material material) {
-        this.material = material;
-    }
-
-    public boolean isValue() {
-        return value;
-    }
-
-    public String getTexture() {
-        return texture;
-    }
-
-    public int getCustomModelData() {
-        return customModelData;
-    }
-
-    public int getIndex() {
-        return index;
     }
 }

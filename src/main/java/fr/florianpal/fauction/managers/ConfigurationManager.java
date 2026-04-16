@@ -12,6 +12,7 @@ import fr.florianpal.fauction.configurations.DatabaseConfig;
 import fr.florianpal.fauction.configurations.GlobalConfig;
 import fr.florianpal.fauction.configurations.SortConfig;
 import fr.florianpal.fauction.configurations.gui.*;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,33 +20,43 @@ import java.util.Objects;
 
 public class ConfigurationManager {
 
+    @Getter
     private final DatabaseConfig database = new DatabaseConfig();
     private final YamlDocument databaseConfig;
 
+    @Getter
     private final AuctionConfig auctionConfig = new AuctionConfig();
     private YamlDocument auctionConfiguration;
 
+    @Getter
     private final HistoricConfig historicConfig = new HistoricConfig();
     private YamlDocument historicConfiguration;
 
+    @Getter
     private final PlayerViewConfig playerViewConfig = new PlayerViewConfig();
     private YamlDocument playerViewConfiguration;
 
+    @Getter
     private final ExpireGuiConfig expireConfig = new ExpireGuiConfig();
     private YamlDocument expireConfiguration;
 
+    @Getter
     private final AuctionConfirmGuiConfig auctionConfirmConfig = new AuctionConfirmGuiConfig();
     private YamlDocument auctionConfirmConfiguration;
 
+    @Getter
     private final GlobalConfig globalConfig = new GlobalConfig();
     private YamlDocument globalConfiguration;
 
+    @Getter
     private final CategoriesConfig categoriesConfig = new CategoriesConfig();
     private YamlDocument categoriesConfiguration;
 
+    @Getter
     private final SortConfig sortConfig = new SortConfig();
     private YamlDocument sortConfiguration;
 
+    @Getter
     private final MenuConfig menuConfig = new MenuConfig();
 
     public ConfigurationManager(FAuction plugin) {
@@ -156,45 +167,5 @@ public class ConfigurationManager {
         }
 
         menuConfig.load(plugin);
-    }
-
-    public DatabaseConfig getDatabase() {
-        return database;
-    }
-
-    public AuctionConfig getAuctionConfig() {
-        return auctionConfig;
-    }
-
-    public GlobalConfig getGlobalConfig() {
-        return globalConfig;
-    }
-
-    public AuctionConfirmGuiConfig getAuctionConfirmConfig() {
-        return auctionConfirmConfig;
-    }
-
-    public ExpireGuiConfig getExpireConfig() {
-        return expireConfig;
-    }
-
-    public PlayerViewConfig getPlayerViewConfig() {
-        return playerViewConfig;
-    }
-
-    public CategoriesConfig getCategoriesConfig() {
-        return categoriesConfig;
-    }
-
-    public HistoricConfig getHistoricConfig() {
-        return historicConfig;
-    }
-
-    public MenuConfig getMenuConfig() {
-        return menuConfig;
-    }
-
-    public SortConfig getSortConfig() {
-        return sortConfig;
     }
 }

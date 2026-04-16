@@ -98,10 +98,10 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
     }
 
     protected void initGui(String title, int size) {
-        if (abstractGuiConfig.getType() == InventoryType.CHEST) {
+        if (abstractGuiConfig.getInventoryType() == InventoryType.CHEST) {
             inv = Bukkit.createInventory(this, size, FormatUtil.format(title));
         } else {
-            inv = Bukkit.createInventory(this, abstractGuiConfig.getType(), FormatUtil.format(title));
+            inv = Bukkit.createInventory(this, abstractGuiConfig.getInventoryType(), FormatUtil.format(title));
         }
     }
 

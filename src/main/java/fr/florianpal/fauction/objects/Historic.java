@@ -1,8 +1,11 @@
 package fr.florianpal.fauction.objects;
 
+import lombok.Getter;
+
 import java.util.Date;
 import java.util.UUID;
 
+@Getter
 public class Historic extends Auction {
 
     private final UUID playerBuyerUUID;
@@ -16,17 +19,5 @@ public class Historic extends Auction {
         this.playerBuyerUUID = playerBuyerUUID;
         this.playerBuyerName = playerBuyerName;
         this.buyDate = new Date(buyDate);
-    }
-
-    public UUID getPlayerBuyerUUID() {
-        return playerBuyerUUID;
-    }
-
-    public String getPlayerBuyerName() {
-        return playerBuyerName;
-    }
-
-    public Date getBuyDate() {
-        return buyDate;
     }
 }

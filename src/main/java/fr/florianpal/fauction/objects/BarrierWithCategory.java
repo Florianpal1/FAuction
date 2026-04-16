@@ -1,9 +1,11 @@
 package fr.florianpal.fauction.objects;
 
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.List;
 
+@Getter
 public class BarrierWithCategory extends Barrier {
 
     private final Category category;
@@ -20,7 +22,4 @@ public class BarrierWithCategory extends Barrier {
         this.category = category;
     }
 
-    public Category getCategory() {
-        return category;
-    }
 }

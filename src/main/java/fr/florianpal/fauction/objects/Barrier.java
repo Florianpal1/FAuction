@@ -1,9 +1,11 @@
 package fr.florianpal.fauction.objects;
 
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.List;
 
+@Getter
 public class Barrier {
 
     private final int index;
@@ -41,37 +43,5 @@ public class Barrier {
         this.remplacement = remplacement;
         this.texture = texture;
         this.customModelData = customModelData;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public Material getMaterial() {
-        return material;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public List<String> getDescription() {
-        return description;
-    }
-
-    public Barrier getRemplacement() {
-        return remplacement;
-    }
-
-    public String getTexture() {
-        return texture;
-    }
-
-    public int getCustomModelData() {
-        return customModelData;
-    }
-
-    public String getValue() {
-        return value;
     }
 }

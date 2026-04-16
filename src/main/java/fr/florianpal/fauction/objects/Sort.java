@@ -1,7 +1,9 @@
 package fr.florianpal.fauction.objects;
 
 import fr.florianpal.fauction.enums.SortType;
+import lombok.Getter;
 
+@Getter
 public class Sort {
 
     private final String id;
@@ -14,17 +16,5 @@ public class Sort {
         this.id = id;
         this.displayName = displayName;
         this.type = SortType.valueOf(type);
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public SortType getType() {
-        return type;
     }
 }

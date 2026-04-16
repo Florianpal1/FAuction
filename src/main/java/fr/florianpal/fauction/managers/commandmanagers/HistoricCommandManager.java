@@ -6,6 +6,7 @@ import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Historic;
 import fr.florianpal.fauction.queries.HistoricQueries;
 import fr.florianpal.fauction.utils.SerializationUtil;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 public class HistoricCommandManager {
     private final HistoricQueries historicQueries;
 
+    @Getter
     private Map<UUID, List<Historic>> cache = new HashMap<>();
 
     private List<Historic> sqliteCache = new ArrayList<>();
@@ -64,9 +66,5 @@ public class HistoricCommandManager {
             tempCache.get(historic.getPlayerUUID()).add(historic);
         }
         this.cache = tempCache;
-    }
-
-    public Map<UUID, List<Historic>> getCache() {
-        return cache;
     }
 }

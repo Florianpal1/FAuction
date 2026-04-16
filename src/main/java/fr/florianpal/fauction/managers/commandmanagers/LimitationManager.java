@@ -37,5 +37,4 @@ public class LimitationManager {
     public int getAuctionLimitationByMeta(Player player) {
         return plugin.getLuckPermsImplementation().getMetaData(player);
     }
-
 }

@@ -18,12 +18,9 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class InventoryVisualization implements InventoryHolder, Listener {
 
-    private static final Logger log = LoggerFactory.getLogger(InventoryVisualization.class);
     private final FAuction plugin;
 
     private Inventory inventory;

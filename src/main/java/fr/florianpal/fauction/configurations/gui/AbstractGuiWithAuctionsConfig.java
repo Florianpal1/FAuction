@@ -5,6 +5,7 @@ import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.enums.BlockType;
 import fr.florianpal.fauction.objects.Barrier;
 import fr.florianpal.fauction.objects.Confirm;
+import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import java.util.List;
 
 import static fr.florianpal.fauction.enums.BlockType.*;
 
+@Getter
 public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
+
 
     protected LinkedHashMap<Integer, Integer> baseBlocks = new LinkedHashMap<>();
 
@@ -142,39 +145,4 @@ public abstract class AbstractGuiWithAuctionsConfig extends AbstractGuiConfig {
         description.addAll(config.getStringList("gui.description"));
     }
 
-    public LinkedHashMap<Integer, Integer> getBaseBlocks() {
-        return baseBlocks;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public List<String> getDescription() {
-        return description;
-    }
-
-    public List<Barrier> getPreviousBlocks() {
-        return previousBlocks;
-    }
-
-    public List<Barrier> getNextBlocks() {
-        return nextBlocks;
-    }
-
-    public boolean isReplaceTitle() {
-        return replaceTitle;
-    }
-
-    public List<Barrier> getCategoriesBlocks() {
-        return categoriesBlocks;
-    }
-
-    public List<Barrier> getSortingBlocks() {
-        return sortingBlocks;
-    }
-
-    public boolean isHideFlag() {
-        return hideFlag;
-    }
 }
