@@ -17,10 +17,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Download MLang dependency
+      - name: Install MLang to local repository
         run: |
           mkdir -p libs
           curl -L -o libs/mlang-1.0.0.jar https://github.com/seetch/MLang/releases/download/1.0.0/mlang-1.0.0.jar
+          mvn install:install-file -Dfile=libs/mlang-1.0.0.jar -DgroupId=me.seetch -DartifactId=mlang -Dversion=1.0.0 -Dpackaging=jar -q
       - name: Build with Maven
         run: mvn -B package --file pom.xml
       - name: Update dependency graph
@@ -37,10 +38,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Download MLang dependency
+      - name: Install MLang to local repository
         run: |
           mkdir -p libs
           curl -L -o libs/mlang-1.0.0.jar https://github.com/seetch/MLang/releases/download/1.0.0/mlang-1.0.0.jar
+          mvn install:install-file -Dfile=libs/mlang-1.0.0.jar -DgroupId=me.seetch -DartifactId=mlang -Dversion=1.0.0 -Dpackaging=jar -q
       - name: Publish package
         run: mvn -U -fn --batch-mode deploy
         env:
