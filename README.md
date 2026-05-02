@@ -419,7 +419,7 @@ The compiled JAR will be in `target/fauction-x.x.x.jar`.
 ## Support
 
 - [Wiki](https://github.com/Florianpal1/FAuction/wiki) — detailed documentation and guides
-- [Discord](https://discord.gg/florianpal) — community support
+- [Discord](https://discord.com/invite/dEvR34ZzYQ) — community support
 - [GitHub Discussions](https://github.com/Florianpal1/FAuction/discussions) — questions and ideas
 - [SpigotMC](https://www.spigotmc.org/resources/fauction.89981/) — plugin page
 - [Hangar](https://hangar.papermc.io/Florianpal/FAuction) — PaperMC distribution
