@@ -20,7 +20,7 @@ import fr.florianpal.fauction.utils.FileUtil;
 import fr.florianpal.fauction.utils.FormatUtil;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
-import me.seetch.MLang;
+import me.seetch.mlang.MLang;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bukkit.Bukkit;
