@@ -149,6 +149,11 @@
             <id>placeholderapi</id>
             <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <!--MLang repo-->
+        <repository>
+            <id>seetch-repo-releases</id>
+            <url>https://repo.seetch.ru/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -251,7 +256,7 @@
         <dependency>
             <groupId>me.seetch</groupId>
             <artifactId>mlang</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 </project>
