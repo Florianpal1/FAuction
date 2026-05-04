@@ -15,6 +15,7 @@
   </p>
 </p>
 
+[![bStats](https://bstats.org/signatures/bukkit/FAuction.svg)](https://bstats.org/plugin/bukkit/FAuction)
 ---
 
 ## Table of Contents
