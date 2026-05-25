@@ -422,7 +422,7 @@ The compiled JAR will be in `target/fauction-x.x.x.jar`.
 - [Wiki](https://github.com/Florianpal1/FAuction/wiki) — detailed documentation and guides
 - [Discord](https://discord.com/invite/dEvR34ZzYQ) — community support
 - [GitHub Discussions](https://github.com/Florianpal1/FAuction/discussions) — questions and ideas
-- [SpigotMC](https://www.spigotmc.org/resources/fauction.89981/) — plugin page
+- [SpigotMC](https://www.spigotmc.org/resources/fauction-auction-plugin-with-bungeecord-support.108552/) — plugin page
 - [Hangar](https://hangar.papermc.io/Florianpal/FAuction) — PaperMC distribution
 - [Modrinth](https://modrinth.com/plugin/fauction) — alternative download
 - [bStats](https://bstats.org/plugin/bukkit/FAuction/24018) — usage statistics
