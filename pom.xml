@@ -6,7 +6,7 @@
 
     <groupId>fr.florianpal</groupId>
     <artifactId>fauction</artifactId>
-    <version>1.9.9</version>
+    <version>1.9.10</version>
     <properties>
         <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>

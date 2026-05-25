@@ -1,6 +1,7 @@
 package fr.florianpal.fauction.gui;
 
 import fr.florianpal.fauction.FAuction;
+import fr.florianpal.fauction.configurations.CategoriesConfig;
 import fr.florianpal.fauction.configurations.GlobalConfig;
 import fr.florianpal.fauction.configurations.gui.AbstractGuiConfig;
 import fr.florianpal.fauction.gui.subGui.*;
@@ -59,6 +60,8 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
 
     protected AbstractGuiConfig abstractGuiConfig;
 
+    protected CategoriesConfig categoriesConfig;
+
     protected DecimalFormat df;
 
     protected SimpleDateFormat dateFormater;
@@ -76,6 +79,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         this.historicCommandManager = plugin.getHistoricCommandManager();
         this.spamManager = plugin.getSpamManager();
         this.abstractGuiConfig = abstractGuiConfig;
+        this.categoriesConfig = plugin.getConfigurationManager().getCategoriesConfig();
 
         if (abstractGuiConfig == null) {
             plugin.getLogger().severe("Error when load custom menu. Cannot found config");

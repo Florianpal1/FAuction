@@ -18,9 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractGuiWithAuctions extends AbstractGui  {
 
@@ -220,14 +218,43 @@ public abstract class AbstractGuiWithAuctions extends AbstractGui  {
                 itemStack.setAmount(1);
             }
 
+            var previousCategories = new LinkedList<Category>();
+            var nextCategories = new LinkedList<Category>();
+            boolean isFound = false;
+            for (var entry : categoriesConfig.getCategories().entrySet()) {
+
+                if (entry.getValue().getId().equals(category.getId())) {
+                    isFound = true;
+                } else if (isFound) {
+                    nextCategories.add(entry.getValue());
+                } else {
+                    previousCategories.add(entry.getValue());
+                }
+            }
+
             List<String> descriptions = new ArrayList<>();
             for (String desc : barrier.getDescription()) {
-                desc = FormatUtil.format(desc);
-                desc = PlaceholderUtil.parsePlaceholder(plugin.isPlaceholderAPIEnabled(), player, desc);
-                desc = desc.replace("{categoryDisplayName}", category != null ? category.getDisplayName() : "");
-                desc = desc.replace("{sortDisplayName}", category != null ? sort.getDisplayName() : "");
-                descriptions.add(desc);
+
+                if (desc.equals("{previousCategories}")) {
+
+                    for (var previous : previousCategories) {
+                        descriptions.add(previous.getDisplayName());
+                    }
+                } else if (desc.equals("{nextCategories}")) {
+
+                    for (var next : nextCategories) {
+                        descriptions.add(next.getDisplayName());
+                    }
+                } else {
+                    desc = FormatUtil.format(desc);
+                    desc = PlaceholderUtil.parsePlaceholder(plugin.isPlaceholderAPIEnabled(), player, desc);
+                    desc = desc.replace("{currentCategory}", category != null ? category.getDisplayName() : "");
+                    desc = desc.replace("{sortDisplayName}", category != null ? sort.getDisplayName() : "");
+                    descriptions.add(desc);
+                }
+
             }
+
 
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {

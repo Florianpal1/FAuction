@@ -205,7 +205,9 @@ block:
     title: "&5Filter."
     description:
       - "&eClick here to change filter"
-      - "&eCurrent filter : {categoryDisplayName}"
+      - "{previousCategories}"
+      - "&e{currentCategory}"
+      - "{nextCategories}"
   '52':
     utility: sorting
     material: BOOK
