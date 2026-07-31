@@ -6,10 +6,60 @@ api-version: 1.13
 softdepend: [Vault]
 permissions:
   fauction.user:
+    description: Parent, grants every player permission
     default: op
     children:
       fauction.list: true
       fauction.sell: true
       fauction.expire: true
-  fauction.bypass.spam: # Ignore the anti packet spamming protection
+      fauction.search: true
+  fauction.list:
+    description: Open the auction gui
+    default: op
+  fauction.sell:
+    description: Sell an item on the auction house
+    default: op
+  fauction.expire:
+    description: Open the expired items gui
+    default: op
+  fauction.search:
+    description: Search the auctions by material
+    default: op
+  fauction.bypass.spam:
+    description: Ignore the anti packet spamming protection
+    default: op
+  fauction.mod.cancel:
+    description: Cancel the auction of another player
+    default: op
+  fauction.admin:
+    description: Parent, grants every administration permission
+    default: op
+    children:
+      fauction.admin.reload: true
+      fauction.admin.purge.all: true
+      fauction.admin.purge.auction: true
+      fauction.admin.purge.expire: true
+      fauction.admin.purge.hictoric: true
+      fauction.admin.transfertBddToPaper: true
+      fauction.admin.migrate: true
+  fauction.admin.reload:
+    description: Reload the configuration
+    default: op
+  fauction.admin.purge.all:
+    description: Purge every data
+    default: op
+  fauction.admin.purge.auction:
+    description: Purge the active auctions
+    default: op
+  fauction.admin.purge.expire:
+    description: Purge the expired items
+    default: op
+  fauction.admin.purge.hictoric:
+    description: Purge the transaction history
+    default: op
+  fauction.admin.transfertBddToPaper:
+    description: Migrate the serialization format of the database
+    default: op
+  fauction.admin.migrate:
+    description: Run the migration of a given version
     default: op

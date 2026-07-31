@@ -136,22 +136,30 @@ All commands use the `/ah` alias (or `/hdv`).
 | Permission         | Description                  | Default |
 |--------------------|------------------------------|---------|
 | `fauction.user`    | Parent — grants all children | `op`    |
-| `fauction.list`    | Open the auction GUI         | —       |
-| `fauction.sell`    | Sell items on the auction    | —       |
-| `fauction.expire`  | View expired items           | —       |
-| `fauction.search`  | Search auctions by material  | —       |
+| `fauction.list`    | Open the auction GUI         | `op`    |
+| `fauction.sell`    | Sell items on the auction    | `op`    |
+| `fauction.expire`  | View expired items           | `op`    |
+| `fauction.search`  | Search auctions by material  | `op`    |
+| `fauction.bypass.spam` | Ignore the anti-spam protection | `op` |
+
+### Moderator Permissions
+
+| Permission            | Description                          | Default |
+|-----------------------|--------------------------------------|---------|
+| `fauction.mod.cancel` | Cancel the auction of another player | `op`    |
 
 ### Admin Permissions
 
-| Permission                          | Description                          |
-|-------------------------------------|--------------------------------------|
-| `fauction.admin.reload`             | Reload plugin configuration          |
-| `fauction.admin.purge.all`          | Purge all data                       |
-| `fauction.admin.purge.auction`      | Purge active auctions                |
-| `fauction.admin.purge.expire`       | Purge expired items                  |
-| `fauction.admin.purge.hictoric`     | Purge transaction history            |
-| `fauction.admin.transfertBddToPaper`| Migrate DB serialization format      |
-| `fauction.admin.migrate`            | Run version migrations               |
+| Permission                          | Description                          | Default |
+|-------------------------------------|--------------------------------------|---------|
+| `fauction.admin`                    | Parent — grants all children         | `op`    |
+| `fauction.admin.reload`             | Reload plugin configuration          | `op`    |
+| `fauction.admin.purge.all`          | Purge all data                       | `op`    |
+| `fauction.admin.purge.auction`      | Purge active auctions                | `op`    |
+| `fauction.admin.purge.expire`       | Purge expired items                  | `op`    |
+| `fauction.admin.purge.hictoric`     | Purge transaction history            | `op`    |
+| `fauction.admin.transfertBddToPaper`| Migrate DB serialization format      | `op`    |
+| `fauction.admin.migrate`            | Run version migrations               | `op`    |
 
 ---
 
@@ -177,6 +185,12 @@ expiration:
   time: 3600                       # Expiration time in seconds (default: 1 hour)
   checkEvery: 72000                # Check interval in ticks (default: 1 hour)
 
+currencyCheck:                     # Delivery of the payments owed to offline sellers
+  time: 3600                       # In seconds (default: 1 hour)
+  checkEvery: 72000                # Check interval in ticks (default: 1 hour)
+
+cacheUpdate: 72000                 # Cache refresh interval in ticks (default: 1 hour)
+
 limitations-use-meta-luckperms: false  # Use LuckPerms meta for auction limits
 limitations:                       # Max active auctions per permission group
   default: 5
@@ -195,7 +209,20 @@ max-price:                         # Per-material maximum price
 
 item-blacklist: []                 # Materials that cannot be auctioned
 
-securityForSpammingPacket: true    # Anti-spam protection
+securityForSpammingPacket: true    # Anti-spam protection, bypassed with fauction.bypass.spam
+
+anti-spam:                         # One budget per action type: "burst" actions in a row,
+  messageCooldown: 3000            # then "perSecond" actions per second
+  logThreshold: 25                 # Actions blocked in a row before warning the console (0 disables)
+  interact:                        # Click on an item in a GUI
+    burst: 8
+    perSecond: 4
+  command:                         # /ah, /ah search
+    burst: 6
+    perSecond: 2
+  transaction:                     # Purchase confirmation, /ah sell
+    burst: 4
+    perSecond: 2
 ```
 
 ### Database (`database.yml`)
@@ -396,7 +423,7 @@ FAuction is published via GitHub Packages:
 <dependency>
     <groupId>fr.florianpal</groupId>
     <artifactId>fauction</artifactId>
-    <version>1.9.9</version>
+    <version>2.0.0</version>
     <scope>provided</scope>
 </dependency>
 ```
