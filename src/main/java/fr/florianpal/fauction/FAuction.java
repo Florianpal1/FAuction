@@ -77,6 +77,9 @@ public class FAuction extends JavaPlugin {
     private SpamManager spamManager;
 
     @Getter
+    private ClaimManager claimManager;
+
+    @Getter
     private TransfertManager transfertManager;
 
     private Metrics metrics;
@@ -150,6 +153,7 @@ public class FAuction extends JavaPlugin {
         historicCommandManager = new HistoricCommandManager(this);
 
         spamManager = new SpamManager(this);
+        claimManager = new ClaimManager();
         transfertManager = new TransfertManager(this);
 
         commandManager.registerCommand(new AuctionCommand(this));

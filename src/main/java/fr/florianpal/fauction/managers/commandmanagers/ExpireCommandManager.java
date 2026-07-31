@@ -8,6 +8,7 @@ import fr.florianpal.fauction.utils.SerializationUtil;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class ExpireCommandManager {
@@ -17,7 +18,7 @@ public class ExpireCommandManager {
     @Getter
     private Map<UUID, List<Auction>> cache = new HashMap<>();
 
-    private List<Auction> sqliteCache = new ArrayList<>();
+    private final List<Auction> sqliteCache;
 
     private final SQLType sqlType;
 
@@ -25,7 +26,7 @@ public class ExpireCommandManager {
 
     public ExpireCommandManager(FAuction plugin) {
         this.expireQueries = plugin.getExpireQueries();
-        this.sqliteCache = expireQueries.getExpires();
+        this.sqliteCache = new CopyOnWriteArrayList<>(expireQueries.getExpires());
         this.sqlType = plugin.getConfigurationManager().getDatabase().getSqlType();
         if (!sqliteCache.isEmpty()) {
             this.idMax = sqliteCache.stream().max(Comparator.comparing(Auction::getId)).get().getId() + 1;
@@ -47,19 +48,52 @@ public class ExpireCommandManager {
         return expireQueries.getExpires(uuid);
     }
 
-    public void addExpire(Auction auction)  {
+    public synchronized void addExpire(Auction auction)  {
         if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.add(auction);
+            // Own id, otherwise an expire could share the id of another entry of the cache and a
+            // single claim would drop them both.
+            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), SerializationUtil.serialize(auction.getItemStack()), auction.getDate().getTime()));
             idMax = idMax + 1;
         }
         expireQueries.addExpire(auction.getPlayerUUID(), auction.getPlayerName(), SerializationUtil.serialize(auction.getItemStack()), auction.getPrice(), auction.getDate());
     }
 
-    public void deleteExpire(int id) {
-        if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.removeAll(sqliteCache.stream().filter(a -> a.getId() == id).collect(Collectors.toList()));
+    /**
+     * Reserves an expired auction and gives it back to the caller.
+     *
+     * @return the reserved expire, null if someone else took it first.
+     */
+    public synchronized Auction claim(int id) {
+
+        Auction expire = expireExist(id);
+        if (expire == null) {
+            return null;
         }
-        expireQueries.deleteExpire(id);
+        return deleteExpire(id) ? expire : null;
+    }
+
+    /**
+     * @return true if this call is the one that removed the expired auction.
+     */
+    public synchronized boolean deleteExpire(int id) {
+        if (SQLType.SQLite.equals(sqlType)) {
+            boolean removed = removeFromCache(id);
+            expireQueries.deleteExpire(id);
+            return removed;
+        }
+        return expireQueries.deleteExpire(id);
+    }
+
+    /**
+     * Removes a single entry, so two entries sharing an id can never be dropped by the same claim.
+     */
+    private boolean removeFromCache(int id) {
+        for (Auction expire : sqliteCache) {
+            if (expire.getId() == id) {
+                return sqliteCache.remove(expire);
+            }
+        }
+        return false;
     }
 
     public void deleteAll() {

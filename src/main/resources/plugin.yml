@@ -1,7 +1,7 @@
 name: FAuction
 main: fr.florianpal.fauction.FAuction
 author: florianpal
-version: 1.9.10
+version: 2.0.0
 api-version: 1.13
 softdepend: [Vault]
 permissions:
@@ -11,3 +11,5 @@ permissions:
       fauction.list: true
       fauction.sell: true
       fauction.expire: true
+  fauction.bypass.spam: # Ignore the anti packet spamming protection
+    default: op

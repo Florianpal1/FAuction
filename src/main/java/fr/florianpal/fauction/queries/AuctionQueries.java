@@ -51,7 +51,11 @@ public class AuctionQueries implements IDatabaseTable {
         }
     }
 
-    public void addAuction(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
+    /**
+     * @return true if the auction has been saved. The item having already left the inventory, a
+     * false has to be given back to the seller.
+     */
+    public boolean addAuction(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
 
         try (Connection connection = databaseManager.getConnection()) {
 
@@ -62,11 +66,12 @@ public class AuctionQueries implements IDatabaseTable {
                 statement.setBytes(3, item);
                 statement.setDouble(4, price);
                 statement.setLong(5, date.getTime());
-                statement.executeUpdate();
+                return statement.executeUpdate() > 0;
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when add auction. Error {} ", e.getMessage()));
         }
+        return false;
     }
 
     public void updateItem(int id, byte[] item) {
@@ -84,18 +89,24 @@ public class AuctionQueries implements IDatabaseTable {
         }
     }
 
-    public void deleteAuctions(int id) {
+    /**
+     * @return true if this call is the one that removed the row. The database serializes the
+     * concurrent deletes of the same row, so exactly one caller gets true whatever the number of
+     * packets received at the same time.
+     */
+    public boolean deleteAuctions(int id) {
 
         try (Connection connection = databaseManager.getConnection()) {
 
             try (PreparedStatement statement = connection.prepareStatement(DELETE_AUCTION)) {
 
                 statement.setInt(1, id);
-                statement.executeUpdate();
+                return statement.executeUpdate() > 0;
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when delete auction. Error {} ", e.getMessage()));
         }
+        return false;
     }
 
     public void deleteAll() {

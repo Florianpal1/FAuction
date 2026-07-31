@@ -2,7 +2,9 @@ package fr.florianpal.fauction.gui.subGui;
 
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.gui.AuctionConfirmGuiConfig;
+import fr.florianpal.fauction.enums.ClaimType;
 import fr.florianpal.fauction.enums.Gui;
+import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionBuyEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -214,7 +216,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        if (spamManager.spamTest(player)) {
+        if (spamManager.spamTest(player, SpamAction.TRANSACTION)) {
             return;
         }
 
@@ -238,66 +240,77 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                     return;
                 }
 
-                FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(this.auction.getId())).syncLast(a -> {
-                    if (a == null) {
-                        MessageUtil.sendMessage(plugin, player, MessageKeys.NO_AUCTION);
+                int auctionId = this.auction.getId();
+
+                // Reserved on the main thread : every other click of the same tick stops here,
+                // before being able to schedule a second chain on the same auction.
+                if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
+                    return;
+                }
+
+                // Read only check, so the usual "not enough money" case never removes the row.
+                if (!CurrencyUtil.haveCurrency(plugin, player, globalConfig.getCurrencyType(), this.auction.getPrice())) {
+                    MessageUtil.sendMessage(plugin, player, MessageKeys.NO_HAVE_MONEY);
+                    plugin.getClaimManager().release(ClaimType.AUCTION, auctionId);
+                    return;
+                }
+
+                FAuction.newChain().asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(auctionGood -> {
+
+                    // The row is already gone : the item cannot be handed over twice from here.
+                    if (auctionGood == null) {
+                        MessageUtil.sendMessage(plugin, player, MessageKeys.AUCTION_ALREADY_SELL);
                         return;
                     }
 
-                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(this.auction.getId())).syncLast(auctionGood -> {
-                        if (auctionGood == null) {
-                            MessageUtil.sendMessage(plugin, player, MessageKeys.AUCTION_ALREADY_SELL);
-                            return;
-                        }
+                    // The auction is ours from now on, every failure has to put it back on the market.
+                    OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(auctionGood.getPlayerUUID());
+                    if (offlinePlayer == null) {
+                        auctionCommandManager.restore(auctionGood);
+                        return;
+                    }
 
-                        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(auctionGood.getPlayerUUID());
-                        if (offlinePlayer == null) {
-                            return;
-                        }
+                    if (!CurrencyUtil.getCurrency(plugin, player, globalConfig.getCurrencyType(), auctionGood.getPrice())) {
+                        MessageUtil.sendMessage(plugin, player, MessageKeys.NO_HAVE_MONEY);
+                        auctionCommandManager.restore(auctionGood);
+                        return;
+                    }
 
-                        if (!CurrencyUtil.haveCurrency(plugin, player, globalConfig.getCurrencyType(), auctionGood.getPrice())) {
-                            MessageUtil.sendMessage(plugin, player, MessageKeys.NO_HAVE_MONEY);
-                            return;
-                        }
+                    if (!CurrencyUtil.giveCurrency(plugin, offlinePlayer, globalConfig.getCurrencyType(), auctionGood.getPrice())) {
+                        CurrencyUtil.giveCurrency(plugin, player, globalConfig.getCurrencyType(), auctionGood.getPrice());
+                        auctionCommandManager.restore(auctionGood);
+                        plugin.getLogger().warning("Payment of " + auctionGood.getPlayerName() + " failed, purchase of " + player.getName() + " cancelled and refunded");
+                        return;
+                    }
 
-                        if (!CurrencyUtil.getCurrency(plugin, player, globalConfig.getCurrencyType(), auctionGood.getPrice())) {
-                            return;
-                        }
+                    MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
 
-                        if (!CurrencyUtil.giveCurrency(plugin, offlinePlayer, globalConfig.getCurrencyType(), auctionGood.getPrice())) {
-                            return;
-                        }
+                    if (offlinePlayer.isOnline()) {
+                        MessageUtil.sendMessage(plugin, offlinePlayer.getPlayer(), MessageKeys.BUY_AUCTION_TARGET_SUCCESS, "{player}", player.getName(), "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
+                    }
 
-                        MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
+                    historicCommandManager.addHistoric(auctionGood, player.getUniqueId(), player.getName());
 
-                        if (offlinePlayer.isOnline()) {
-                            MessageUtil.sendMessage(plugin, offlinePlayer.getPlayer(), MessageKeys.BUY_AUCTION_TARGET_SUCCESS, "{player}", player.getName(), "{item}", FormatUtil.titleItemFormat(auctionGood.getItemStack()), "{price}", df.format(auctionGood.getPrice()));
-                        }
+                    if (player.getInventory().firstEmpty() == -1) {
+                        player.getWorld().dropItem(player.getLocation(), auctionGood.getItemStack());
+                    } else {
+                        player.getInventory().addItem(auctionGood.getItemStack());
+                    }
 
-                        auctionCommandManager.deleteAuction(auctionGood.getId());
-                        historicCommandManager.addHistoric(a, player.getUniqueId(), player.getName());
+                    Bukkit.getPluginManager().callEvent(new AuctionBuyEvent(player, auctionGood));
 
-                        if (player.getInventory().firstEmpty() == -1) {
-                            player.getWorld().dropItem(player.getLocation(), auctionGood.getItemStack());
-                        } else {
-                            player.getInventory().addItem(auctionGood.getItemStack());
-                        }
+                    if (plugin.getConfigurationManager().getGlobalConfig().isOnBuyCommandUse()) {
+                        String command = getCommand(auctionGood);
+                        getServer().dispatchCommand(getServer().getConsoleSender(), command);
+                    }
 
-                        Bukkit.getPluginManager().callEvent(new AuctionBuyEvent(player, a));
+                    plugin.getLogger().info("Player : " + player.getName() + " buy " + auctionGood.getItemStack().getItemMeta().getDisplayName() + " at " + auctionGood.getPlayerName());
 
-                        if (plugin.getConfigurationManager().getGlobalConfig().isOnBuyCommandUse()) {
-                            String command = getCommand(auctionGood);
-                            getServer().dispatchCommand(getServer().getConsoleSender(), command);
-                        }
-
-                        plugin.getLogger().info("Player : " + player.getName() + " buy " + auctionGood.getItemStack().getItemMeta().getDisplayName() + " at " + auctionGood.getPlayerName());
-
-                        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                            AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
-                            gui.initialize();
-                        }).execute();
+                    FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+                        AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
+                        gui.initialize();
                     }).execute();
-                }).execute();
+                }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
                 break;
             }
         }

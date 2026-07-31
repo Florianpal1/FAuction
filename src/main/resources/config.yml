@@ -1,4 +1,4 @@
-version: 10
+version: 11
 lang: "en"
 
 currencyUse: VAULT # VAULT, EXPERIENCE, LEVEL
@@ -16,7 +16,19 @@ decimalFormat: "0.00"
 orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent || Deprecated use sort.yml
 dateFormat: "dd/MM/yyyy ':' HH:mm"
 remainingDateFormat: "MMM ddd HHh mmm sss"
-securityForSpammingPacket: true
+securityForSpammingPacket: true # Anti packet spamming protection. Players with the permission fauction.bypass.spam are ignored
+anti-spam: # Each action type has its own budget : "burst" actions are allowed in a row, then "perSecond" actions per second
+  messageCooldown: 3000 # Minimum delay in ms between two warning messages sent to the same player
+  logThreshold: 25 # Number of actions blocked in a row before warning the console. 0 to disable the logs
+  interact: # Click on an item in a gui
+    burst: 8
+    perSecond: 4
+  command: # /ah, /ah search
+    burst: 6
+    perSecond: 2
+  transaction: # Purchase confirmation, /ah sell
+    burst: 4
+    perSecond: 2
 onBuy:
   sendCommand: # Command sends if item is buying
     use: false

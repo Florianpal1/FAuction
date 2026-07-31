@@ -79,17 +79,21 @@ public class ExpireQueries implements IDatabaseTable {
         }
     }
 
-    public void deleteExpire(int id) {
+    /**
+     * @return true if this call is the one that removed the row.
+     */
+    public boolean deleteExpire(int id) {
 
         try (Connection connection = databaseManager.getConnection()) {
 
             try (PreparedStatement statement = connection.prepareStatement(DELETE_EXPIRE)) {
                 statement.setInt(1, id);
-                statement.executeUpdate();
+                return statement.executeUpdate() > 0;
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when delete expired auction to database. Error {} ", e.getMessage()));
         }
+        return false;
     }
 
     public void deleteAll() {

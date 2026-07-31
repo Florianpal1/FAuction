@@ -3,6 +3,8 @@ package fr.florianpal.fauction.gui.subGui;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.gui.PlayerViewConfig;
 import fr.florianpal.fauction.enums.CancelReason;
+import fr.florianpal.fauction.enums.ClaimType;
+import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionCancelEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -18,15 +20,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     private final PlayerViewConfig playerViewConfig;
-    private static final Set<Integer> processingAuctions = new HashSet<>();
 
     public PlayerViewGui(FAuction plugin, Player player, List<Auction> auctions, int page, Category category, Sort sort) {
         super(plugin, player, page, auctions, category, sort, plugin.getConfigurationManager().getPlayerViewConfig());
@@ -82,7 +81,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        if (spamManager.spamTest(player)) {
+        if (spamManager.spamTest(player, SpamAction.INTERACT)) {
             return;
         }
 
@@ -94,19 +93,26 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
                 if (e.isRightClick()) {
                     int auctionId = auction.getId();
-                    // Prevent processing the same auction multiple times
-                    if (processingAuctions.contains(auctionId)) {
+
+                    // Reserved on the main thread : every other click of the same tick stops here,
+                    // before being able to schedule a second chain on the same auction.
+                    if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
                         return;
                     }
-                    processingAuctions.add(auctionId);
-                    
-                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(auctionId))
-                        .abortIfNull()
-                        .abortIf(a -> !a.getPlayerUUID().equals(player.getUniqueId()))
-                        .syncLast(a -> {
+
+                    if (!auction.getPlayerUUID().equals(player.getUniqueId())) {
+                        plugin.getClaimManager().release(ClaimType.AUCTION, auctionId);
+                        return;
+                    }
+
+                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(a -> {
+
+                        // The row is already gone : nothing can be handed over twice from here.
+                        if (a == null) {
+                            return;
+                        }
 
                         try {
-                            auctionCommandManager.deleteAuction(a.getId());
 
                             if (player.getInventory().firstEmpty() == -1) {
                                 player.getWorld().dropItem(player.getLocation(), a.getItemStack());
@@ -117,7 +123,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
                             plugin.getLogger().info("Player delete from ah auction : " + a.getId() + ", Item : " + a.getItemStack().getItemMeta().getDisplayName() + " of " + a.getPlayerName() + ", by" + player.getName());
 
-                            auctions.remove(a);
+                            auctions.remove(auction);
                             Bukkit.getPluginManager().callEvent(new AuctionCancelEvent(player, a, CancelReason.PLAYER));
 
                             MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(a.getItemStack()));
@@ -126,13 +132,11 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                         }
                         player.closeInventory();
 
-                        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
-                            processingAuctions.remove(auctionId);
-                            PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, this.page, category, sort);
+                        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctionsNew -> {
+                            PlayerViewGui gui = new PlayerViewGui(plugin, player, auctionsNew, this.page, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).abortIfNull()
-                      .execute(() -> processingAuctions.remove(auctionId));
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
                 }
                 break;
             }

@@ -2,6 +2,8 @@ package fr.florianpal.fauction.gui.subGui;
 
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.gui.ExpireGuiConfig;
+import fr.florianpal.fauction.enums.ClaimType;
+import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.ExpireRemoveEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -74,7 +76,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        if (spamManager.spamTest(player)) {
+        if (spamManager.spamTest(player, SpamAction.INTERACT)) {
             return;
         }
 
@@ -90,13 +92,24 @@ public class ExpireGui extends AbstractGuiWithAuctions {
                 Auction auction = auctions.get(itemIndex);
 
                 if (e.isLeftClick()) {
-                    FAuction.newChain().asyncFirst(() -> expireCommandManager.expireExist(auction.getId())).syncLast(a -> {
 
+                    int expireId = auction.getId();
+
+                    // Reserved on the main thread : every other click of the same tick stops here,
+                    // before being able to schedule a second chain on the same item.
+                    if (!plugin.getClaimManager().tryClaim(ClaimType.EXPIRE, expireId)) {
+                        return;
+                    }
+
+                    if (!auction.getPlayerUUID().equals(player.getUniqueId())) {
+                        plugin.getClaimManager().release(ClaimType.EXPIRE, expireId);
+                        return;
+                    }
+
+                    FAuction.newChain().asyncFirst(() -> expireCommandManager.claim(expireId)).syncLast(a -> {
+
+                        // The row is already gone : nothing can be handed over twice from here.
                         if (a == null) {
-                            return;
-                        }
-
-                        if (!a.getPlayerUUID().equals(player.getUniqueId())) {
                             return;
                         }
 
@@ -106,17 +119,16 @@ public class ExpireGui extends AbstractGuiWithAuctions {
                             player.getInventory().addItem(a.getItemStack());
                         }
 
-                        expireCommandManager.deleteExpire(a.getId());
-                        auctions.remove(a);
+                        auctions.remove(auction);
                         Bukkit.getPluginManager().callEvent(new ExpireRemoveEvent(player, a));
 
                         MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_EXPIRE_SUCCESS);
 
-                        FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(auctions -> {
-                            ExpireGui gui = new ExpireGui(plugin, player, auctions, 1, category, sort);
+                        FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(expires -> {
+                            ExpireGui gui = new ExpireGui(plugin, player, expires, 1, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).execute();
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.EXPIRE, expireId));
                 }
             }
         }

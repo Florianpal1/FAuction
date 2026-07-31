@@ -3,7 +3,9 @@ package fr.florianpal.fauction.gui.subGui;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.gui.AuctionConfig;
 import fr.florianpal.fauction.enums.CancelReason;
+import fr.florianpal.fauction.enums.ClaimType;
 import fr.florianpal.fauction.enums.Gui;
+import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionCancelEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -78,7 +80,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
             return;
         }
 
-        if (spamManager.spamTest(player)) {
+        if (spamManager.spamTest(player, SpamAction.INTERACT)) {
             return;
         }
 
@@ -88,21 +90,30 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                 Auction auction = auctions.get(itemIndex);
 
                 if (e.isRightClick()) {
-                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.auctionExist(auction.getId())).syncLast(a -> {
 
+                    int auctionId = auction.getId();
+                    boolean isModCanCancel = (e.isShiftClick() && player.hasPermission("fauction.mod.cancel"));
+
+                    // A right click on someone else auction only opens a preview, no need to reserve.
+                    if (!auction.getPlayerUUID().equals(player.getUniqueId()) && !isModCanCancel) {
+                        VisualizationUtils.createVizualisation(plugin, auction, player, Gui.AUCTION);
+                        return;
+                    }
+
+                    // Reserved on the main thread : every other click of the same tick stops here,
+                    // before being able to schedule a second chain on the same auction.
+                    if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
+                        return;
+                    }
+
+                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(a -> {
+
+                        // The row is already gone : nothing can be handed over twice from here.
                         if (a == null) {
                             return;
                         }
 
-                        boolean isModCanCancel = (e.isShiftClick() && player.hasPermission("fauction.mod.cancel"));
-                        if (!a.getPlayerUUID().equals(player.getUniqueId()) && !isModCanCancel) {
-
-                            VisualizationUtils.createVizualisation(plugin, a, player, Gui.AUCTION);
-                            return;
-                        }
-
                         try {
-                            auctionCommandManager.deleteAuction(a.getId());
 
                             if (!isModCanCancel) {
                                 if (player.getInventory().firstEmpty() == -1) {
@@ -120,7 +131,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                                 plugin.getLogger().info("Player delete from ah auction : " + a.getId() + ", Item : " + a.getItemStack().getItemMeta().getDisplayName() + " of " + a.getPlayerName() + ", by" + player.getName());
                                 Bukkit.getPluginManager().callEvent(new AuctionCancelEvent(player, a, CancelReason.PLAYER));
                             }
-                            auctions.remove(a);
+                            auctions.remove(auction);
 
                             MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_AUCTION_SUCCESS, "{item}", FormatUtil.titleItemFormat(a.getItemStack()));
                         } catch (Exception exception) {
@@ -133,7 +144,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                             AuctionsGui gui = new AuctionsGui(plugin, player, auctionsNew, 1, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).execute();
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
                 } else if (e.isLeftClick()) {
                     if (auction.getPlayerUUID().equals(player.getUniqueId())) {
                         MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_YOUR_ITEM);
