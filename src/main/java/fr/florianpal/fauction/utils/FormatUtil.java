@@ -1,9 +1,12 @@
 package fr.florianpal.fauction.utils;
 
 import fr.florianpal.fauction.FAuction;
+import me.seetch.mlang.MLang;
+import me.seetch.mlang.TranslationKeyGenerator;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.time.Duration;
 import java.util.regex.Matcher;
@@ -60,22 +63,46 @@ public class FormatUtil {
     }
 
     public static String titleItemFormat(ItemStack item, String replacement, String title) {
-        if (item.getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-            return title.replace(replacement, FAuction.getApi().getMLang().getItemStackTranslation(item));
-        }
-        return title.replace(replacement, item.getItemMeta().getDisplayName());
+        return title.replace(replacement, titleItemFormat(item));
     }
 
     public static String titleItemFormat(ItemStack item) {
-        if (item.getItemMeta().getDisplayName().equalsIgnoreCase("")) {
-            return FAuction.getApi().getMLang().getItemStackTranslation(item);
+        return itemName(item, translate(item));
+    }
+
+    /**
+     * The name shown to the player: the custom name of the item, otherwise its vanilla translation.
+     * MLang gives back the translation key itself when the language file could not be loaded, which
+     * would show "block.minecraft.diamond_block" in the message instead of a name, so the material
+     * is then written the same way as in the menus.
+     */
+    static String itemName(ItemStack item, String translation) {
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null && meta.hasDisplayName()) {
+            return meta.getDisplayName();
         }
-        return item.getItemMeta().getDisplayName();
+
+        if (translation == null || translation.isEmpty()
+                || translation.equals(TranslationKeyGenerator.getItemStackKey(item))) {
+            return item.getType().name().replace('_', ' ').toLowerCase();
+        }
+
+        return translation;
+    }
+
+    private static String translate(ItemStack item) {
+        FAuction plugin = FAuction.getApi();
+        if (plugin == null) {
+            return null;
+        }
+
+        MLang mLang = plugin.getMLang();
+        return mLang == null ? null : mLang.getItemStackTranslation(item);
     }
 
     public static String formatLanguageCode(String languageCode) {
         if (languageCode.contains("_")) {
-            return languageCode;
+            return languageCode.toLowerCase();
         }
 
         return switch (languageCode.toLowerCase()) {

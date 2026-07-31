@@ -1,14 +1,30 @@
 package fr.florianpal.fauction.utils;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockbukkit.mockbukkit.MockBukkit;
 
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FormatUtilTest {
+
+    @BeforeEach
+    void setUpServer() {
+        MockBukkit.mock();
+    }
+
+    @AfterEach
+    void tearDownServer() {
+        MockBukkit.unmock();
+    }
 
     @Test
     @DisplayName("The & colour codes are translated")
@@ -87,5 +103,36 @@ class FormatUtilTest {
     @DisplayName("The language code is case insensitive")
     void languageCodeIsCaseInsensitive() {
         assertEquals("fr_fr", FormatUtil.formatLanguageCode("FR"));
+        assertEquals("pt_br", FormatUtil.formatLanguageCode("pt_BR"));
+    }
+
+    @Test
+    @DisplayName("The custom name of the item wins over the translation")
+    void keepsTheCustomNameOfTheItem() {
+
+        ItemStack item = new ItemStack(Material.DIAMOND_BLOCK);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName("§bBloc légendaire");
+        item.setItemMeta(meta);
+
+        assertEquals("§bBloc légendaire", FormatUtil.itemName(item, "Bloc de diamant"));
+    }
+
+    @Test
+    @DisplayName("An item without a custom name uses its vanilla translation")
+    void usesTheVanillaTranslation() {
+        assertEquals("Bloc de diamant", FormatUtil.itemName(new ItemStack(Material.DIAMOND_BLOCK), "Bloc de diamant"));
+    }
+
+    @Test
+    @DisplayName("An untranslated item shows its material and not the translation key")
+    void fallsBackOnTheMaterialWhenTheTranslationIsMissing() {
+
+        ItemStack item = new ItemStack(Material.DIAMOND_BLOCK);
+
+        // MLang gives the key back when the language file of the version could not be downloaded.
+        assertEquals("diamond block", FormatUtil.itemName(item, "block.minecraft.diamond_block"));
+        assertEquals("diamond block", FormatUtil.itemName(item, null));
+        assertEquals("diamond block", FormatUtil.itemName(item, ""));
     }
 }

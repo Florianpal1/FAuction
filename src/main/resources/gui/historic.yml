@@ -151,19 +151,19 @@ block:
   '43':
     utility: historic
   '44':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '45':
     utility: auctionGui
     material: CHEST
     title: "&cReturn to the auction house."
     description: { }
-  '45':
+  '46':
     utility: expireGui
     material: CHEST_MINECART
     title: "&cCollect your expired items"
-    description: {}
-  '46':
-    utility: barrier
-    material: AIR
-    title: " "
     description: {}
   '47':
     utility: barrier

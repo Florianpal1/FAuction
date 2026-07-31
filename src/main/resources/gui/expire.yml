@@ -150,26 +150,26 @@ block:
   '43':
     utility: expire
   '44':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '45':
     utility: player
     material: NETHER_STAR
     title: "&5My Items"
     description:
       - "&eClick here to see your items for sale"
-  '45':
+  '46':
     utility: auctionGui
     material: CHEST
     title: "&cReturn to the auction house."
     description: {}
-  '46':
+  '47':
     utility: historicGui
     material: WRITABLE_BOOK
     title: "&cSee our item historic"
     description: { }
-  '47':
-    utility: barrier
-    material: AIR
-    title: " "
-    description: {}
   '48':
     utility: previous
     material: ARROW
