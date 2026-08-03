@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class AuctionCommandManager {
 
+    private final FAuction plugin;
+
     private final AuctionQueries auctionQueries;
 
     @Getter
@@ -28,6 +30,7 @@ public class AuctionCommandManager {
     private int idMax = 0;
 
     public AuctionCommandManager(FAuction plugin) {
+        this.plugin = plugin;
         this.auctionQueries = plugin.getAuctionQueries();
         this.sqliteCache = new CopyOnWriteArrayList<>(auctionQueries.getAuctions());
         this.sqlType = plugin.getConfigurationManager().getDatabase().getSqlType();
@@ -55,13 +58,22 @@ public class AuctionCommandManager {
      * @return true if the auction has been saved, the item can stay out of the inventory.
      */
     public synchronized boolean addAuction(Player player, ItemStack item, double price)  {
-        if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.add(new Auction(idMax, player.getUniqueId(), player.getName(), price, SerializationUtil.serialize(item), Calendar.getInstance().getTime().getTime()));
-            idMax = idMax + 1;
-            auctionQueries.addAuction(player.getUniqueId(), player.getName(), SerializationUtil.serialize(item), price, Calendar.getInstance().getTime());
-            return true;
+        byte[] serializedItem = SerializationUtil.serialize(item);
+        Date date = Calendar.getInstance().getTime();
+
+        // The database row is what has to survive a crash ; the cache (and its id counter, which
+        // must stay in lockstep with SQLite's own AUTOINCREMENT sequence) is only advanced once the
+        // write is confirmed, otherwise a failed insert would drift the two id spaces apart and a
+        // later row could reuse an id still referenced by a stale cache entry.
+        if (!auctionQueries.addAuction(player.getUniqueId(), player.getName(), serializedItem, price, date)) {
+            return false;
         }
-        return auctionQueries.addAuction(player.getUniqueId(), player.getName(), SerializationUtil.serialize(item), price, Calendar.getInstance().getTime());
+
+        if (SQLType.SQLite.equals(sqlType)) {
+            sqliteCache.add(new Auction(idMax, player.getUniqueId(), player.getName(), price, serializedItem, date.getTime()));
+            idMax = idMax + 1;
+        }
+        return true;
     }
 
     public void saveAllAuctionInBddFromSQLiteCache()  {
@@ -87,14 +99,21 @@ public class AuctionCommandManager {
     }
 
     /**
-     * @return true if this call is the one that removed the auction.
+     * @return true if this call is the one that removed the auction, from both the cache and the
+     * database. The database is checked first and is the one allowed to refuse the removal ; a row
+     * that fails to delete (transient database error, or a row that was never actually persisted by a
+     * failed restore()) is kept on the market from the cache instead of being evicted with nothing to
+     * show for it.
      */
     public synchronized boolean deleteAuction(int id) {
         if (SQLType.SQLite.equals(sqlType)) {
+            boolean removedInDb = auctionQueries.deleteAuctions(id);
+            if (!removedInDb) {
+                plugin.getLogger().severe("Auction " + id + " could not be deleted from the database ; kept on the market instead of being lost from the cache for nothing.");
+                return false;
+            }
             // The cache is the authority in SQLite mode, the rows being rewritten on shutdown.
-            boolean removed = removeFromCache(id);
-            auctionQueries.deleteAuctions(id);
-            return removed;
+            return removeFromCache(id);
         }
         return auctionQueries.deleteAuctions(id);
     }
@@ -103,11 +122,25 @@ public class AuctionCommandManager {
      * Puts back an auction removed by a claim, when the transaction could not be completed.
      */
     public synchronized void restore(Auction auction) {
+        byte[] serializedItem = SerializationUtil.serialize(auction.getItemStack());
+        boolean savedInDb = auctionQueries.addAuction(auction.getPlayerUUID(), auction.getPlayerName(), serializedItem, auction.getPrice(), auction.getDate());
+
+        if (!savedInDb) {
+            // The row is already gone from the market at this point (deleteAuction succeeded when it
+            // was claimed). In SQLite mode it stays visible from the cache rather than losing the item
+            // outright, at the cost of a database desync a non-clean restart could still turn into
+            // data loss ; in a shared database mode there is no cache to fall back on, so the item is
+            // simply lost.
+            String outcome = SQLType.SQLite.equals(sqlType)
+                    ? "it stays visible from the cache only until the next successful save"
+                    : "the item is lost, there is no cache to fall back on outside of SQLite mode";
+            plugin.getLogger().severe("Restoring auction of " + auction.getPlayerName() + " to the database failed ; " + outcome + ".");
+        }
+
         if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), SerializationUtil.serialize(auction.getItemStack()), auction.getDate().getTime()));
+            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), serializedItem, auction.getDate().getTime()));
             idMax = idMax + 1;
         }
-        auctionQueries.addAuction(auction.getPlayerUUID(), auction.getPlayerName(), SerializationUtil.serialize(auction.getItemStack()), auction.getPrice(), auction.getDate());
     }
 
     /**

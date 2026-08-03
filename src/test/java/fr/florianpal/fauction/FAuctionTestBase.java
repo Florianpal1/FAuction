@@ -18,7 +18,12 @@ import org.mockbukkit.mockbukkit.ServerMock;
 
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.logging.Logger;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,10 +66,19 @@ public abstract class FAuctionTestBase {
         when(plugin.getConfigurationManager()).thenReturn(configurationManager);
         when(plugin.getAuctionQueries()).thenReturn(auctionQueries);
         when(plugin.getExpireQueries()).thenReturn(expireQueries);
+        when(plugin.getLogger()).thenReturn(Logger.getLogger("FAuctionTest"));
 
         // The cache mode is the one keeping the auctions in memory, where the reservation is
         // arbitrated by the plugin itself.
         when(databaseConfig.getSqlType()).thenReturn(SQLType.SQLite);
+
+        // Happy path default : a database write succeeds, unless a test overrides it to exercise a
+        // failure. AuctionCommandManager/ExpireCommandManager now keep their SQLite cache in sync
+        // with these results instead of assuming success.
+        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(true);
+        when(auctionQueries.deleteAuctions(anyInt())).thenReturn(true);
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(true);
+        when(expireQueries.deleteExpire(anyInt())).thenReturn(true);
     }
 
     @AfterEach

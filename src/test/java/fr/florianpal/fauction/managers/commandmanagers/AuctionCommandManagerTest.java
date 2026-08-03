@@ -186,6 +186,35 @@ class AuctionCommandManagerTest extends FAuctionTestBase {
     }
 
     @Test
+    @DisplayName("A database write failure keeps the cache and the database in sync (SQLite)")
+    void failedSqliteInsertDoesNotEnterTheCache() {
+
+        when(auctionQueries.getAuctions()).thenReturn(new ArrayList<>());
+        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(false);
+        AuctionCommandManager manager = new AuctionCommandManager(plugin);
+        Player seller = server.addPlayer();
+
+        assertFalse(manager.addAuction(seller, namedItem(Material.DIAMOND, 1, "Gem"), 10.0));
+        assertTrue(manager.getAuctions().isEmpty());
+    }
+
+    @Test
+    @DisplayName("A database delete failure refuses the claim and keeps the auction on the market (SQLite)")
+    void failedSqliteDeleteRefusesTheClaim() {
+
+        when(auctionQueries.getAuctions()).thenReturn(new ArrayList<>(List.of(auction(1, SELLER, 250.0))));
+        when(auctionQueries.deleteAuctions(1)).thenReturn(false);
+        AuctionCommandManager manager = new AuctionCommandManager(plugin);
+
+        assertNull(manager.claim(1));
+
+        // The database is checked before the cache is touched, so a row that fails to delete (a
+        // transient error, or a row a failed restore() never actually persisted) is never lost.
+        assertNotNull(manager.auctionExist(1));
+        assertEquals(1, manager.getAuctions().size());
+    }
+
+    @Test
     @DisplayName("Only the player auctions are listed in his own view")
     void listsTheAuctionsOfAPlayer() {
 

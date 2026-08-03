@@ -9,6 +9,7 @@ import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionAddEvent;
 import fr.florianpal.fauction.gui.subGui.*;
 import fr.florianpal.fauction.languages.MessageKeys;
+import fr.florianpal.fauction.managers.ClaimManager;
 import fr.florianpal.fauction.managers.SpamManager;
 import fr.florianpal.fauction.managers.commandmanagers.AuctionCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.ExpireCommandManager;
@@ -153,7 +154,8 @@ public class AuctionCommand extends BaseCommand {
 
         // Reserved on the main thread : only one sale in flight per player, so the other packets of
         // the same tick cannot start a second sale of the very same item.
-        if (!plugin.getClaimManager().tryClaim(playerSender.getUniqueId())) {
+        long saleClaim = plugin.getClaimManager().tryClaim(playerSender.getUniqueId());
+        if (saleClaim == ClaimManager.NOT_CLAIMED) {
             return;
         }
 
@@ -169,7 +171,7 @@ public class AuctionCommand extends BaseCommand {
         // Everything is checked while the item is still in the inventory, so a refused sale has
         // nothing to give back.
         if (!isSellable(playerSender, itemToSell, price)) {
-            plugin.getClaimManager().release(playerSender.getUniqueId());
+            plugin.getClaimManager().release(playerSender.getUniqueId(), saleClaim);
             return;
         }
 
@@ -211,6 +213,13 @@ public class AuctionCommand extends BaseCommand {
 
             FAuction.newChain().asyncFirst(() -> auctionCommandManager.addAuction(playerSender, itemToSell, price)).syncLast(added -> {
 
+                // The hash only guards this sale while it is in flight ; it must not survive the
+                // round trip, or every future sale of a visually identical item would be blocked
+                // forever and the list would grow without bound.
+                if (globalConfig.isFeatureDuplicationHashCodeControl()) {
+                    itemHash.remove((Integer) itemToSell.hashCode());
+                }
+
                 if (!Boolean.TRUE.equals(added)) {
                     plugin.getLogger().severe("Auction of " + playerSender.getName() + " could not be saved, item given back");
                     resetItem(playerSender, itemToSell);
@@ -223,12 +232,12 @@ public class AuctionCommand extends BaseCommand {
                 Bukkit.getPluginManager().callEvent(new AuctionAddEvent(playerSender, itemToSell, price));
 
                 MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_ADD_SUCCESS, "{item}", FormatUtil.titleItemFormat(itemToSell), "{price}", String.valueOf(price));
-            }).execute(() -> plugin.getClaimManager().release(playerSender.getUniqueId()));
+            }).execute(() -> plugin.getClaimManager().release(playerSender.getUniqueId(), saleClaim));
 
         }).execute(() -> {
             // The sale is released by the chain that really took the item, if any.
             if (!itemTaken.get()) {
-                plugin.getClaimManager().release(playerSender.getUniqueId());
+                plugin.getClaimManager().release(playerSender.getUniqueId(), saleClaim);
             }
         });
     }
@@ -264,7 +273,7 @@ public class AuctionCommand extends BaseCommand {
         return haveCorrectShulkerPrice(playerSender, itemToSell, price);
     }
 
-    private boolean haveCorrectShulkerPrice(Player playerSender, ItemStack itemToSell, double price) {
+    public boolean haveCorrectShulkerPrice(Player playerSender, ItemStack itemToSell, double price) {
 
         if (!Tag.SHULKER_BOXES.getValues().contains(itemToSell.getType())) {
             return true;
@@ -274,30 +283,37 @@ public class AuctionCommand extends BaseCommand {
             return true;
         }
 
-        double minPrice = -1;
-        double maxPrice = -1;
+        double minPrice = 0;
+        double maxPrice = 0;
+        boolean minPriceSet = false;
+        boolean maxPriceSet = false;
+
         for (ItemStack itemIn : shulker.getInventory().getContents()) {
             if (itemIn != null && (itemIn.getType() != Material.AIR)) {
-                if (plugin.getConfigurationManager().getGlobalConfig().getMinPrice().containsKey(itemIn.getType())) {
-                    minPrice = minPrice + itemIn.getAmount() * globalConfig.getMinPrice().get(itemIn.getType());
-                } else if (plugin.getConfigurationManager().getGlobalConfig().isDefaultMinValueEnable()) {
-                    minPrice = minPrice + itemIn.getAmount() * globalConfig.getDefaultMinValue();
+                if (globalConfig.getMinPrice().containsKey(itemIn.getType())) {
+                    minPrice += itemIn.getAmount() * globalConfig.getMinPrice().get(itemIn.getType());
+                    minPriceSet = true;
+                } else if (globalConfig.isDefaultMinValueEnable()) {
+                    minPrice += itemIn.getAmount() * globalConfig.getDefaultMinValue();
+                    minPriceSet = true;
                 }
 
-                if (plugin.getConfigurationManager().getGlobalConfig().getMaxPrice().containsKey(itemIn.getType())) {
-                    maxPrice = maxPrice + itemIn.getAmount() * globalConfig.getMaxPrice().get(itemIn.getType());
-                } else if (plugin.getConfigurationManager().getGlobalConfig().isDefaultMaxValueEnable()) {
-                    maxPrice = maxPrice + itemIn.getAmount() * globalConfig.getDefaultMaxValue();
+                if (globalConfig.getMaxPrice().containsKey(itemIn.getType())) {
+                    maxPrice += itemIn.getAmount() * globalConfig.getMaxPrice().get(itemIn.getType());
+                    maxPriceSet = true;
+                } else if (globalConfig.isDefaultMaxValueEnable()) {
+                    maxPrice += itemIn.getAmount() * globalConfig.getDefaultMaxValue();
+                    maxPriceSet = true;
                 }
             }
         }
 
-        if (minPrice != -1 && minPrice > price) {
+        if (minPriceSet && minPrice > price) {
             MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIN_PRICE, "{minPrice}", String.valueOf(ceil(minPrice)));
             return false;
         }
 
-        if (maxPrice != -1 && maxPrice < price) {
+        if (maxPriceSet && maxPrice < price) {
             MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MAX_PRICE, "{maxPrice}", String.valueOf(ceil(maxPrice)));
             return false;
         }
@@ -334,7 +350,6 @@ public class AuctionCommand extends BaseCommand {
         } else {
             playerSender.getInventory().addItem(item);
         }
-        itemHash.remove((Integer)item.hashCode());
     }
 
     public boolean haveCorrectMaxPrice(ItemStack itemToSell, Player player, double price) {

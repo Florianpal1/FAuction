@@ -9,6 +9,7 @@ import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionCancelEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
+import fr.florianpal.fauction.managers.ClaimManager;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Sort;
@@ -102,7 +103,8 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
 
                     // Reserved on the main thread : every other click of the same tick stops here,
                     // before being able to schedule a second chain on the same auction.
-                    if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
+                    long auctionClaim = plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId);
+                    if (auctionClaim == ClaimManager.NOT_CLAIMED) {
                         return;
                     }
 
@@ -124,7 +126,14 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                             }
 
                             if (isModCanCancel) {
-                                plugin.getExpireCommandManager().addExpire(a);
+                                if (!plugin.getExpireCommandManager().addExpire(a)) {
+                                    // The move failed halfway : put the auction back rather than
+                                    // losing the item, there being no single transaction covering
+                                    // both tables.
+                                    plugin.getLogger().severe("Auction " + a.getId() + " of " + a.getPlayerName() + " could not be moved to the expired items by moderator " + player.getName() + " ; put back on the market instead of being lost.");
+                                    auctionCommandManager.restore(a);
+                                    return;
+                                }
                                 plugin.getLogger().info("Modo delete from ah auction : " + a.getId() + ", Item : " + a.getItemStack().getItemMeta().getDisplayName() + " of " + a.getPlayerName() + ", by" + player.getName());
                                 Bukkit.getPluginManager().callEvent(new AuctionCancelEvent(player, a, CancelReason.MODERATOR));
                             } else {
@@ -144,7 +153,7 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                             AuctionsGui gui = new AuctionsGui(plugin, player, auctionsNew, 1, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim));
                 } else if (e.isLeftClick()) {
                     if (auction.getPlayerUUID().equals(player.getUniqueId())) {
                         MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_YOUR_ITEM);

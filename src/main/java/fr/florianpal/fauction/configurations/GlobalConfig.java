@@ -120,8 +120,10 @@ public class GlobalConfig {
 
         limitationsUseMetaLuckperms = config.getBoolean("limitations-use-meta-luckperms", false);
         limitations = new HashMap<>();
-        for (Object limitationGroup : config.getSection("limitations").getKeys()) {
-            limitations.put(limitationGroup.toString(), config.getInt("limitations." + limitationGroup));
+        if (config.contains("limitations")) {
+            for (Object limitationGroup : config.getSection("limitations").getKeys()) {
+                limitations.put(limitationGroup.toString(), config.getInt("limitations." + limitationGroup));
+            }
         }
 
         if (config.contains("min-price-default")) {

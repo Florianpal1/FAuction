@@ -51,7 +51,10 @@ public class ExpireQueries implements IDatabaseTable {
         }
     }
 
-    public void addExpire(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
+    /**
+     * @return true if the expired auction has been saved.
+     */
+    public boolean addExpire(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
         try (Connection connection = databaseManager.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(ADD_EXPIRE)) {
                 statement.setString(1, playerUUID.toString());
@@ -59,11 +62,12 @@ public class ExpireQueries implements IDatabaseTable {
                 statement.setBytes(3, item);
                 statement.setDouble(4, price);
                 statement.setLong(5, date.getTime());
-                statement.executeUpdate();
+                return statement.executeUpdate() > 0;
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when add expired auction to database. Error {} ", e.getMessage()));
         }
+        return false;
     }
 
     public void updateItem(int id, byte[] item) {
@@ -80,7 +84,9 @@ public class ExpireQueries implements IDatabaseTable {
     }
 
     /**
-     * @return true if this call is the one that removed the row.
+     * @return true if this call is the one that removed the row. The database serializes the
+     * concurrent deletes of the same row, so exactly one caller gets true whatever the number of
+     * packets received at the same time.
      */
     public boolean deleteExpire(int id) {
 

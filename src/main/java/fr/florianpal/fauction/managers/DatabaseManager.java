@@ -15,8 +15,6 @@ public class DatabaseManager {
 
     private final HikariDataSource ds;
 
-    private Connection connection;
-
     private final FAuction plugin;
 
     private final ArrayList<IDatabaseTable> repositories = new ArrayList<>();
@@ -36,6 +34,10 @@ public class DatabaseManager {
 
         if (plugin.getConfigurationManager().getDatabase().getSqlType().equals(SQLType.SQLite)) {
             config.addDataSourceProperty("dataSource.journal_mode", "WAL");
+            // SQLite only ever allows one writer at a time; a pool bigger than 1 would let two
+            // threads open concurrent connections and fail with "database is locked" instead of
+            // simply waiting their turn.
+            config.setMaximumPoolSize(1);
         }
 
         if (plugin.getConfigurationManager().getDatabase().getSqlType().equals(SQLType.MariaDB)) {
@@ -50,11 +52,7 @@ public class DatabaseManager {
     }
 
     public Connection getConnection() throws SQLException {
-
-        if (this.connection == null || this.connection.isClosed()) {
-            this.connection = ds.getConnection();
-        }
-        return this.connection;
+        return ds.getConnection();
     }
 
     public void addRepository(IDatabaseTable repository) {

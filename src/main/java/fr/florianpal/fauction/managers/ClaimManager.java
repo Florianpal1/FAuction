@@ -5,7 +5,7 @@ import fr.florianpal.fauction.enums.ClaimType;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Reserves an auction before any asynchronous work is scheduled for it.
@@ -24,6 +24,11 @@ public class ClaimManager {
      * A claim never released, because a chain died on an exception, is taken over after that delay (ms).
      */
     private static final long CLAIM_TIMEOUT = 10_000L;
+
+    /**
+     * Returned by tryClaim() when someone else already holds the claim.
+     */
+    public static final long NOT_CLAIMED = -1L;
 
     private final Map<Long, Long> claims = new ConcurrentHashMap<>();
 
@@ -48,14 +53,19 @@ public class ClaimManager {
     }
 
     /**
-     * @return true if the caller owns the auction and must release it once done.
+     * @return a token to give back to release(), or NOT_CLAIMED if someone else already holds it.
      */
-    public boolean tryClaim(ClaimType type, int id) {
+    public long tryClaim(ClaimType type, int id) {
         return tryClaim(claims, key(type, id));
     }
 
-    public void release(ClaimType type, int id) {
-        claims.remove(key(type, id));
+    /**
+     * Releases the claim, but only if it is still the one identified by token. A claim taken over by
+     * someone else after a timeout is never released by the chain that lost it, which would otherwise
+     * drop a claim it no longer owns.
+     */
+    public void release(ClaimType type, int id, long token) {
+        release(claims, key(type, id), token);
     }
 
     /**
@@ -63,30 +73,40 @@ public class ClaimManager {
      * are not a single operation, so a second sale started meanwhile could work on an item that is
      * already sold.
      *
-     * @return true if the caller owns the sale and must release it once done.
+     * @return a token to give back to release(), or NOT_CLAIMED if a sale of this player is already
+     * in flight.
      */
-    public boolean tryClaim(UUID playerUUID) {
+    public long tryClaim(UUID playerUUID) {
         return tryClaim(playerClaims, playerUUID);
     }
 
-    public void release(UUID playerUUID) {
-        playerClaims.remove(playerUUID);
+    public void release(UUID playerUUID, long token) {
+        release(playerClaims, playerUUID, token);
     }
 
-    private <K> boolean tryClaim(Map<K, Long> reservations, K key) {
+    private <K> long tryClaim(Map<K, Long> reservations, K key) {
 
         long now = now();
-        AtomicBoolean acquired = new AtomicBoolean(false);
+        AtomicLong acquired = new AtomicLong(NOT_CLAIMED);
 
         reservations.compute(key, (k, claimedAt) -> {
             if (claimedAt == null || now - claimedAt > claimTimeout) {
-                acquired.set(true);
+                acquired.set(now);
                 return now;
             }
             return claimedAt;
         });
 
         return acquired.get();
+    }
+
+    private <K> void release(Map<K, Long> reservations, K key, long token) {
+        if (token == NOT_CLAIMED) {
+            return;
+        }
+        // Compare-and-remove : only removes the entry if it is still the one this token was issued
+        // for, so a claim already taken over by someone else survives this call.
+        reservations.remove(key, token);
     }
 
     private long key(ClaimType type, int id) {

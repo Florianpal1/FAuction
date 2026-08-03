@@ -82,8 +82,8 @@ class SortConfigTest {
     }
 
     @Test
-    @DisplayName("Without a DEFAULT entry, there is no default sort")
-    void noDefaultEntryMeansNoDefaultSort() {
+    @DisplayName("Without a DEFAULT entry, the first configured sort is used instead")
+    void noDefaultEntryFallsBackToTheFirstSort() {
 
         SortConfig withoutDefault = new SortConfig();
         withoutDefault.load(TestConfigs.of("""
@@ -91,9 +91,25 @@ class SortConfigTest {
                   PRICE_LOWER_TO_HIGHER:
                     displayName: "By price (Lower to Higher)"
                     type: PRICE_LOWER_TO_HIGHER
+                  PRICE_HIGHER_TO_LOWER:
+                    displayName: "By price (Higher to Lower)"
+                    type: PRICE_HIGHER_TO_LOWER
                 """));
 
-        assertNull(withoutDefault.getDefault());
-        assertNull(withoutDefault.getNext(withoutDefault.getSort().get("PRICE_LOWER_TO_HIGHER")));
+        // Renaming/removing "DEFAULT" must not NPE every gui that opens without an explicit sort.
+        assertEquals("PRICE_LOWER_TO_HIGHER", withoutDefault.getDefault().getId());
+        assertEquals("PRICE_LOWER_TO_HIGHER", withoutDefault.getNext(withoutDefault.getSort().get("PRICE_HIGHER_TO_LOWER")).getId());
+    }
+
+    @Test
+    @DisplayName("With no sort configured at all, there is no default sort")
+    void noSortAtAllMeansNoDefaultSort() {
+
+        SortConfig empty = new SortConfig();
+        empty.load(TestConfigs.of("""
+                sort: {}
+                """));
+
+        assertNull(empty.getDefault());
     }
 }

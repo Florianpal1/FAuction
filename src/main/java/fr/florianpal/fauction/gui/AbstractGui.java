@@ -20,8 +20,10 @@ import fr.florianpal.fauction.utils.PlayerHeadUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -196,6 +198,19 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
             }
         }
         return itemStack;
+    }
+
+    /**
+     * Every subclass only cancels InventoryClickEvent, leaving drag-and-drop free to place an item
+     * from the player's own inventory into any empty/decorative slot of these non-persistent
+     * inventories, where it is then silently lost when the gui closes.
+     */
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent e) {
+        if (e.getInventory() != inv || inv.getHolder() != this || player != e.getWhoClicked()) {
+            return;
+        }
+        e.setCancelled(true);
     }
 
     public boolean guiClick(InventoryClickEvent e) {
