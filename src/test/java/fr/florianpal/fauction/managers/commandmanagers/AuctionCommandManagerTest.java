@@ -186,11 +186,32 @@ class AuctionCommandManagerTest extends FAuctionTestBase {
     }
 
     @Test
+    @DisplayName("A new auction keeps the database's own id, so it can always be removed later")
+    void newAuctionUsesTheDatabaseAssignedId() {
+
+        // Regression : the cache used to guess the next id from the highest one still in the table,
+        // which undercounts the database's real AUTOINCREMENT sequence as soon as that highest row
+        // has ever been sold and deleted (SQLite never reuses a once-assigned id). A guessed id of 6
+        // here would never match the id the database actually assigns, leaving the row impossible to
+        // delete from the market.
+        when(auctionQueries.getAuctions()).thenReturn(new ArrayList<>(List.of(auction(5, SELLER, 250.0))));
+        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(42);
+        AuctionCommandManager manager = new AuctionCommandManager(plugin);
+        Player seller = server.addPlayer();
+
+        assertTrue(manager.addAuction(seller, namedItem(Material.DIAMOND, 1, "Gem"), 10.0));
+
+        assertNotNull(manager.auctionExist(42));
+        assertTrue(manager.deleteAuction(42));
+        assertNull(manager.auctionExist(42));
+    }
+
+    @Test
     @DisplayName("A database write failure keeps the cache and the database in sync (SQLite)")
     void failedSqliteInsertDoesNotEnterTheCache() {
 
         when(auctionQueries.getAuctions()).thenReturn(new ArrayList<>());
-        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(false);
+        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
         AuctionCommandManager manager = new AuctionCommandManager(plugin);
         Player seller = server.addPlayer();
 
@@ -281,7 +302,7 @@ class AuctionCommandManagerTest extends FAuctionTestBase {
             AuctionCommandManager manager = new AuctionCommandManager(plugin);
             Player seller = server.addPlayer();
 
-            when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(false);
+            when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
 
             assertFalse(manager.addAuction(seller, namedItem(Material.DIAMOND, 1, "Gem"), 10.0));
         }

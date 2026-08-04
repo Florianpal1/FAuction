@@ -61,6 +61,24 @@ class ExpireCommandManagerTest extends FAuctionTestBase {
     }
 
     @Test
+    @DisplayName("A new expire keeps the database's own id, so it can always be withdrawn later")
+    void newExpireUsesTheDatabaseAssignedId() {
+
+        // Regression : the cache used to guess the next id from the highest one still in the table,
+        // which undercounts the database's real AUTOINCREMENT sequence as soon as that highest row
+        // has ever been withdrawn (SQLite never reuses a once-assigned id). A guessed id here would
+        // never match the id the database actually assigns, leaving the row impossible to withdraw.
+        when(expireQueries.getExpires()).thenReturn(new ArrayList<>(List.of(auction(5, SELLER, 250.0))));
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(42);
+        ExpireCommandManager manager = new ExpireCommandManager(plugin);
+
+        assertTrue(manager.addExpire(auction(1, SELLER, 10.0)));
+
+        assertNotNull(manager.expireExist(42));
+        assertNotNull(manager.claim(42));
+    }
+
+    @Test
     @DisplayName("Two auctions of the same player expiring together stay separate")
     void twoExpiresStaySeparate() {
 
@@ -156,7 +174,7 @@ class ExpireCommandManagerTest extends FAuctionTestBase {
     void failedSqliteInsertDoesNotEnterTheCache() {
 
         when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
-        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(false);
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
         ExpireCommandManager manager = new ExpireCommandManager(plugin);
 
         assertFalse(manager.addExpire(auction(1, SELLER, 250.0)));
@@ -222,7 +240,7 @@ class ExpireCommandManagerTest extends FAuctionTestBase {
             when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
             ExpireCommandManager manager = new ExpireCommandManager(plugin);
 
-            when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(false);
+            when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
 
             assertFalse(manager.addExpire(auction(1, SELLER, 250.0)));
         }

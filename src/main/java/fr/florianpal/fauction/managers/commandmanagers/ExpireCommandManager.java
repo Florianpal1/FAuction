@@ -24,16 +24,11 @@ public class ExpireCommandManager {
 
     private final SQLType sqlType;
 
-    private int idMax = 0;
-
     public ExpireCommandManager(FAuction plugin) {
         this.plugin = plugin;
         this.expireQueries = plugin.getExpireQueries();
         this.sqliteCache = new CopyOnWriteArrayList<>(expireQueries.getExpires());
         this.sqlType = plugin.getConfigurationManager().getDatabase().getSqlType();
-        if (!sqliteCache.isEmpty()) {
-            this.idMax = sqliteCache.stream().max(Comparator.comparing(Auction::getId)).get().getId() + 1;
-        }
         updateCache();
     }
 
@@ -53,22 +48,21 @@ public class ExpireCommandManager {
 
     /**
      * @return true if the expired auction has been saved, the item can be considered moved off the
-     * market. Only advances the cache (and its id counter, kept in lockstep with SQLite's own
-     * AUTOINCREMENT sequence) once the database write is confirmed, so a failed insert can never
-     * leave an item that only exists in the cache.
+     * market. Only advances the cache once the database write is confirmed, using the id the
+     * database itself assigned (rather than a locally guessed one, which could drift from the
+     * database's own sequence), so a failed insert can never leave an item that only exists in the
+     * cache, and a successful one can never end up impossible to remove later.
      */
     public synchronized boolean addExpire(Auction auction)  {
         byte[] serializedItem = SerializationUtil.serialize(auction.getItemStack());
 
-        if (!expireQueries.addExpire(auction.getPlayerUUID(), auction.getPlayerName(), serializedItem, auction.getPrice(), auction.getDate())) {
+        int id = expireQueries.addExpire(auction.getPlayerUUID(), auction.getPlayerName(), serializedItem, auction.getPrice(), auction.getDate());
+        if (id < 0) {
             return false;
         }
 
         if (SQLType.SQLite.equals(sqlType)) {
-            // Own id, otherwise an expire could share the id of another entry of the cache and a
-            // single claim would drop them both.
-            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), serializedItem, auction.getDate().getTime()));
-            idMax = idMax + 1;
+            sqliteCache.add(new Auction(id, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), serializedItem, auction.getDate().getTime()));
         }
         return true;
     }

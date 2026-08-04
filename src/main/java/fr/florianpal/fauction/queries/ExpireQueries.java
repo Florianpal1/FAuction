@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 public class ExpireQueries implements IDatabaseTable {
@@ -52,22 +53,29 @@ public class ExpireQueries implements IDatabaseTable {
     }
 
     /**
-     * @return true if the expired auction has been saved.
+     * @return the id the database assigned to the new row, -1 if the insert failed. The caller must
+     * use this id for its own cache instead of guessing it, otherwise a locally tracked counter can
+     * drift from the database's own sequence and leave a row that can never be targeted again.
      */
-    public boolean addExpire(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
+    public int addExpire(UUID playerUUID, String playerName, byte[] item, double price, Date date) {
         try (Connection connection = databaseManager.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(ADD_EXPIRE)) {
+            try (PreparedStatement statement = connection.prepareStatement(ADD_EXPIRE, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, playerUUID.toString());
                 statement.setString(2, playerName);
                 statement.setBytes(3, item);
                 statement.setDouble(4, price);
                 statement.setLong(5, date.getTime());
-                return statement.executeUpdate() > 0;
+                if (statement.executeUpdate() == 0) {
+                    return -1;
+                }
+                try (ResultSet keys = statement.getGeneratedKeys()) {
+                    return keys.next() ? keys.getInt(1) : -1;
+                }
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when add expired auction to database. Error {} ", e.getMessage()));
         }
-        return false;
+        return -1;
     }
 
     public void updateItem(int id, byte[] item) {
