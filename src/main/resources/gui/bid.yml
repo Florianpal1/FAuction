@@ -1,0 +1,229 @@
+version: 1
+gui:
+  size: 54
+  type: CHEST
+  name: "Auction House - Bids {Page}/{TotalPage}"
+  title: "&eItem : &6{ItemName}"
+  replaceTitle: false
+  hideFlag: false
+  description:
+    - "&5Sold by : &6{OwnerName}"
+    - "&5Start price : &6{StartPrice}"
+    - "&5Current bid : &6{CurrentBid}"
+    - "&5Current bidder : &6{CurrentBidder}"
+    - "&5Bid ends on : &6{ExpireTime}"
+    - "&5Remaining time : &6{RemainingTime}"
+    - "&5Lore :"
+    - "{lore}"
+block:
+  '0':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '1':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '2':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '3':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '4':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '5':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '6':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '7':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '8':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '9':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '10':
+    utility: bid
+  '11':
+    utility: bid
+  '12':
+    utility: bid
+  '13':
+    utility: bid
+  '14':
+    utility: bid
+  '15':
+    utility: bid
+  '16':
+    utility: bid
+  '17':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '18':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '19':
+    utility: bid
+  '20':
+    utility: bid
+  '21':
+    utility: bid
+  '22':
+    utility: bid
+  '23':
+    utility: bid
+  '24':
+    utility: bid
+  '25':
+    utility: bid
+  '26':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '27':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '28':
+    utility: bid
+  '29':
+    utility: bid
+  '30':
+    utility: bid
+  '31':
+    utility: bid
+  '32':
+    utility: bid
+  '33':
+    utility: bid
+  '34':
+    utility: bid
+  '35':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '36':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '37':
+    utility: bid
+  '38':
+    utility: bid
+  '39':
+    utility: bid
+  '40':
+    utility: bid
+  '41':
+    utility: bid
+  '42':
+    utility: bid
+  '43':
+    utility: bid
+  '44':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: { }
+  '45':
+    utility: auctionGui
+    material: GOLD_INGOT
+    title: "&5Back to the Auction House"
+    description:
+      - "&eClick here to see the classic sale listings"
+  '46':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: { }
+  '47':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: { }
+  '48':
+    utility: previous
+    material: ARROW
+    title: "&5Previous Page"
+    description:
+      - "&eClick here to return to previous page"
+    replacement:
+      material: AIR
+      title: " "
+      description: {}
+  '49':
+    utility: barrier
+    material: PLAYER_HEAD
+    texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTY0MzlkMmUzMDZiMjI1NTE2YWE5YTZkMDA3YTdlNzVlZGQyZDUwMTVkMTEzYjQyZjQ0YmU2MmE1MTdlNTc0ZiJ9fX0="
+    title: "Informations"
+    description:
+      - "&7Welcome to the bid house"
+      - "&7Here, all players can put an"
+      - "&7item up for auction and bid"
+      - "&7on each other's items."
+      - ""
+      - "&7To start a bid, you must:"
+      - "&a/ah bid &7<&astartPrice&7>"
+  '50':
+    utility: next
+    material: ARROW
+    title: "&5Next Page"
+    description:
+      - "&eClick here to go to the next page"
+    replacement:
+      material: AIR
+      title: " "
+      description: {}
+  '51':
+    utility: category
+    material: BOOK
+    title: "&5Filter."
+    description:
+      - "&eClick here to change filter"
+      - "{previousCategories}"
+      - "&e{currentCategory}"
+      - "{nextCategories}"
+  '52':
+    utility: sorting
+    material: BOOK
+    title: "&5Sort."
+    description:
+      - "&eClick here to sort item"
+      - "&eCurrent sort : {sortDisplayName}"
+  '53':
+    utility: close
+    material: BARRIER
+    title: "Close"
+    description: {}
