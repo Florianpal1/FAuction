@@ -8,11 +8,29 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FormatUtil {
+
+    /**
+     * Rounds a price entered by a player to the precision of the configured money format, when that
+     * feature is enabled. Parses back through {@code df} itself (not {@link Double#parseDouble}), so a
+     * pattern with a grouping separator (e.g. "#,##0") round-trips instead of throwing.
+     */
+    public static double applyMoneyFormat(double priceEntry, DecimalFormat df, boolean featureFlippingMoneyFormat) {
+        if (!featureFlippingMoneyFormat) {
+            return priceEntry;
+        }
+        try {
+            return df.parse(df.format(priceEntry)).doubleValue();
+        } catch (ParseException e) {
+            return priceEntry;
+        }
+    }
 
     public static String format(String msg) {
         Pattern pattern = Pattern.compile("#[a-fA-F0-9]{6}");

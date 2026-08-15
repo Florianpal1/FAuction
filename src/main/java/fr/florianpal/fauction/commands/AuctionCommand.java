@@ -161,12 +161,7 @@ public class AuctionCommand extends BaseCommand {
 
         ItemStack itemToSell = playerSender.getInventory().getItemInMainHand().clone();
 
-        double price;
-        if (globalConfig.isFeatureFlippingMoneyFormat()) {
-            price = Double.parseDouble(df.format(priceEntry));
-        } else {
-            price = priceEntry;
-        }
+        double price = FormatUtil.applyMoneyFormat(priceEntry, df, globalConfig.isFeatureFlippingMoneyFormat());
 
         // Everything is checked while the item is still in the inventory, so a refused sale has
         // nothing to give back.
@@ -231,7 +226,7 @@ public class AuctionCommand extends BaseCommand {
 
                 Bukkit.getPluginManager().callEvent(new AuctionAddEvent(playerSender, itemToSell, price));
 
-                MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_ADD_SUCCESS, "{item}", FormatUtil.titleItemFormat(itemToSell), "{price}", String.valueOf(price));
+                MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_ADD_SUCCESS, "{item}", FormatUtil.titleItemFormat(itemToSell), "{price}", df.format(price));
             }).execute(() -> plugin.getClaimManager().release(playerSender.getUniqueId(), saleClaim));
 
         }).execute(() -> {
@@ -309,12 +304,12 @@ public class AuctionCommand extends BaseCommand {
         }
 
         if (minPriceSet && minPrice > price) {
-            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIN_PRICE, "{minPrice}", String.valueOf(ceil(minPrice)));
+            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIN_PRICE, "{minPrice}", df.format(ceil(minPrice)));
             return false;
         }
 
         if (maxPriceSet && maxPrice < price) {
-            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MAX_PRICE, "{maxPrice}", String.valueOf(ceil(maxPrice)));
+            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MAX_PRICE, "{maxPrice}", df.format(ceil(maxPrice)));
             return false;
         }
 
@@ -326,13 +321,13 @@ public class AuctionCommand extends BaseCommand {
         if (globalConfig.getMinPrice().containsKey(itemToSell.getType())) {
             double minPrice = itemToSell.getAmount() * globalConfig.getMinPrice().get(itemToSell.getType());
             if (minPrice > price) {
-                MessageUtil.sendMessage(plugin, player, MessageKeys.MIN_PRICE, "{minPrice}", String.valueOf(ceil(minPrice)));
+                MessageUtil.sendMessage(plugin, player, MessageKeys.MIN_PRICE, "{minPrice}", df.format(ceil(minPrice)));
                 return false;
             }
         } else if (globalConfig.isDefaultMinValueEnable()) {
             double minPrice = itemToSell.getAmount() * globalConfig.getDefaultMinValue();
             if (minPrice > price) {
-                MessageUtil.sendMessage(plugin, player, MessageKeys.MIN_PRICE, "{minPrice}", String.valueOf(ceil(minPrice)));
+                MessageUtil.sendMessage(plugin, player, MessageKeys.MIN_PRICE, "{minPrice}", df.format(ceil(minPrice)));
                 return false;
             }
         }
@@ -357,13 +352,13 @@ public class AuctionCommand extends BaseCommand {
         if (globalConfig.getMaxPrice().containsKey(itemToSell.getType())) {
             double maxPrice = itemToSell.getAmount() * globalConfig.getMaxPrice().get(itemToSell.getType());
             if (maxPrice < price) {
-                MessageUtil.sendMessage(plugin, player, MessageKeys.MAX_PRICE, "{maxPrice}", String.valueOf(ceil(maxPrice)));
+                MessageUtil.sendMessage(plugin, player, MessageKeys.MAX_PRICE, "{maxPrice}", df.format(ceil(maxPrice)));
                 return false;
             }
         } else if (globalConfig.isDefaultMaxValueEnable()) {
             double maxPrice = itemToSell.getAmount() * globalConfig.getDefaultMaxValue();
             if (maxPrice < price) {
-                MessageUtil.sendMessage(plugin, player, MessageKeys.MAX_PRICE, "{maxPrice}", String.valueOf(ceil(maxPrice)));
+                MessageUtil.sendMessage(plugin, player, MessageKeys.MAX_PRICE, "{maxPrice}", df.format(ceil(maxPrice)));
                 return false;
             }
         }
