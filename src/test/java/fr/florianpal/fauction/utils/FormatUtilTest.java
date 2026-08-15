@@ -10,7 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockbukkit.mockbukkit.MockBukkit;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.Duration;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -134,5 +137,23 @@ class FormatUtilTest {
         assertEquals("diamond block", FormatUtil.itemName(item, "block.minecraft.diamond_block"));
         assertEquals("diamond block", FormatUtil.itemName(item, null));
         assertEquals("diamond block", FormatUtil.itemName(item, ""));
+    }
+
+    @Test
+    @DisplayName("A money format with a thousands separator round-trips instead of throwing NumberFormatException")
+    void moneyFormatWithGroupingSeparatorRoundTrips() {
+        assertEquals(1000.0, FormatUtil.applyMoneyFormat(1000.0, decimalFormat("#,##0"), true));
+    }
+
+    @Test
+    @DisplayName("A disabled money format returns the raw entered price unchanged")
+    void moneyFormatDisabledReturnsRawPrice() {
+        assertEquals(1000.4, FormatUtil.applyMoneyFormat(1000.4, decimalFormat("0.00"), false));
+    }
+
+    private DecimalFormat decimalFormat(String pattern) {
+        DecimalFormat df = new DecimalFormat(pattern);
+        df.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        return df;
     }
 }
