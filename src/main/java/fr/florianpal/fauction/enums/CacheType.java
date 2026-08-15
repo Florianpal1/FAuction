@@ -5,5 +5,7 @@ public enum CacheType {
 
     EXPIRE,
 
-    HISTORIC
+    HISTORIC,
+
+    BID
 }

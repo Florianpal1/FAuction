@@ -1,4 +1,4 @@
-version: 11
+version: 12
 lang: "en"
 
 currencyUse: VAULT # VAULT, EXPERIENCE, LEVEL
@@ -36,6 +36,16 @@ onBuy:
 expiration:
   time: 3600 #In seconds 3600 seconds == 1 Hour
   checkEvery: 72000 #In ticks 72000 ticks == 1 Hour
+bid:
+  feature-flipping:
+    item-expiration: true
+  expiration:
+    time: 3600 #In seconds 3600 seconds == 1 Hour, separate from the classic auction duration
+    checkEvery: 72000 #In ticks 72000 ticks == 1 Hour
+  minIncrement: 1.0 # Minimum amount a new bid must add on top of the current one
+  applyDefaultPriceLimits: false # If true, /ah bid reuses min-price/max-price/min-price-default/max-price-default below
+  limitations: # Number of active bids per rank, independent from the classic "limitations" cap above
+    default: 5
 currencyCheck:
   time: 3600 #In seconds 3600 seconds == 1 Hour
   checkEvery: 72000 #In ticks 72000 ticks == 1 Hour

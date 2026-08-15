@@ -1,0 +1,153 @@
+version: 1
+gui:
+  size: 27
+  type: CHEST
+  name: "Confirmation of a bid."
+  title-true: "&eConfirm your bid on {Item}."
+  title-false: "&eCancel."
+  hideFlag: false
+  description:
+    - "&5Sold by: &6{OwnerName}"
+    - "&5Current bid: &6{CurrentBid}"
+    - "&5Your bid: &6{Price}"
+  bid:
+    title: "&eItem : &6{ItemName}"
+    replaceTitle: false
+    description:
+      - "&5Sold by : &6{OwnerName}"
+      - "&5Current bid : &6{CurrentBid}"
+      - "&5Your bid : &6{Price}"
+      - "&5Bid ends on : &6{ExpireTime}"
+      - "&5Lore :"
+      - "{lore}"
+block:
+  '0':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '1':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '2':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '3':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '4':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '5':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '6':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '7':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '8':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '9':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '10':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '11':
+    utility: confirm
+    material: RED_WOOL
+    value: false
+  '12':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '13':
+    utility: bid
+  '14':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '15':
+    utility: confirm
+    material: GREEN_WOOL
+    value: true
+  '16':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '17':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '18':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '19':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '20':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '21':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '22':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '23':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '24':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '25':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}
+  '26':
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: {}

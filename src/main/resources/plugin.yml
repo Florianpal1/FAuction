@@ -13,6 +13,7 @@ permissions:
       fauction.sell: true
       fauction.expire: true
       fauction.search: true
+      fauction.bid: true
   fauction.list:
     description: Open the auction gui
     default: true
@@ -25,11 +26,17 @@ permissions:
   fauction.search:
     description: Search the auctions by material
     default: true
+  fauction.bid:
+    description: Start a bid and place bids on the bid house
+    default: true
   fauction.bypass.spam:
     description: Ignore the anti packet spamming protection
     default: op
   fauction.mod.cancel:
     description: Cancel the auction of another player
+    default: op
+  fauction.mod.bid.cancel:
+    description: Cancel the bid of another player
     default: op
   fauction.admin:
     description: Parent, grants every administration permission
@@ -40,6 +47,7 @@ permissions:
       fauction.admin.purge.auction: true
       fauction.admin.purge.expire: true
       fauction.admin.purge.hictoric: true
+      fauction.admin.purge.bid: true
       fauction.admin.transfertBddToPaper: true
       fauction.admin.migrate: true
   fauction.admin.reload:
@@ -56,6 +64,9 @@ permissions:
     default: op
   fauction.admin.purge.hictoric:
     description: Purge the transaction history
+    default: op
+  fauction.admin.purge.bid:
+    description: Purge the active bids
     default: op
   fauction.admin.transfertBddToPaper:
     description: Migrate the serialization format of the database

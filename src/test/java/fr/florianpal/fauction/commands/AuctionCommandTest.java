@@ -71,6 +71,56 @@ class AuctionCommandTest extends FAuctionTestBase {
         assertFalse(command.haveCorrectShulkerPrice(player, shulker, 21.0));
     }
 
+    @Test
+    @DisplayName("A bid start price ignores the default min/max price bounds when the toggle is off")
+    void bidIgnoresDefaultBoundsWhenToggleIsOff() {
+
+        when(globalConfig.isBidApplyDefaultPriceLimits()).thenReturn(false);
+        when(globalConfig.getBlacklistItem()).thenReturn(java.util.List.of());
+
+        Player player = server.addPlayer();
+        ItemStack gem = namedItem(Material.DIAMOND, 1, "Gem");
+
+        // Would be refused by haveCorrectMinPrice if the bounds applied ; the toggle being off, only
+        // the negative-price and blacklist checks still run.
+        when(globalConfig.isDefaultMinValueEnable()).thenReturn(true);
+        when(globalConfig.getDefaultMinValue()).thenReturn(1000.0);
+        when(globalConfig.getMinPrice()).thenReturn(Map.of());
+
+        assertTrue(command.isBidStartable(player, gem, 1.0));
+    }
+
+    @Test
+    @DisplayName("A bid start price is bound by the default min/max prices when the toggle is on")
+    void bidRespectsDefaultBoundsWhenToggleIsOn() {
+
+        when(globalConfig.isBidApplyDefaultPriceLimits()).thenReturn(true);
+        when(globalConfig.getBlacklistItem()).thenReturn(java.util.List.of());
+        when(globalConfig.getMinPrice()).thenReturn(Map.of());
+        when(globalConfig.getMaxPrice()).thenReturn(Map.of());
+        when(globalConfig.isDefaultMinValueEnable()).thenReturn(true);
+        when(globalConfig.getDefaultMinValue()).thenReturn(1000.0);
+        when(globalConfig.isDefaultMaxValueEnable()).thenReturn(false);
+
+        Player player = server.addPlayer();
+        ItemStack gem = namedItem(Material.DIAMOND, 1, "Gem");
+
+        assertFalse(command.isBidStartable(player, gem, 1.0));
+    }
+
+    @Test
+    @DisplayName("A negative bid start price is always refused")
+    void negativeBidStartPriceIsRefused() {
+
+        when(globalConfig.isBidApplyDefaultPriceLimits()).thenReturn(false);
+        when(globalConfig.getBlacklistItem()).thenReturn(java.util.List.of());
+
+        Player player = server.addPlayer();
+        ItemStack gem = namedItem(Material.DIAMOND, 1, "Gem");
+
+        assertFalse(command.isBidStartable(player, gem, -1.0));
+    }
+
     private ItemStack shulkerWith(ItemStack... contents) {
         ItemStack shulkerItem = new ItemStack(Material.SHULKER_BOX);
         BlockStateMeta meta = (BlockStateMeta) shulkerItem.getItemMeta();

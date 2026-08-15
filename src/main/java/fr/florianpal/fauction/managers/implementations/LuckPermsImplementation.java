@@ -21,4 +21,9 @@ public class LuckPermsImplementation {
         CachedMetaData metaData = luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
         return metaData.getMetaValue("maxAuctions", Integer::parseInt).orElse(0);
     }
+
+    public int getBidMetaData(Player player) {
+        CachedMetaData metaData = luckPerms.getPlayerAdapter(Player.class).getMetaData(player);
+        return metaData.getMetaValue("maxBids", Integer::parseInt).orElse(0);
+    }
 }
