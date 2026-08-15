@@ -20,6 +20,8 @@ public enum BlockType {
 
     EXPIREGUI("expireGui"),
 
+    BIDGUI("bidGui"),
+
     PLAYER("player"),
 
     NEXT("next"),

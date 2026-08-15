@@ -5,5 +5,6 @@ package fr.florianpal.fauction.enums;
  */
 public enum ClaimType {
     AUCTION,
-    EXPIRE
+    EXPIRE,
+    BID
 }

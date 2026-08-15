@@ -45,6 +45,14 @@ public class ConfigurationManager {
     private YamlDocument auctionConfirmConfiguration;
 
     @Getter
+    private final BidConfig bidConfig = new BidConfig();
+    private YamlDocument bidConfiguration;
+
+    @Getter
+    private final BidConfirmGuiConfig bidConfirmConfig = new BidConfirmGuiConfig();
+    private YamlDocument bidConfirmConfiguration;
+
+    @Getter
     private final GlobalConfig globalConfig = new GlobalConfig();
     private YamlDocument globalConfiguration;
 
@@ -124,6 +132,22 @@ public class ConfigurationManager {
                     UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
             );
 
+            bidConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/bid.yml"),
+                    Objects.requireNonNull(getClass().getResourceAsStream("/gui/bid.yml")),
+                    GeneralSettings.builder().setUseDefaults(false).build(),
+                    LoaderSettings.builder().setAutoUpdate(false).build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
+            );
+
+            bidConfirmConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "gui/bidConfirm.yml"),
+                    Objects.requireNonNull(getClass().getResourceAsStream("/gui/bidConfirm.yml")),
+                    GeneralSettings.builder().setUseDefaults(false).build(),
+                    LoaderSettings.builder().setAutoUpdate(false).build(),
+                    DumperSettings.DEFAULT,
+                    UpdaterSettings.builder().setVersioning(new BasicVersioning("version")).setOptionSorting(UpdaterSettings.DEFAULT_OPTION_SORTING).build()
+            );
+
             globalConfiguration = YamlDocument.create(new File(plugin.getDataFolder(), "config.yml"),
                     Objects.requireNonNull(getClass().getResourceAsStream("/config.yml")),
                     GeneralSettings.builder().setUseDefaults(false).build(),
@@ -160,6 +184,8 @@ public class ConfigurationManager {
         auctionConfirmConfig.load(plugin, auctionConfirmConfiguration);
         expireConfig.load(plugin, expireConfiguration);
         playerViewConfig.load(plugin, playerViewConfiguration);
+        bidConfig.load(plugin, bidConfiguration);
+        bidConfirmConfig.load(plugin, bidConfirmConfiguration);
 
         File menusDir = new File(plugin.getDataFolder().getPath() + "/gui/menus");
         if (!menusDir.exists()){

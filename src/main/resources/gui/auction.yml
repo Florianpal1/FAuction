@@ -151,10 +151,11 @@ block:
   '43':
     utility: auction
   '44':
-    utility: barrier
-    material: GRAY_STAINED_GLASS_PANE
-    title: " "
-    description: { }
+    utility: bidGui
+    material: GOLD_INGOT
+    title: "&5See the ongoing bids"
+    description:
+      - "&eClick here to see the items on auction"
   '45':
     utility: player
     material: NETHER_STAR

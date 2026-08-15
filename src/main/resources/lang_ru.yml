@@ -9,6 +9,9 @@ fauction:
   clear_cache_help_description: "Очистить кэш"
   auction_search_help_description: "Поиск предмета"
   migrate_help_description: "Мигрировать на другую версию."
+  bid_help_description: "Начать аукцион для стака предметов из вашей руки"
+  bid_list_help_description: "Открыть аукцион ставок"
+  bid_cancel_help_description: "Отменить одну из ваших ставок, на которую еще никто не ставил"
 
   buy_auction_success: "Вы успешно купили {item} за {price}."
   buy_auction_target_success: "Игрок {player} купил ваш предмет {item} за {price}."
@@ -39,6 +42,20 @@ fauction:
 
   transfert_bdd: "Перенос данных базы данных завершен."
   auction_purge: "Все данные были удалены."
+
+  bid_add_success: "Вы начали аукцион на {item} с начальной ценой {price}."
+  bid_placed_success: "Вы сделали ставку {price} на {item}."
+  bid_too_low: "Кто-то уже перебил эту ставку, попробуйте еще раз."
+  outbid_notification: "Вашу ставку на {item} перебили, новая ставка {price}. Деньги были возвращены."
+  bid_won: "Вы выиграли аукцион на {item} за {price}."
+  bid_sold: "Ваш аукцион на {item} завершен, продано за {price}."
+  bid_ended_no_winner: "Один из ваших аукционов на {item} завершился без ставок, предмет ожидает вас среди просроченных предметов."
+  bid_your_item: "Вы не можете делать ставку на свой собственный предмет."
+  bid_already_yours: "Вы уже являетесь лидером ставок на этот предмет."
+  max_bid: "Вы достигли максимального количества ставок для вашей группы."
+  bid_cancelled: "Вы отменили свою ставку."
+  bid_cancel_success: "Вы сняли {item} с аукциона ставок."
+  bid_cancel_has_bidder: "На этот аукцион уже сделана ставка, его больше нельзя отменить."
 
 acf-minecraft:
   invalid_world: "Ошибка: Этот мир не существует."

@@ -7,6 +7,9 @@ fauction:
   reload_help_description: "重载插件配置."
   transfert_bdd_help_description: "将 bdd 数据在 Paper 与 Spigot 之间互转"
   auction_search_help_description: "Search for an item"
+  bid_help_description: "为手中的物品堆开始一次拍卖竞价"
+  bid_list_help_description: "打开竞价拍卖行"
+  bid_cancel_help_description: "取消一个尚未有人出价的竞价"
 
   buy_auction_success: "你购买了一个物品."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -30,6 +33,20 @@ fauction:
 
   remove_expire_success: "你已取得过期物品."
   transfert_bdd: "数据库迁移完毕."
+
+  bid_add_success: "你已为 {item} 开始竞价拍卖, 起拍价 {price}."
+  bid_placed_success: "你对 {item} 出价 {price}."
+  bid_too_low: "已有其他玩家提高了出价, 请重试."
+  outbid_notification: "你对 {item} 的出价已被超过, 新出价为 {price}. 你的钱已退还."
+  bid_won: "你以 {price} 的价格竞拍到了 {item}."
+  bid_sold: "你的 {item} 竞价拍卖已结束, 以 {price} 售出."
+  bid_ended_no_winner: "你的一次 {item} 竞价拍卖已结束且无人出价, 物品正在过期物品中等待你领取."
+  bid_your_item: "你不能对自己的物品出价."
+  bid_already_yours: "你已经是这件物品的最高出价者."
+  max_bid: "你当前不能再进行更多次竞价."
+  bid_cancelled: "你取消了本次出价."
+  bid_cancel_success: "你已从竞价拍卖行下架 {item}."
+  bid_cancel_has_bidder: "此次竞价已有人出价, 无法再取消."
 
   max_bill: "你现在不能再参与更多次竞拍出价了."
   bill_add_success: "你成功为此次拍卖出价."
