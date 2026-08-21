@@ -24,7 +24,7 @@
     <build>
         <plugins>
             <plugin>
-                <version>3.14.0</version>
+                <version>3.15.0</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -47,7 +47,7 @@
                 <!-- Resolves ${org.mockito:mockito-core:jar} used by surefire below -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -60,7 +60,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.6</version>
                 <configuration>
                     <!-- Mockito as an agent, it is no longer allowed to attach itself -->
                     <argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
@@ -70,7 +70,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.2</version>
 
                 <configuration>
                     <minimizeJar>true</minimizeJar>
@@ -247,7 +247,7 @@
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>3.6.1</version>
+            <version>3.6.2</version>
         </dependency>
         <!--Boosted Yaml-->
         <dependency>
