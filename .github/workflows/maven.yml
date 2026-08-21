@@ -31,7 +31,7 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Upload the plugin JAR
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fauction-dev-${{ github.sha }}
           path: target/fauction-*.jar
@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload the test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: surefire-reports-${{ github.sha }}
           path: target/surefire-reports/
