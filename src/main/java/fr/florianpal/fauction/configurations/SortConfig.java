@@ -23,8 +23,16 @@ public class SortConfig {
         }
     }
 
+    /**
+     * @return the sort configured as "DEFAULT", or the first configured sort if that key was
+     * renamed/removed ; only returns null if no sort at all is configured.
+     */
     public Sort getDefault() {
-        return sort.getOrDefault("DEFAULT", null);
+        Sort configuredDefault = sort.get("DEFAULT");
+        if (configuredDefault != null) {
+            return configuredDefault;
+        }
+        return sort.values().stream().findFirst().orElse(null);
     }
 
     public Sort getNext(Sort sort) {

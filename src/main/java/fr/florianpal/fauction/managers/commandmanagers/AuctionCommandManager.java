@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class AuctionCommandManager {
 
+    private final FAuction plugin;
+
     private final AuctionQueries auctionQueries;
 
     @Getter
@@ -25,15 +27,15 @@ public class AuctionCommandManager {
 
     private final SQLType sqlType;
 
-    private int idMax = 0;
+    // Only used to give a cache-only row (one the database refused, see restore()) an id that can
+    // never collide with a real, database-assigned one, which are always positive.
+    private int fallbackId = -1;
 
     public AuctionCommandManager(FAuction plugin) {
+        this.plugin = plugin;
         this.auctionQueries = plugin.getAuctionQueries();
         this.sqliteCache = new CopyOnWriteArrayList<>(auctionQueries.getAuctions());
         this.sqlType = plugin.getConfigurationManager().getDatabase().getSqlType();
-        if (!sqliteCache.isEmpty()) {
-            this.idMax = sqliteCache.stream().max(Comparator.comparing(Auction::getId)).get().getId() + 1;
-        }
         updateCache();
     }
 
@@ -55,13 +57,22 @@ public class AuctionCommandManager {
      * @return true if the auction has been saved, the item can stay out of the inventory.
      */
     public synchronized boolean addAuction(Player player, ItemStack item, double price)  {
-        if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.add(new Auction(idMax, player.getUniqueId(), player.getName(), price, SerializationUtil.serialize(item), Calendar.getInstance().getTime().getTime()));
-            idMax = idMax + 1;
-            auctionQueries.addAuction(player.getUniqueId(), player.getName(), SerializationUtil.serialize(item), price, Calendar.getInstance().getTime());
-            return true;
+        byte[] serializedItem = SerializationUtil.serialize(item);
+        Date date = Calendar.getInstance().getTime();
+
+        // The database row is what has to survive a crash ; the cache is only advanced once the
+        // write is confirmed, using the id the database itself assigned so the two id spaces can
+        // never drift apart (a locally guessed id would, e.g. as soon as the highest-id row so far
+        // had already been deleted once).
+        int id = auctionQueries.addAuction(player.getUniqueId(), player.getName(), serializedItem, price, date);
+        if (id < 0) {
+            return false;
         }
-        return auctionQueries.addAuction(player.getUniqueId(), player.getName(), SerializationUtil.serialize(item), price, Calendar.getInstance().getTime());
+
+        if (SQLType.SQLite.equals(sqlType)) {
+            sqliteCache.add(new Auction(id, player.getUniqueId(), player.getName(), price, serializedItem, date.getTime()));
+        }
+        return true;
     }
 
     public void saveAllAuctionInBddFromSQLiteCache()  {
@@ -87,14 +98,21 @@ public class AuctionCommandManager {
     }
 
     /**
-     * @return true if this call is the one that removed the auction.
+     * @return true if this call is the one that removed the auction, from both the cache and the
+     * database. The database is checked first and is the one allowed to refuse the removal ; a row
+     * that fails to delete (transient database error, or a row that was never actually persisted by a
+     * failed restore()) is kept on the market from the cache instead of being evicted with nothing to
+     * show for it.
      */
     public synchronized boolean deleteAuction(int id) {
         if (SQLType.SQLite.equals(sqlType)) {
+            boolean removedInDb = auctionQueries.deleteAuctions(id);
+            if (!removedInDb) {
+                plugin.getLogger().severe("Auction " + id + " could not be deleted from the database ; kept on the market instead of being lost from the cache for nothing.");
+                return false;
+            }
             // The cache is the authority in SQLite mode, the rows being rewritten on shutdown.
-            boolean removed = removeFromCache(id);
-            auctionQueries.deleteAuctions(id);
-            return removed;
+            return removeFromCache(id);
         }
         return auctionQueries.deleteAuctions(id);
     }
@@ -103,11 +121,28 @@ public class AuctionCommandManager {
      * Puts back an auction removed by a claim, when the transaction could not be completed.
      */
     public synchronized void restore(Auction auction) {
-        if (SQLType.SQLite.equals(sqlType)) {
-            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), SerializationUtil.serialize(auction.getItemStack()), auction.getDate().getTime()));
-            idMax = idMax + 1;
+        byte[] serializedItem = SerializationUtil.serialize(auction.getItemStack());
+        int id = auctionQueries.addAuction(auction.getPlayerUUID(), auction.getPlayerName(), serializedItem, auction.getPrice(), auction.getDate());
+        boolean savedInDb = id >= 0;
+
+        if (!savedInDb) {
+            // The row is already gone from the market at this point (deleteAuction succeeded when it
+            // was claimed). In SQLite mode it stays visible from the cache rather than losing the item
+            // outright, at the cost of a database desync a non-clean restart could still turn into
+            // data loss ; in a shared database mode there is no cache to fall back on, so the item is
+            // simply lost.
+            String outcome = SQLType.SQLite.equals(sqlType)
+                    ? "it stays visible from the cache only until the next successful save"
+                    : "the item is lost, there is no cache to fall back on outside of SQLite mode";
+            plugin.getLogger().severe("Restoring auction of " + auction.getPlayerName() + " to the database failed ; " + outcome + ".");
         }
-        auctionQueries.addAuction(auction.getPlayerUUID(), auction.getPlayerName(), SerializationUtil.serialize(auction.getItemStack()), auction.getPrice(), auction.getDate());
+
+        if (SQLType.SQLite.equals(sqlType)) {
+            // The database write failed above, so there is no real id to reuse ; the cache-only
+            // fallback id must stay out of the range SQLite assigns, which is why it is negative.
+            int cacheId = savedInDb ? id : fallbackId--;
+            sqliteCache.add(new Auction(cacheId, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), serializedItem, auction.getDate().getTime()));
+        }
     }
 
     /**

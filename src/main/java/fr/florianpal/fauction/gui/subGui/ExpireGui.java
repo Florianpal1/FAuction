@@ -7,6 +7,7 @@ import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.ExpireRemoveEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
+import fr.florianpal.fauction.managers.ClaimManager;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Sort;
@@ -97,12 +98,13 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
                     // Reserved on the main thread : every other click of the same tick stops here,
                     // before being able to schedule a second chain on the same item.
-                    if (!plugin.getClaimManager().tryClaim(ClaimType.EXPIRE, expireId)) {
+                    long expireClaim = plugin.getClaimManager().tryClaim(ClaimType.EXPIRE, expireId);
+                    if (expireClaim == ClaimManager.NOT_CLAIMED) {
                         return;
                     }
 
                     if (!auction.getPlayerUUID().equals(player.getUniqueId())) {
-                        plugin.getClaimManager().release(ClaimType.EXPIRE, expireId);
+                        plugin.getClaimManager().release(ClaimType.EXPIRE, expireId, expireClaim);
                         return;
                     }
 
@@ -128,7 +130,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
                             ExpireGui gui = new ExpireGui(plugin, player, expires, 1, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).execute(() -> plugin.getClaimManager().release(ClaimType.EXPIRE, expireId));
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.EXPIRE, expireId, expireClaim));
                 }
             }
         }

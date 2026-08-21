@@ -34,7 +34,15 @@ public class ExpireSchedule implements Runnable {
                     if (!plugin.getAuctionCommandManager().deleteAuction(auction.getId())) {
                         continue;
                     }
-                    plugin.getExpireCommandManager().addExpire(auction);
+
+                    if (!plugin.getExpireCommandManager().addExpire(auction)) {
+                        // The move failed halfway : put the auction back rather than losing the item,
+                        // there being no single transaction covering both tables.
+                        plugin.getLogger().severe("Auction " + auction.getId() + " of " + auction.getPlayerName() + " could not be moved to the expired items ; put back on the market instead of being lost.");
+                        plugin.getAuctionCommandManager().restore(auction);
+                        continue;
+                    }
+
                     Bukkit.getPluginManager().callEvent(new ExpireAddEvent(auction.getPlayerUUID(), auction));
                 }
             }

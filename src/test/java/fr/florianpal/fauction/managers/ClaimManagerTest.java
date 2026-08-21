@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClaimManagerTest {
@@ -21,8 +21,8 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
-        assertFalse(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertNotClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
     }
 
     @Test
@@ -35,7 +35,7 @@ class ClaimManagerTest {
 
         int winners = 0;
         for (int packet = 0; packet < 200; packet++) {
-            if (claimManager.tryClaim(ClaimType.AUCTION, 42)) {
+            if (claimManager.tryClaim(ClaimType.AUCTION, 42) != ClaimManager.NOT_CLAIMED) {
                 winners++;
             }
         }
@@ -58,7 +58,7 @@ class ClaimManagerTest {
             new Thread(() -> {
                 try {
                     start.await();
-                    if (claimManager.tryClaim(ClaimType.AUCTION, 42)) {
+                    if (claimManager.tryClaim(ClaimType.AUCTION, 42) != ClaimManager.NOT_CLAIMED) {
                         winners.incrementAndGet();
                     }
                 } catch (InterruptedException e) {
@@ -80,10 +80,11 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
-        claimManager.release(ClaimType.AUCTION, 42);
+        long claim = claimManager.tryClaim(ClaimType.AUCTION, 42);
+        assertClaimed(claim);
+        claimManager.release(ClaimType.AUCTION, 42, claim);
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
     }
 
     @Test
@@ -92,10 +93,10 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 43));
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, -42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 43));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, -42));
     }
 
     @Test
@@ -104,9 +105,9 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
 
-        assertTrue(claimManager.tryClaim(ClaimType.EXPIRE, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.EXPIRE, 42));
     }
 
     @Test
@@ -115,12 +116,41 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager(50);
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
-        assertFalse(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertNotClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
 
         Thread.sleep(80);
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
+    }
+
+    @Test
+    @DisplayName("A release with a stale token does not drop the claim that took over")
+    void releaseWithAStaleTokenDoesNotDropTheNewClaim() throws InterruptedException {
+
+        // The chain that lost the claim to a timeout must not be able to release the new claim of
+        // whoever took over meanwhile, otherwise a third attempt could jump in while the second one
+        // still believes it owns the auction.
+        ClaimManager claimManager = new ClaimManager(50);
+
+        long staleClaim = claimManager.tryClaim(ClaimType.AUCTION, 42);
+        assertClaimed(staleClaim);
+
+        Thread.sleep(80);
+
+        long newClaim = claimManager.tryClaim(ClaimType.AUCTION, 42);
+        assertClaimed(newClaim);
+        assertNotEquals(staleClaim, newClaim);
+
+        // The original (now stale) chain finally finishes and releases its own token.
+        claimManager.release(ClaimType.AUCTION, 42, staleClaim);
+
+        // The new claim must still be held : a third attempt is refused.
+        assertNotClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
+
+        // Only the actual owner releasing its own token frees the auction.
+        claimManager.release(ClaimType.AUCTION, 42, newClaim);
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
     }
 
     @Test
@@ -129,9 +159,9 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        claimManager.release(ClaimType.AUCTION, 42);
+        claimManager.release(ClaimType.AUCTION, 42, ClaimManager.NOT_CLAIMED);
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
     }
 
     @Test
@@ -145,7 +175,7 @@ class ClaimManagerTest {
 
         int sales = 0;
         for (int packet = 0; packet < 200; packet++) {
-            if (claimManager.tryClaim(seller)) {
+            if (claimManager.tryClaim(seller) != ClaimManager.NOT_CLAIMED) {
                 sales++;
             }
         }
@@ -169,7 +199,7 @@ class ClaimManagerTest {
             new Thread(() -> {
                 try {
                     start.await();
-                    if (claimManager.tryClaim(seller)) {
+                    if (claimManager.tryClaim(seller) != ClaimManager.NOT_CLAIMED) {
                         winners.incrementAndGet();
                     }
                 } catch (InterruptedException e) {
@@ -191,8 +221,8 @@ class ClaimManagerTest {
 
         ClaimManager claimManager = new ClaimManager();
 
-        assertTrue(claimManager.tryClaim(UUID.randomUUID()));
-        assertTrue(claimManager.tryClaim(UUID.randomUUID()));
+        assertClaimed(claimManager.tryClaim(UUID.randomUUID()));
+        assertClaimed(claimManager.tryClaim(UUID.randomUUID()));
     }
 
     @Test
@@ -202,12 +232,13 @@ class ClaimManagerTest {
         ClaimManager claimManager = new ClaimManager();
         UUID seller = UUID.randomUUID();
 
-        assertTrue(claimManager.tryClaim(seller));
-        assertFalse(claimManager.tryClaim(seller));
+        long claim = claimManager.tryClaim(seller);
+        assertClaimed(claim);
+        assertNotClaimed(claimManager.tryClaim(seller));
 
-        claimManager.release(seller);
+        claimManager.release(seller, claim);
 
-        assertTrue(claimManager.tryClaim(seller));
+        assertClaimed(claimManager.tryClaim(seller));
     }
 
     @Test
@@ -217,12 +248,12 @@ class ClaimManagerTest {
         ClaimManager claimManager = new ClaimManager(50);
         UUID seller = UUID.randomUUID();
 
-        assertTrue(claimManager.tryClaim(seller));
-        assertFalse(claimManager.tryClaim(seller));
+        assertClaimed(claimManager.tryClaim(seller));
+        assertNotClaimed(claimManager.tryClaim(seller));
 
         Thread.sleep(80);
 
-        assertTrue(claimManager.tryClaim(seller));
+        assertClaimed(claimManager.tryClaim(seller));
     }
 
     @Test
@@ -232,9 +263,17 @@ class ClaimManagerTest {
         ClaimManager claimManager = new ClaimManager();
         UUID seller = UUID.randomUUID();
 
-        assertTrue(claimManager.tryClaim(seller));
+        assertClaimed(claimManager.tryClaim(seller));
 
-        assertTrue(claimManager.tryClaim(ClaimType.AUCTION, 42));
-        assertTrue(claimManager.tryClaim(ClaimType.EXPIRE, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.AUCTION, 42));
+        assertClaimed(claimManager.tryClaim(ClaimType.EXPIRE, 42));
+    }
+
+    private void assertClaimed(long token) {
+        assertNotEquals(ClaimManager.NOT_CLAIMED, token, "Expected the claim to succeed");
+    }
+
+    private void assertNotClaimed(long token) {
+        assertEquals(ClaimManager.NOT_CLAIMED, token, "Expected the claim to be refused");
     }
 }

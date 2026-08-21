@@ -18,7 +18,13 @@ import org.mockbukkit.mockbukkit.ServerMock;
 
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,10 +67,25 @@ public abstract class FAuctionTestBase {
         when(plugin.getConfigurationManager()).thenReturn(configurationManager);
         when(plugin.getAuctionQueries()).thenReturn(auctionQueries);
         when(plugin.getExpireQueries()).thenReturn(expireQueries);
+        when(plugin.getLogger()).thenReturn(Logger.getLogger("FAuctionTest"));
 
         // The cache mode is the one keeping the auctions in memory, where the reservation is
         // arbitrated by the plugin itself.
         when(databaseConfig.getSqlType()).thenReturn(SQLType.SQLite);
+
+        // Happy path default : a database write succeeds and hands back an auto-incrementing id,
+        // unless a test overrides it (with a negative return) to exercise a failure.
+        // AuctionCommandManager/ExpireCommandManager keep their SQLite cache in sync with these
+        // results instead of assuming success or guessing the assigned id.
+        // Starts well above any hardcoded id used by test fixtures (auction(1, ...), auction(2, ...),
+        // ...), so a freshly "inserted" row never collides with one already sitting in a preloaded
+        // cache.
+        AtomicInteger nextAuctionId = new AtomicInteger(1000);
+        AtomicInteger nextExpireId = new AtomicInteger(1000);
+        when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenAnswer(invocation -> nextAuctionId.getAndIncrement());
+        when(auctionQueries.deleteAuctions(anyInt())).thenReturn(true);
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenAnswer(invocation -> nextExpireId.getAndIncrement());
+        when(expireQueries.deleteExpire(anyInt())).thenReturn(true);
     }
 
     @AfterEach

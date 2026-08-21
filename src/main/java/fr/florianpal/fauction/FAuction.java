@@ -115,6 +115,7 @@ public class FAuction extends JavaPlugin {
         } catch (RuntimeException e) {
             getLogger().severe(e.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         if (configurationManager.getGlobalConfig().isLimitationsUseMetaLuckperms()) {
@@ -136,6 +137,7 @@ public class FAuction extends JavaPlugin {
         } catch (SQLException e) {
             getLogger().severe(e.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
         auctionQueries = new AuctionQueries(this);
         expireQueries = new ExpireQueries(this);
@@ -198,6 +200,14 @@ public class FAuction extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        // onEnable can call disablePlugin() before databaseManager is assigned (config or database
+        // initialization failure) ; this runs synchronously as part of that call. configurationManager
+        // is always set by this point, onEnable returning before databaseManager is ever reached
+        // otherwise.
+        if (databaseManager == null) {
+            return;
+        }
 
         if (configurationManager.getDatabase().getSqlType().equals(SQLType.SQLite)) {
             auctionCommandManager.deleteAllOnlyOnDB();

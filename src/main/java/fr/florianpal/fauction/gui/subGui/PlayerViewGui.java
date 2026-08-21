@@ -8,6 +8,7 @@ import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionCancelEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
+import fr.florianpal.fauction.managers.ClaimManager;
 import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Sort;
@@ -96,12 +97,13 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
                     // Reserved on the main thread : every other click of the same tick stops here,
                     // before being able to schedule a second chain on the same auction.
-                    if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
+                    long auctionClaim = plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId);
+                    if (auctionClaim == ClaimManager.NOT_CLAIMED) {
                         return;
                     }
 
                     if (!auction.getPlayerUUID().equals(player.getUniqueId())) {
-                        plugin.getClaimManager().release(ClaimType.AUCTION, auctionId);
+                        plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim);
                         return;
                     }
 
@@ -136,7 +138,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctionsNew, this.page, category, sort);
                             gui.initialize();
                         }).execute();
-                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
+                    }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim));
                 }
                 break;
             }

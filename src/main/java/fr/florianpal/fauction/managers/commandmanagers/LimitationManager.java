@@ -18,7 +18,8 @@ public class LimitationManager {
         Permission perms = plugin.getVaultIntegrationManager().getPerms();
         Map<String, Integer> limitations = plugin.getConfigurationManager().getGlobalConfig().getLimitations();
         String[] playerGroup;
-        int limit = limitations.get("default");
+        // Deny by default rather than NPE/unlimited if "limitations" or its "default" key is missing.
+        int limit = limitations.getOrDefault("default", 0);
         if (perms != null) {
             String primaryGroup = perms.getPrimaryGroup(player);
             if (limitations.containsKey(primaryGroup) && (limit < limitations.get(primaryGroup))) {

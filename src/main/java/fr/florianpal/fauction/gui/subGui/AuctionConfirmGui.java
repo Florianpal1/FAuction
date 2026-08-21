@@ -8,6 +8,7 @@ import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionBuyEvent;
 import fr.florianpal.fauction.gui.AbstractGuiWithAuctions;
 import fr.florianpal.fauction.languages.MessageKeys;
+import fr.florianpal.fauction.managers.ClaimManager;
 import fr.florianpal.fauction.objects.*;
 import fr.florianpal.fauction.utils.*;
 import org.bukkit.Bukkit;
@@ -244,14 +245,15 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
 
                 // Reserved on the main thread : every other click of the same tick stops here,
                 // before being able to schedule a second chain on the same auction.
-                if (!plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId)) {
+                long auctionClaim = plugin.getClaimManager().tryClaim(ClaimType.AUCTION, auctionId);
+                if (auctionClaim == ClaimManager.NOT_CLAIMED) {
                     return;
                 }
 
                 // Read only check, so the usual "not enough money" case never removes the row.
                 if (!CurrencyUtil.haveCurrency(plugin, player, globalConfig.getCurrencyType(), this.auction.getPrice())) {
                     MessageUtil.sendMessage(plugin, player, MessageKeys.NO_HAVE_MONEY);
-                    plugin.getClaimManager().release(ClaimType.AUCTION, auctionId);
+                    plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim);
                     return;
                 }
 
@@ -310,7 +312,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                         AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                         gui.initialize();
                     }).execute();
-                }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId));
+                }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim));
                 break;
             }
         }

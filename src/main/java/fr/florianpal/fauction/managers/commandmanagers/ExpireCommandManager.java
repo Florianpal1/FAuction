@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 public class ExpireCommandManager {
 
+    private final FAuction plugin;
+
     private final ExpireQueries expireQueries;
 
     @Getter
@@ -22,15 +24,11 @@ public class ExpireCommandManager {
 
     private final SQLType sqlType;
 
-    private int idMax = 0;
-
     public ExpireCommandManager(FAuction plugin) {
+        this.plugin = plugin;
         this.expireQueries = plugin.getExpireQueries();
         this.sqliteCache = new CopyOnWriteArrayList<>(expireQueries.getExpires());
         this.sqlType = plugin.getConfigurationManager().getDatabase().getSqlType();
-        if (!sqliteCache.isEmpty()) {
-            this.idMax = sqliteCache.stream().max(Comparator.comparing(Auction::getId)).get().getId() + 1;
-        }
         updateCache();
     }
 
@@ -48,14 +46,25 @@ public class ExpireCommandManager {
         return expireQueries.getExpires(uuid);
     }
 
-    public synchronized void addExpire(Auction auction)  {
-        if (SQLType.SQLite.equals(sqlType)) {
-            // Own id, otherwise an expire could share the id of another entry of the cache and a
-            // single claim would drop them both.
-            sqliteCache.add(new Auction(idMax, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), SerializationUtil.serialize(auction.getItemStack()), auction.getDate().getTime()));
-            idMax = idMax + 1;
+    /**
+     * @return true if the expired auction has been saved, the item can be considered moved off the
+     * market. Only advances the cache once the database write is confirmed, using the id the
+     * database itself assigned (rather than a locally guessed one, which could drift from the
+     * database's own sequence), so a failed insert can never leave an item that only exists in the
+     * cache, and a successful one can never end up impossible to remove later.
+     */
+    public synchronized boolean addExpire(Auction auction)  {
+        byte[] serializedItem = SerializationUtil.serialize(auction.getItemStack());
+
+        int id = expireQueries.addExpire(auction.getPlayerUUID(), auction.getPlayerName(), serializedItem, auction.getPrice(), auction.getDate());
+        if (id < 0) {
+            return false;
         }
-        expireQueries.addExpire(auction.getPlayerUUID(), auction.getPlayerName(), SerializationUtil.serialize(auction.getItemStack()), auction.getPrice(), auction.getDate());
+
+        if (SQLType.SQLite.equals(sqlType)) {
+            sqliteCache.add(new Auction(id, auction.getPlayerUUID(), auction.getPlayerName(), auction.getPrice(), serializedItem, auction.getDate().getTime()));
+        }
+        return true;
     }
 
     /**
@@ -73,13 +82,19 @@ public class ExpireCommandManager {
     }
 
     /**
-     * @return true if this call is the one that removed the expired auction.
+     * @return true if this call is the one that removed the expired auction, from both the cache and
+     * the database. The database is checked first, so a row that fails to delete is kept visible from
+     * the cache instead of being evicted with nothing to show for it.
      */
     public synchronized boolean deleteExpire(int id) {
         if (SQLType.SQLite.equals(sqlType)) {
-            boolean removed = removeFromCache(id);
-            expireQueries.deleteExpire(id);
-            return removed;
+            boolean removedInDb = expireQueries.deleteExpire(id);
+            if (!removedInDb) {
+                plugin.getLogger().severe("Expired item " + id + " could not be deleted from the database ; kept visible instead of being lost from the cache for nothing.");
+                return false;
+            }
+            // The cache is the authority in SQLite mode, the rows being rewritten on shutdown.
+            return removeFromCache(id);
         }
         return expireQueries.deleteExpire(id);
     }

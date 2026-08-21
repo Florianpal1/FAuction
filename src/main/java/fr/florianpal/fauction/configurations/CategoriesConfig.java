@@ -24,8 +24,16 @@ public class CategoriesConfig {
         }
     }
 
+    /**
+     * @return the category configured as "default", or the first configured category if that key was
+     * renamed/removed ; only returns null if no category at all is configured.
+     */
     public Category getDefault() {
-        return categories.getOrDefault("default", null);
+        Category configuredDefault = categories.get("default");
+        if (configuredDefault != null) {
+            return configuredDefault;
+        }
+        return categories.values().stream().findFirst().orElse(null);
     }
 
     public Category getNext(Category category) {

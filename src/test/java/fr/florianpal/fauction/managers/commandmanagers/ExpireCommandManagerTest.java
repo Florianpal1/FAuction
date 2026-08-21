@@ -6,6 +6,7 @@ import fr.florianpal.fauction.objects.Auction;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -20,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class ExpireCommandManagerTest extends FAuctionTestBase {
@@ -54,6 +58,24 @@ class ExpireCommandManagerTest extends FAuctionTestBase {
         List<Auction> expires = manager.getExpires(SELLER);
         assertEquals(2, expires.size());
         assertNotEquals(expires.get(0).getId(), expires.get(1).getId());
+    }
+
+    @Test
+    @DisplayName("A new expire keeps the database's own id, so it can always be withdrawn later")
+    void newExpireUsesTheDatabaseAssignedId() {
+
+        // Regression : the cache used to guess the next id from the highest one still in the table,
+        // which undercounts the database's real AUTOINCREMENT sequence as soon as that highest row
+        // has ever been withdrawn (SQLite never reuses a once-assigned id). A guessed id here would
+        // never match the id the database actually assigns, leaving the row impossible to withdraw.
+        when(expireQueries.getExpires()).thenReturn(new ArrayList<>(List.of(auction(5, SELLER, 250.0))));
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(42);
+        ExpireCommandManager manager = new ExpireCommandManager(plugin);
+
+        assertTrue(manager.addExpire(auction(1, SELLER, 10.0)));
+
+        assertNotNull(manager.expireExist(42));
+        assertNotNull(manager.claim(42));
     }
 
     @Test
@@ -148,20 +170,79 @@ class ExpireCommandManagerTest extends FAuctionTestBase {
     }
 
     @Test
-    @DisplayName("With a shared database, the delete has the last word")
-    void databaseArbitratesTheWithdrawal() {
+    @DisplayName("A database write failure keeps the cache and the database in sync (SQLite)")
+    void failedSqliteInsertDoesNotEnterTheCache() {
 
-        when(databaseConfig.getSqlType()).thenReturn(SQLType.MySQL);
         when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
+        when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
         ExpireCommandManager manager = new ExpireCommandManager(plugin);
 
-        when(expireQueries.getExpire(1)).thenReturn(auction(1, SELLER, 250.0));
+        assertFalse(manager.addExpire(auction(1, SELLER, 250.0)));
+        assertTrue(manager.getExpires().isEmpty());
+    }
+
+    @Test
+    @DisplayName("A database delete failure refuses the claim and keeps the expire visible (SQLite)")
+    void failedSqliteDeleteRefusesTheClaim() {
+
+        when(expireQueries.getExpires()).thenReturn(new ArrayList<>(List.of(auction(1, SELLER, 250.0))));
         when(expireQueries.deleteExpire(1)).thenReturn(false);
+        ExpireCommandManager manager = new ExpireCommandManager(plugin);
 
         assertNull(manager.claim(1));
 
-        when(expireQueries.deleteExpire(1)).thenReturn(true);
+        // The database is checked before the cache is touched, so a row that fails to delete is
+        // never lost.
+        assertNotNull(manager.expireExist(1));
+        assertEquals(1, manager.getExpires().size());
+    }
 
-        assertNotNull(manager.claim(1));
+    @Nested
+    @DisplayName("With a shared database")
+    class SharedDatabase {
+
+        @Test
+        @DisplayName("The database has the last word on who withdraws the item")
+        void databaseArbitratesTheWithdrawal() {
+
+            when(databaseConfig.getSqlType()).thenReturn(SQLType.MySQL);
+            when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
+            ExpireCommandManager manager = new ExpireCommandManager(plugin);
+
+            when(expireQueries.getExpire(1)).thenReturn(auction(1, SELLER, 250.0));
+            when(expireQueries.deleteExpire(1)).thenReturn(false);
+
+            assertNull(manager.claim(1));
+
+            when(expireQueries.deleteExpire(1)).thenReturn(true);
+
+            assertNotNull(manager.claim(1));
+        }
+
+        @Test
+        @DisplayName("An expire already gone is not claimed")
+        void missingExpireIsNotClaimed() {
+
+            when(databaseConfig.getSqlType()).thenReturn(SQLType.MySQL);
+            when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
+            ExpireCommandManager manager = new ExpireCommandManager(plugin);
+
+            when(expireQueries.getExpire(1)).thenReturn(null);
+
+            assertNull(manager.claim(1));
+        }
+
+        @Test
+        @DisplayName("A failed insert is reported, so the item can be handled by the caller")
+        void failedInsertIsReported() {
+
+            when(databaseConfig.getSqlType()).thenReturn(SQLType.MySQL);
+            when(expireQueries.getExpires()).thenReturn(new ArrayList<>());
+            ExpireCommandManager manager = new ExpireCommandManager(plugin);
+
+            when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenReturn(-1);
+
+            assertFalse(manager.addExpire(auction(1, SELLER, 250.0)));
+        }
     }
 }

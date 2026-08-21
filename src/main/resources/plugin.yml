@@ -1,13 +1,13 @@
 name: FAuction
 main: fr.florianpal.fauction.FAuction
 author: florianpal
-version: 2.0.0
+version: 2.0.2
 api-version: 1.13
 softdepend: [Vault]
 permissions:
   fauction.user:
     description: Parent, grants every player permission
-    default: op
+    default: true
     children:
       fauction.list: true
       fauction.sell: true
@@ -15,16 +15,16 @@ permissions:
       fauction.search: true
   fauction.list:
     description: Open the auction gui
-    default: op
+    default: true
   fauction.sell:
     description: Sell an item on the auction house
-    default: op
+    default: true
   fauction.expire:
     description: Open the expired items gui
-    default: op
+    default: true
   fauction.search:
     description: Search the auctions by material
-    default: op
+    default: true
   fauction.bypass.spam:
     description: Ignore the anti packet spamming protection
     default: op

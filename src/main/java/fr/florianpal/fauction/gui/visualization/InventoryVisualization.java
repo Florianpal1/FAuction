@@ -14,6 +14,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -66,6 +67,16 @@ public class InventoryVisualization implements InventoryHolder, Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClickEvent(InventoryClickEvent event) {
+
+        if (event.getInventory().getHolder() != this) {
+            return;
+        }
+
+        event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onInventoryDrag(InventoryDragEvent event) {
 
         if (event.getInventory().getHolder() != this) {
             return;

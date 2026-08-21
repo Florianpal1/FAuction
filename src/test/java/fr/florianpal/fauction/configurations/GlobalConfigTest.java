@@ -204,6 +204,18 @@ class GlobalConfigTest {
     }
 
     @Test
+    @DisplayName("A missing limitations section loads as empty instead of throwing")
+    void missingLimitationsSectionDoesNotThrow() {
+
+        GlobalConfig config = new GlobalConfig();
+        config.load(TestConfigs.of("""
+                lang: "en"
+                """));
+
+        assertTrue(config.getLimitations().isEmpty());
+    }
+
+    @Test
     @DisplayName("Reloading replaces the previous values instead of piling them up")
     void reloadReplacesTheValues() {
 

@@ -74,8 +74,8 @@ class CategoriesConfigTest {
     }
 
     @Test
-    @DisplayName("Without a default entry, there is no default category")
-    void noDefaultEntryMeansNoDefaultCategory() {
+    @DisplayName("Without a default entry, the first configured category is used instead")
+    void noDefaultEntryFallsBackToTheFirstCategory() {
 
         CategoriesConfig withoutDefault = new CategoriesConfig();
         withoutDefault.load(TestConfigs.of("""
@@ -84,9 +84,26 @@ class CategoriesConfigTest {
                     displayName: "&aBlocks"
                     materials:
                       - BLOCKS
+                  custom:
+                    displayName: "&aCustom"
+                    materials:
+                      - DIAMOND
                 """));
 
-        assertNull(withoutDefault.getDefault());
+        // Renaming/removing "default" must not NPE every gui that opens without an explicit category.
+        assertEquals("blocks", withoutDefault.getDefault().getId());
+    }
+
+    @Test
+    @DisplayName("With no category configured at all, there is no default category")
+    void noCategoryAtAllMeansNoDefaultCategory() {
+
+        CategoriesConfig empty = new CategoriesConfig();
+        empty.load(TestConfigs.of("""
+                categories: {}
+                """));
+
+        assertNull(empty.getDefault());
     }
 
     @Test
