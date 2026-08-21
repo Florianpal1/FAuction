@@ -1,0 +1,58 @@
+name: Release
+
+# Publishing happens here, and only here: pushing a `v*` tag builds the plugin,
+# deploys it to GitHub Packages and attaches the shaded JAR to the GitHub Release.
+on:
+  push:
+    tags: [ 'v*' ]
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    name: Build & publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Check that the tag matches the pom version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          POM="$(mvn -B -q -DforceStdout help:evaluate -Dexpression=project.version)"
+          echo "Tag: $TAG — pom: $POM"
+          if [ "$TAG" != "$POM" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match the pom version ($POM). Bump the pom or retag."
+            exit 1
+          fi
+
+      - name: Build with Maven
+        run: mvn -B clean package --file pom.xml
+
+      - name: Publish to GitHub Packages
+        run: mvn -B -DskipTests deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create or update the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" target/fauction-*.jar --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" target/fauction-*.jar \
+              --title "FAuction $GITHUB_REF_NAME" \
+              --generate-notes \
+              --verify-tag
+          fi

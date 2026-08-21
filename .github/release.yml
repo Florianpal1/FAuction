@@ -1,0 +1,26 @@
+changelog:
+  exclude:
+    labels:
+      - duplicate
+      - invalid
+      - question
+      - wontfix
+  categories:
+    - title: ⚠️ Breaking Changes
+      labels: [ "breaking-change" ]
+    - title: ✨ Features
+      labels: [ "enhancement", "feature" ]
+    - title: 🐛 Bug Fixes
+      labels: [ "bug" ]
+    - title: 🔒 Security
+      labels: [ "security" ]
+    - title: ⚡ Performance
+      labels: [ "performance" ]
+    - title: 🌍 Translations
+      labels: [ "translation" ]
+    - title: 📖 Documentation
+      labels: [ "documentation" ]
+    - title: 🧹 Maintenance & Dependencies
+      labels: [ "dependencies", "github-actions", "chore", "refactor" ]
+    - title: 🔄 Other Changes
+      labels: [ "*" ]

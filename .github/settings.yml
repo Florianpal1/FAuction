@@ -1,0 +1,121 @@
+# Declarative repository configuration.
+#
+# This file is the source of truth for the repository metadata that lives in GitHub's
+# settings rather than in the code: description, topics, feature toggles, labels and
+# branch protection.
+#
+# Apply it with:
+#   GH_TOKEN=<pat> python3 .github/scripts/apply-repo-settings.py
+#
+# The format is also compatible with the GitHub "Settings" app
+# (https://github.com/apps/settings), so installing that app makes changes to this file
+# apply automatically on push instead.
+
+repository:
+  description: >-
+    A fully GUI-driven auction house plugin for Paper servers — sell, browse, search and
+    manage auctions from fully configurable menus. Vault & XP currencies,
+    SQLite/MySQL/MariaDB/PostgreSQL, multi-language.
+  homepage: https://github.com/Florianpal1/FAuction/wiki
+  topics:
+    - minecraft
+    - minecraft-plugin
+    - paper
+    - papermc
+    - spigot
+    - spigot-plugin
+    - bukkit
+    - bukkit-plugin
+    - auction
+    - auction-house
+    - bungeecord
+    - java
+  has_issues: true
+  has_wiki: true
+  has_discussions: true
+  has_projects: false
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
+  delete_branch_on_merge: true
+
+# Labels used by the issue templates and by the generated release notes
+# (see .github/release.yml — a label missing here means its section never appears).
+labels:
+  - name: bug
+    color: d73a4a
+    description: Something is not working as intended
+  - name: enhancement
+    color: a2eeef
+    description: New feature or improvement request
+  - name: breaking-change
+    color: b60205
+    description: Requires action from server owners on update
+  - name: security
+    color: ee0701
+    description: Security-related fix or hardening
+  - name: performance
+    color: fbca04
+    description: Performance or resource usage
+  - name: translation
+    color: 5319e7
+    description: Language files and message keys
+  - name: documentation
+    color: 0075ca
+    description: README, wiki, or in-repo docs
+  - name: dependencies
+    color: 0366d6
+    description: Dependency updates
+  - name: github-actions
+    color: 24292e
+    description: CI workflows and automation
+  - name: chore
+    color: cfd3d7
+    description: Maintenance with no user-facing change
+  - name: refactor
+    color: c5def5
+    description: Internal restructuring with no behaviour change
+  - name: database
+    color: 006b75
+    description: SQLite, MySQL, MariaDB, PostgreSQL, or migrations
+  - name: gui
+    color: bfd4f2
+    description: Menus and GUI configuration
+  - name: needs-info
+    color: d4c5f9
+    description: Waiting for more details from the reporter
+  - name: cannot-reproduce
+    color: e4e669
+    description: The issue could not be reproduced
+  - name: good first issue
+    color: 7057ff
+    description: Good entry point for a new contributor
+  - name: help wanted
+    color: "008672"
+    description: Extra attention or contributions welcome
+  - name: question
+    color: d876e3
+    description: Usage question rather than a defect
+  - name: duplicate
+    color: cfd3d7
+    description: Already reported elsewhere
+  - name: wontfix
+    color: ffffff
+    description: Out of scope, will not be worked on
+
+# Only applied when the script is run with --with-branch-protection, since it also
+# prevents direct pushes to master.
+branches:
+  - name: master
+    protection:
+      required_status_checks:
+        strict: false
+        contexts:
+          # Must match the job names in .github/workflows/maven.yml and codeql.yml
+          - Build & test
+          - Analyze Java
+      enforce_admins: false
+      required_pull_request_reviews: null
+      restrictions: null
+      allow_force_pushes: false
+      allow_deletions: false

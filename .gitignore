@@ -1,4 +1,9 @@
 # Project exclude paths
 /target/
+
+# IDE
 /.idea/
-/FAuction.iml
+*.iml
+
+# Local tooling
+/.claude/
