@@ -1,0 +1,151 @@
+name: 🐛 Bug Report
+description: Report something that is broken or behaves unexpectedly
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+
+        Before opening an issue, please:
+        - Check the [existing issues](https://github.com/Florianpal1/FAuction/issues?q=is%3Aissue) to avoid duplicates.
+        - Make sure you are running the [latest release](https://github.com/Florianpal1/FAuction/releases/latest).
+        - Have a look at the [Wiki](https://github.com/Florianpal1/FAuction/wiki) — the answer may already be there.
+
+        If you just have a question, use [Discussions](https://github.com/Florianpal1/FAuction/discussions) or [Discord](https://discord.com/invite/dEvR34ZzYQ) instead.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight checklist
+      options:
+        - label: I searched the existing issues and this bug has not been reported yet
+          required: true
+        - label: I am using the latest release of FAuction
+          required: true
+        - label: I can reproduce this bug on a server without other conflicting plugins (or I listed the conflict below)
+          required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of what goes wrong.
+      placeholder: When I buy an item from the auction GUI, the money is taken but the item never reaches my inventory.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: The exact steps someone else can follow to see the bug.
+      placeholder: |
+        1. Run `/ah sell 100` while holding a diamond sword
+        2. Log in with a second account and run `/ah`
+        3. Click the listing and confirm the purchase
+        4. Observe that ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+
+  - type: input
+    id: fauction-version
+    attributes:
+      label: FAuction version
+      description: Visible with `/version FAuction`. Please give the exact version, not "latest".
+      placeholder: "2.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: server-version
+    attributes:
+      label: Server version
+      description: Full output of the `/version` command.
+      placeholder: "Paper 1.21.4-90-master@... (MC 1.21.4)"
+    validations:
+      required: true
+
+  - type: input
+    id: java-version
+    attributes:
+      label: Java version
+      description: Output of `java -version`.
+      placeholder: "OpenJDK 21.0.5"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database type
+      description: See `database.yml`.
+      options:
+        - SQLite
+        - MySQL
+        - MariaDB
+        - PostgreSQL
+        - Not sure
+    validations:
+      required: true
+
+  - type: dropdown
+    id: currency
+    attributes:
+      label: Currency mode
+      description: See `currency` in `config.yml`.
+      options:
+        - Vault (economy)
+        - Experience points
+        - Experience levels
+        - Not sure / not relevant
+    validations:
+      required: true
+
+  - type: textarea
+    id: plugins
+    attributes:
+      label: Related plugins
+      description: |
+        Relevant plugins and their versions (Vault, economy plugin, PlaceholderAPI, LuckPerms, protection or GUI plugins, ...).
+        The output of `/plugins` is fine.
+      placeholder: |
+        Vault 1.7.3, EssentialsX 2.20.1, LuckPerms 5.4.150, PlaceholderAPI 2.11.6
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack trace
+      description: |
+        Any error from `logs/latest.log`. For long logs, please use a paste service such as [mclo.gs](https://mclo.gs/) and share the link.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration
+      description: The parts of `config.yml`, `database.yml`, `categories.yml`, `sort.yml` or the GUI files needed to reproduce the issue.
+      render: yaml
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Screenshots, videos, or anything else that helps understand the problem.
+    validations:
+      required: false

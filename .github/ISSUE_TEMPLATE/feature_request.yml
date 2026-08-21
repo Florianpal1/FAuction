@@ -1,0 +1,88 @@
+name: ✨ Feature Request
+description: Suggest a new feature or an improvement for FAuction
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve FAuction!
+
+        Before opening a request, please:
+        - Check the [existing issues](https://github.com/Florianpal1/FAuction/issues?q=is%3Aissue) — someone may have asked for it already.
+        - Check the [Wiki](https://github.com/Florianpal1/FAuction/wiki) — the feature may already exist and only need configuring.
+
+        For open-ended ideas or discussions, [Discussions](https://github.com/Florianpal1/FAuction/discussions) is often a better fit.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-flight checklist
+      options:
+        - label: I searched the existing issues and this feature has not been requested yet
+          required: true
+        - label: I checked the Wiki and this is not already possible through configuration
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / use case
+      description: What are you trying to do that FAuction does not allow today? Describe the situation on your server.
+      placeholder: On my server, players want to know when one of their listings has been sold, but they only find out when they open the expired items GUI.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature you would like. Be as concrete as you can — commands, GUI behaviour, config keys, permissions, placeholders...
+      placeholder: |
+        - A configurable notification sent to the seller when an item is bought
+        - New section in `config.yml`: `notifications.on-sale.enabled` / `notifications.on-sale.message`
+        - Optional sound, reusing the existing sound configuration format
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Which part of the plugin does this touch?
+      multiple: true
+      options:
+        - GUI / menus
+        - Commands
+        - Permissions
+        - Auction listing / selling
+        - Purchase / confirmation
+        - Expiration & collection
+        - Transaction history
+        - Search / categories / sorting
+        - Price & listing limits
+        - Currency / economy (Vault, XP)
+        - Database & migrations
+        - Languages / messages
+        - Integrations (PlaceholderAPI, LuckPerms, ...)
+        - Developer API / events
+        - Performance
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other ways you tried or considered solving this (other plugins, existing config options, workarounds) and why they fall short.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Mockups, screenshots of similar features in other plugins, links, or anything else that clarifies the request.
+    validations:
+      required: false

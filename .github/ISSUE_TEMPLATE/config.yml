@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discord
+    url: https://discord.com/invite/dEvR34ZzYQ
+    about: Community support and quick questions.
+  - name: 🗣️ GitHub Discussions
+    url: https://github.com/Florianpal1/FAuction/discussions
+    about: Questions, ideas, and general discussion about FAuction.
+  - name: 📖 Wiki
+    url: https://github.com/Florianpal1/FAuction/wiki
+    about: Documentation, configuration guides, and examples.
