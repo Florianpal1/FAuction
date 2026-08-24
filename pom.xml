@@ -272,7 +272,7 @@
         <dependency>
             <groupId>org.mockbukkit.mockbukkit</groupId>
             <artifactId>mockbukkit-v1.21</artifactId>
-            <version>4.110.0</version>
+            <version>4.116.3</version>
             <scope>test</scope>
         </dependency>
         <!--Mockito-->
