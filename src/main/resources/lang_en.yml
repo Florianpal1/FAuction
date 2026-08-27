@@ -1,3 +1,6 @@
+# Language file of FAuction. "version" is managed by the plugin : leave it alone,
+# it is what lets your own texts be kept when new keys are added.
+version: 2
 fauction:
   help_description: "Displays this help."
   auction_list_help_description: "To open the auction house"
@@ -39,44 +42,28 @@ fauction:
 
   transfert_bdd: "Transfert of the database finished."
   auction_purge: "You have erased all data."
-acf-minecraft:
-  invalid_world: "Error: That world does not exist."
-  you_must_be_holding_item: "Error: You must be holding an item in your main hand."
-  acf-minecraft.player_is_vanished_confirm: " Warning: <c2>{vanished}</c2> is vanished. Do not blow their cover!\n\
-  To confirm your action, add <c2>:confirm</c2> to the end of their name.\n\
-  Ex: <c2>{vanished}:confirm</c2>"
-  username_too_short: "Error: Username too short, must be at least three characters."
-  is_not_a_valid_name: "Error: <c2>{name}</c2> is not a valid username."
-  multiple_players_match: "Error: Multiple players matched <c2>{search}</c2> <c3>({all})</c3>, please be more specific."
-  no_player_found_server: "No player matching <c2>{search}</c2> is connected to this server."
-  no_player_found_offline: "No player matching <c2>{search}</c2> could be found."
-  no_player_found: "No player matching <c2>{search}</c2> could be found."
-  location_please_specify_world: "Error: Please specify world. Example: <c2>world:x,y,z</c2>."
-  location_please_specify_xyz: "Error: Please specify the coordinates x, y and z. Example: <c2>world:x,y,z</c2>."
-  location_console_not_relative: "Error: Console may not use relative coordinates for location."
-acf-core:
-  permission_denied: "I'm sorry, but you do not have permission to perform this command."
-  permission_denied_parameter: "I'm sorry, but you do not have permission to perform this command."
-  error_generic_logged: "An error occurred. This problem has been logged. Sorry for the inconvenience."
-  unknown_command: "Unknown Command, please type <c2>/help</c2>"
-  invalid_syntax: "Usage: <c2>{command}</c2> <c3>{syntax}</c3>"
-  error_prefix: "{message}"
-  error_performing_command: "I'm sorry, but there was an error performing this command."
-  info_message: "{message}"
-  please_specify_one_of: "Error: Please specify one of (<c2>{valid}</c2>)."
-  must_be_a_number: "Error: {num} must be a number."
-  must_be_min_length: "Error: Must be at least {min} characters long."
-  must_be_max_length: "Error: Must be at most {max} characters long."
-  please_specify_at_most: "Error: Please specify a value at most {max}."
-  please_specify_at_least: "Error: Please specify a value at least {min}."
-  not_allowed_on_console: "Error: Console may not execute this command."
-  could_not_find_player: "Error: Could not find a player by the name: <c2>{search}</c2>"
-  no_command_matched_search: "No command matched <c2>{search}</c2>."
-  help_page_information: "- Showing page <c2>{page}</c2> of <c2>{totalpages}</c2> (<c3>{results}</c3> results)."
-  help_no_results: "Error: No more results."
-  help_header: "<c3>=== </c3><c1>Showing help for </c1><c2>{commandprefix}{command}</c2><c3> ===</c3>"
-  help_format: "<c1>{command}</c1> <c2>{parameters}</c2> <c3>{separator} {description}</c3>"
-  help_detailed_header: "<c3>=== </c3><c1>Showing detailed help for </c1><c2>{commandprefix}{command}</c2><c3> ===</c3>"
-  help_detailed_command_format: "<c2>{command}</c2> {parameters} <c2>{separator}</c2> {description}"
-  help_detailed_parameter_format: "<c2>{name}:</c2> {description}"
-  help_search_header: "<c3>=== </c3><c1>Search results for </c1><c2>{commandprefix}{command} {search}</c2><c3> ===</c3>"
+
+  # Messages of the command framework itself (permissions, syntax, parsing).
+  error:
+    permission_denied: "&cI'm sorry, but you do not have permission to perform this command."
+    invalid_syntax: "&cUsage: &6{command} {syntax}"
+    not_allowed_on_console: "&cThis command can only be used by a player."
+    must_be_a_number: "&6{num}&c must be a number."
+    internal: "&cI'm sorry, but there was an error performing this command."
+    unknown_migrate_version: "&cUnknown migration version &6{version}&c. Available versions: &6{versions}"
+
+  # Texts of the generated help of /ah help.
+  help:
+    help: "Help"
+    command: "Command"
+    description: "Description"
+    no_description: "No description"
+    arguments: "Arguments"
+    optional: "Optional"
+    showing_results_for_query: "Showing search results for query"
+    no_results_for_query: "No results for query"
+    available_commands: "Available Commands"
+    click_to_show_help: "Click to show help for this command"
+    page_out_of_range: "Error: Page <page> is not in range. Must be in range [1, <max_pages>]"
+    click_for_next_page: "Click for next page"
+    click_for_previous_page: "Click for previous page"

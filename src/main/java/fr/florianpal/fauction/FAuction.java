@@ -7,6 +7,7 @@ import fr.florianpal.fauction.commands.AuctionCommand;
 import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.managers.*;
 import fr.florianpal.fauction.managers.commandmanagers.*;
+import fr.florianpal.fauction.languages.Lang;
 import fr.florianpal.fauction.managers.implementations.LuckPermsImplementation;
 import fr.florianpal.fauction.placeholders.FPlaceholderExpansion;
 import fr.florianpal.fauction.queries.AuctionQueries;
@@ -16,7 +17,6 @@ import fr.florianpal.fauction.queries.HistoricQueries;
 import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
-import fr.florianpal.fauction.utils.FileUtil;
 import fr.florianpal.fauction.utils.FormatUtil;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
@@ -27,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -54,6 +53,9 @@ public class FAuction extends JavaPlugin {
 
     @Getter
     private CommandManager commandManager;
+
+    @Getter
+    private Lang lang;
 
     @Getter
     private VaultIntegrationManager vaultIntegrationManager;
@@ -122,8 +124,8 @@ public class FAuction extends JavaPlugin {
             luckPermsImplementation = new LuckPermsImplementation();
         }
 
-        File languageFile = new File(getDataFolder(), "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
-        FileUtil.createDefaultConfiguration(this, this.getFile(), languageFile, "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
+        lang = new Lang();
+        lang.load(this);
 
         commandManager = new CommandManager(this);
 
@@ -239,6 +241,7 @@ public class FAuction extends JavaPlugin {
 
     public void reloadConfiguration() {
         configurationManager.reload(this);
+        lang.load(this);
     }
 
     public void purgeAllData() {

@@ -1,9 +1,7 @@
 package fr.florianpal.fauction.commands;
 
-import co.aikar.commands.BukkitCommandIssuer;
-import co.aikar.commands.BukkitLocales;
 import fr.florianpal.fauction.FAuctionTestBase;
-import fr.florianpal.fauction.managers.commandmanagers.CommandManager;
+import fr.florianpal.fauction.languages.Lang;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
@@ -17,8 +15,6 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class AuctionCommandTest extends FAuctionTestBase {
@@ -30,15 +26,9 @@ class AuctionCommandTest extends FAuctionTestBase {
 
         when(globalConfig.getDecimalFormat()).thenReturn("0.00");
 
-        // haveCorrectShulkerPrice sends a message on refusal ; give MessageUtil an ACF stack that
-        // resolves to "no message configured" instead of null-ing out on the mocked plugin.
-        CommandManager commandManager = mock(CommandManager.class);
-        BukkitCommandIssuer issuer = mock(BukkitCommandIssuer.class);
-        BukkitLocales locales = mock(BukkitLocales.class);
-        when(plugin.getCommandManager()).thenReturn(commandManager);
-        when(commandManager.getCommandIssuer(any())).thenReturn(issuer);
-        when(commandManager.getLocales()).thenReturn(locales);
-        when(locales.getOptionalMessage(any(), any())).thenReturn(null);
+        // haveCorrectShulkerPrice sends a message on refusal : an empty Lang resolves every key to
+        // "no message configured", so the price rules can be exercised without a language file.
+        when(plugin.getLang()).thenReturn(new Lang());
 
         command = new AuctionCommand(plugin);
     }

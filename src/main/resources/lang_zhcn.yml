@@ -1,3 +1,6 @@
+# Language file of FAuction. "version" is managed by the plugin : leave it alone,
+# it is what lets your own texts be kept when new keys are added.
+version: 2
 fauction:
   help_description: "显示本帮助页面."
   auction_list_help_description: "打开竞拍市场"
@@ -6,7 +9,9 @@ fauction:
   auction_add_help_description: "添加新促销"
   reload_help_description: "重载插件配置."
   transfert_bdd_help_description: "将 bdd 数据在 Paper 与 Spigot 之间互转"
-  auction_search_help_description: "Search for an item"
+  auction_search_help_description: "搜索物品"
+  clear_cache_help_description: "清空缓存"
+  migrate_help_description: "迁移至其他版本."
 
   buy_auction_success: "你购买了一个物品."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -25,7 +30,10 @@ fauction:
   auction_expire_drop: "有竞拍到期而你的背包没有多余的空间. 退还物品已掉落在地面."
   buy_auction_cancelled: "你取消了购买操作."
   min_price: "你设置的价格低于最低价 {minPrice}."
+  max_price: "你设置的价格高于最高价 {maxPrice}."
   auction_reload: "插件配置已重载."
+  clear_cache: "你已清空缓存."
+  migrate: "你已迁移至版本 {version}."
   spam: "&c等等! 你在短时间内执行了太多次购买操作! 请再等一会..."
 
   remove_expire_success: "你已取得过期物品."
@@ -46,44 +54,28 @@ fauction:
   item_blacklist: "You cannot sell this item !"
 
   auction_purge: "You have erased all data."
-acf-minecraft:
-  invalid_world: "错误: 世界不存在."
-  you_must_be_holding_item: "错误: 你必须在主手中持有物品."
-  acf-minecraft.player_is_vanished_confirm: " 警告: <c2>{vanished}</c2> 正处于隐身状态. 请不要破坏他们的隐身状态!\n\
-  若要确认此次操作, 请在玩家名称末尾加上 <c2>:confirm</c2>.\n\
-  示例: <c2>{vanished}:confirm</c2>"
-  username_too_short: "错误: 玩家名称过短, 必须至少为三个字符."
-  is_not_a_valid_name: "错误: <c2>{name}</c2> 不是有效的玩家名称."
-  multiple_players_match: "错误: 多个玩家符合关键词 <c2>{search}</c2> <c3>({all})</c3>, 请给出更具体的搜索关键词."
-  no_player_found_server: "无连接至该服务器的玩家匹配关键词 <c2>{search}</c2>."
-  no_player_found_offline: "无离线玩家符合关键词 <c2>{search}</c2>."
-  no_player_found: "无玩家符合关键词 <c2>{search}</c2>."
-  location_please_specify_world: "错误: 请指定世界名称. 示例: <c2>world:x,y,z</c2>."
-  location_please_specify_xyz: "错误: 请指定 x, y 与 z 坐标. 示例: <c2>world:x,y,z</c2>."
-  location_console_not_relative: "错误: 控制条不能使用相对位置."
-acf-core:
-  permission_denied: "抱歉, 你没有权限执行该命令."
-  permission_denied_parameter: "抱歉, 你没有权限执行该命令."
-  error_generic_logged: "出现错误, 日志已将其记录. 抱歉带来不便."
-  unknown_command: "未知命令, 请输入 <c2>/help</c2> 获取帮助"
-  invalid_syntax: "命令用法: <c2>{command}</c2> <c3>{syntax}</c3>"
-  error_prefix: "{message}"
-  error_performing_command: "抱歉, 但执行命令时出现未知错误."
-  info_message: "{message}"
-  please_specify_one_of: "错误: 请指定 (<c2>{valid}</c2>)."
-  must_be_a_number: "错误: {num} 必须为数字."
-  must_be_min_length: "错误: 输入内容必须长于 {min} 个字符长度."
-  must_be_max_length: "错误: 输入内容必须短于 {max} 个字符长度."
-  please_specify_at_most: "错误: 请指定不大于 {max} 的值."
-  please_specify_at_least: "错误: 请指定不小于 {min} 的值."
-  not_allowed_on_console: "错误: 控制台不能执行该命令."
-  could_not_find_player: "错误: 找不到该名称的玩家: <c2>{search}</c2>"
-  no_command_matched_search: "无命令符合搜索内容 <c2>{search}</c2>."
-  help_page_information: "- 当前第 <c2>{page}</c2> 页, 共 <c2>{totalpages}</c2> 页 (<c3>{results}</c3> 个结果)."
-  help_no_results: "错误: 无更多可用结果."
-  help_header: "<c3>=== </c3><c1>显示命令 </c1><c2>{commandprefix}{command}</c2> <c1>的帮助</c1><c3> ===</c3>"
-  help_format: "<c1>{command}</c1> <c2>{parameters}</c2> <c3>{separator} {description}</c3>"
-  help_detailed_header: "<c3>=== </c3><c1>显示命令 </c1><c2>{commandprefix}{command}</c2> <c1>的详细帮助</c1><c3> ===</c3>"
-  help_detailed_command_format: "<c2>{command}</c2> {parameters} <c2>{separator}</c2> {description}"
-  help_detailed_parameter_format: "<c2>{name}:</c2> {description}"
-  help_search_header: "<c3>=== </c3><c2>{commandprefix}{command} {search}</c2><c1> 的搜索结果</c1><c3> ===</c3>"
+
+  # Messages of the command framework itself (permissions, syntax, parsing).
+  error:
+    permission_denied: "&c抱歉, 你没有权限执行该命令."
+    invalid_syntax: "&c命令用法: &6{command} {syntax}"
+    not_allowed_on_console: "&c该命令只能由玩家执行."
+    must_be_a_number: "&6{num}&c 必须为数字."
+    internal: "&c抱歉, 但执行命令时出现未知错误."
+    unknown_migrate_version: "&c未知的迁移版本: &6{version}&c. 可用版本: &6{versions}"
+
+  # Texts of the generated help of /ah help.
+  help:
+    help: "帮助"
+    command: "命令"
+    description: "描述"
+    no_description: "无描述"
+    arguments: "参数"
+    optional: "可选"
+    showing_results_for_query: "搜索结果"
+    no_results_for_query: "无匹配结果"
+    available_commands: "可用命令"
+    click_to_show_help: "点击查看该命令的帮助"
+    page_out_of_range: "错误: 第 <page> 页不存在, 页码范围为 [1, <max_pages>]."
+    click_for_next_page: "点击查看下一页"
+    click_for_previous_page: "点击查看上一页"
