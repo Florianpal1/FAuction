@@ -8,6 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,12 +54,19 @@ class LangMigrationTest {
 
     /**
      * A language file as it is found on a server installed in the ACF era : no version key, the
-     * acf-core and acf-minecraft sections still there.
+     * acf-core and acf-minecraft sections still there. The four shipped files are used as they were,
+     * not a hand-made sample : the Russian and Chinese ones carry escaped multi-line strings, the
+     * French one unquoted continuation lines, and all four the malformed
+     * acf-minecraft.player_is_vanished_confirm key nested inside its own section.
      */
-    private String legacyFile() throws IOException {
-        try (InputStream in = Objects.requireNonNull(getClass().getResourceAsStream("/lang/legacy_en.yml"))) {
+    private String legacyFile(String code) throws IOException {
+        try (InputStream in = Objects.requireNonNull(getClass().getResourceAsStream("/lang/legacy_" + code + ".yml"))) {
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private String legacyFile() throws IOException {
+        return legacyFile("en");
     }
 
     private Lang loadWith(String code, String content) throws IOException {
@@ -82,29 +92,52 @@ class LangMigrationTest {
         return YamlDocument.create(dataFolder.resolve("lang_" + code + ".yml").toFile()).getString("version");
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"en", "fr", "ru", "zhcn"})
     @DisplayName("A file inherited from the ACF era is migrated with no administrator action")
-    void legacyFileIsMigrated() throws IOException {
-        Lang lang = loadWith("en", legacyFile());
-        String file = fileOf("en");
+    void legacyFileIsMigrated(String code) throws IOException {
+        Lang lang = loadWith(code, legacyFile(code));
+        String file = fileOf(code);
 
-        assertEquals("2", versionOf("en"), "the file is versioned from now on");
+        assertEquals("2", versionOf(code), "the file is versioned from now on");
         assertFalse(file.contains("acf-minecraft"), "the unused section is gone");
         assertFalse(file.contains("acf-core"), "the framework section is gone");
 
         assertTrue(lang.raw("fauction.error.permission_denied").isPresent(), "the framework messages are there");
         assertTrue(lang.raw("fauction.help.available_commands").isPresent(), "the help texts are there");
-        assertEquals("There is currently no active sale.", lang.raw("fauction.no_auction").orElseThrow());
+
+        // Every key that is really sent, in the language of the file — the messages of the plugin
+        // survive the update in the four languages, not only in English.
+        for (MessageKeys key : MessageKeys.values()) {
+            if (key != MessageKeys.DATABASEERROR) {
+                assertTrue(lang.raw(key.getKey()).isPresent(), code + " lost " + key.getKey());
+            }
+        }
     }
 
-    @Test
-    @DisplayName("The file is copied aside before its first versioned write")
-    void legacyFileIsBackedUp() throws IOException {
-        loadWith("en", legacyFile());
+    @ParameterizedTest
+    @CsvSource({
+            "en, There is currently no active sale.",
+            "fr, Il n'y a actuellement aucune vente active.",
+            "ru, В настоящее время нет активных предметов на аукционе.",
+            "zhcn, 当前无物品正在出售."
+    })
+    @DisplayName("The texts of the file are read back in their own language and encoding")
+    void migratedFileKeepsItsOwnTexts(String code, String noAuction) throws IOException {
+        Lang lang = loadWith(code, legacyFile(code));
 
-        File backup = dataFolder.resolve("lang_en.yml.bak").toFile();
+        assertEquals(noAuction, lang.raw("fauction.no_auction").orElseThrow());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"en", "fr", "ru", "zhcn"})
+    @DisplayName("The file is copied aside before its first versioned write")
+    void legacyFileIsBackedUp(String code) throws IOException {
+        loadWith(code, legacyFile(code));
+
+        File backup = dataFolder.resolve("lang_" + code + ".yml.bak").toFile();
         assertTrue(backup.exists(), "a backup is left next to the file");
-        assertEquals(legacyFile(), Files.readString(backup.toPath(), StandardCharsets.UTF_8));
+        assertEquals(legacyFile(code), Files.readString(backup.toPath(), StandardCharsets.UTF_8));
     }
 
     @Test
@@ -131,27 +164,34 @@ class LangMigrationTest {
         assertEquals("Nope.", lang.raw("fauction.error.permission_denied").orElseThrow());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"en", "fr", "ru", "zhcn"})
     @DisplayName("A file already migrated is left alone")
-    void migratedFileIsIdempotent() throws IOException {
-        loadWith("en", legacyFile());
-        String afterFirstLoad = fileOf("en");
+    void migratedFileIsIdempotent(String code) throws IOException {
+        loadWith(code, legacyFile(code));
+        String afterFirstLoad = fileOf(code);
 
         Lang lang = new Lang();
         lang.load(plugin);
 
-        assertEquals(afterFirstLoad, fileOf("en"), "a restart does not replay the relocations");
+        assertEquals(afterFirstLoad, fileOf(code), "a restart does not replay the relocations");
         assertTrue(lang.raw("fauction.error.permission_denied").isPresent());
     }
 
-    @Test
+    @ParameterizedTest
+    @CsvSource({
+            "en, You opened the auction house.",
+            "fr, Vous avez ouvert l'hotel des ventes.",
+            "ru, Вы открыли аукцион.",
+            "zhcn, 你打开了拍卖市场."
+    })
     @DisplayName("A fresh installation writes the shipped file")
-    void freshInstallWritesTheFile() throws IOException {
-        Lang lang = loadWith("fr", null);
+    void freshInstallWritesTheFile(String code, String auctionOpen) throws IOException {
+        Lang lang = loadWith(code, null);
 
-        assertEquals("2", versionOf("fr"));
-        assertEquals("Vous avez ouvert l'hotel des ventes.", lang.raw("fauction.auction_open").orElseThrow());
-        assertFalse(dataFolder.resolve("lang_fr.yml.bak").toFile().exists(), "nothing to back up");
+        assertEquals("2", versionOf(code));
+        assertEquals(auctionOpen, lang.raw("fauction.auction_open").orElseThrow());
+        assertFalse(dataFolder.resolve("lang_" + code + ".yml.bak").toFile().exists(), "nothing to back up");
     }
 
     @Test
