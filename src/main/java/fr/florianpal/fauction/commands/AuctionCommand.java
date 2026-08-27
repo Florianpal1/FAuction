@@ -1,10 +1,8 @@
 package fr.florianpal.fauction.commands;
 
-import co.aikar.commands.BaseCommand;
-import co.aikar.commands.CommandHelp;
-import co.aikar.commands.annotation.*;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.GlobalConfig;
+import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.enums.SpamAction;
 import fr.florianpal.fauction.events.AuctionAddEvent;
 import fr.florianpal.fauction.gui.subGui.*;
@@ -26,6 +24,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
+import org.incendo.cloud.annotation.specifier.Greedy;
+import org.incendo.cloud.annotations.Argument;
+import org.incendo.cloud.annotations.Command;
+import org.incendo.cloud.annotations.CommandDescription;
+import org.incendo.cloud.annotations.Permission;
+import org.incendo.cloud.annotations.parser.Parser;
+import org.incendo.cloud.annotations.suggestion.Suggestions;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.context.CommandInput;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -36,8 +43,19 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.ceil;
 
-@CommandAlias("ah|hdv")
-public class AuctionCommand extends BaseCommand {
+public class AuctionCommand {
+
+    /**
+     * The root of every command path. {@code hdv} is the historical alias, declared as a literal of
+     * the path exactly like ACF's {@code @CommandAlias} did.
+     */
+    private static final String ROOT = "ah|hdv ";
+
+    static final String PRICE_PARSER = "fauction:price";
+
+    static final String MIGRATE_VERSION_PARSER = "fauction:migrate_version";
+
+    static final String MIGRATE_VERSION_SUGGESTIONS = "fauction:migrate_versions";
 
     private final FAuction plugin;
 
@@ -67,10 +85,12 @@ public class AuctionCommand extends BaseCommand {
         df.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ENGLISH));
     }
 
-    @Default
-    @Subcommand("list")
-    @CommandPermission("fauction.list")
-    @Description("{@@fauction.auction_list_help_description}")
+    // Two paths, one handler, as under ACF (@Default + @Subcommand("list")) : a bare /ah is the
+    // main entry point of the plugin and must not be lost.
+    @Command("ah|hdv")
+    @Command(ROOT + "list")
+    @Permission("fauction.list")
+    @CommandDescription("{@@fauction.auction_list_help_description}")
     public void onList(Player playerSender) {
 
         if (spamManager.spamTest(playerSender, SpamAction.COMMAND)) {
@@ -122,9 +142,9 @@ public class AuctionCommand extends BaseCommand {
 
     }
 
-    @Subcommand("search")
-    @CommandPermission("fauction.search")
-    @Description("{@@fauction.auction_search_help_description}")
+    @Command(ROOT + "search <material>")
+    @Permission("fauction.search")
+    @CommandDescription("{@@fauction.auction_search_help_description}")
     public void onSearch(Player playerSender, Material material) {
 
         if (spamManager.spamTest(playerSender, SpamAction.COMMAND)) {
@@ -143,10 +163,10 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("sell")
-    @CommandPermission("fauction.sell")
-    @Description("{@@fauction.auction_add_help_description}")
-    public void onAdd(Player playerSender, double priceEntry) {
+    @Command(ROOT + "sell <priceEntry>")
+    @Permission("fauction.sell")
+    @CommandDescription("{@@fauction.auction_add_help_description}")
+    public void onAdd(Player playerSender, @Argument(value = "priceEntry", parserName = PRICE_PARSER) double priceEntry) {
 
         if (spamManager.spamTest(playerSender, SpamAction.TRANSACTION)) {
             return;
@@ -365,9 +385,9 @@ public class AuctionCommand extends BaseCommand {
         return true;
     }
 
-    @Subcommand("expire")
-    @CommandPermission("fauction.expire")
-    @Description("{@@fauction.expire_add_help_description}")
+    @Command(ROOT + "expire")
+    @Permission("fauction.expire")
+    @CommandDescription("{@@fauction.expire_add_help_description}")
     public void onExpire(Player playerSender) {
 
         FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(auctions -> {
@@ -377,18 +397,18 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("admin reload")
-    @CommandPermission("fauction.admin.reload")
-    @Description("{@@fauction.reload_help_description}")
+    @Command(ROOT + "admin reload")
+    @Permission("fauction.admin.reload")
+    @CommandDescription("{@@fauction.reload_help_description}")
     public void onReload(Player playerSender) {
 
         plugin.reloadConfiguration();
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_RELOAD);
     }
 
-    @Subcommand("admin purge all")
-    @CommandPermission("fauction.admin.purge.all")
-    @Description("{@@fauction.reload_help_description}")
+    @Command(ROOT + "admin purge all")
+    @Permission("fauction.admin.purge.all")
+    @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAll(Player playerSender) {
 
         FAuction.newChain().async(() -> {
@@ -397,9 +417,9 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("admin purge historic")
-    @CommandPermission("fauction.admin.purge.hictoric")
-    @Description("{@@fauction.reload_help_description}")
+    @Command(ROOT + "admin purge historic")
+    @Permission("fauction.admin.purge.hictoric")
+    @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllHistoric(Player playerSender) {
 
         FAuction.newChain().async(() -> {
@@ -408,9 +428,9 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("admin purge expire")
-    @CommandPermission("fauction.admin.purge.expire")
-    @Description("{@@fauction.reload_help_description}")
+    @Command(ROOT + "admin purge expire")
+    @Permission("fauction.admin.purge.expire")
+    @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllExpire(Player playerSender) {
 
         FAuction.newChain().async(() -> {
@@ -419,9 +439,9 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("admin purge auction")
-    @CommandPermission("fauction.admin.purge.auction")
-    @Description("{@@fauction.reload_help_description}")
+    @Command(ROOT + "admin purge auction")
+    @Permission("fauction.admin.purge.auction")
+    @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllAucton(Player playerSender) {
 
         FAuction.newChain().async(() -> {
@@ -430,36 +450,128 @@ public class AuctionCommand extends BaseCommand {
         }).execute();
     }
 
-    @Subcommand("admin transfertToPaper")
-    @CommandPermission("fauction.admin.transfertBddToPaper")
-    @Description("{@@fauction.transfert_bdd_help_description}")
+    @Command(ROOT + "admin transfertToPaper")
+    @Permission("fauction.admin.transfertBddToPaper")
+    @CommandDescription("{@@fauction.transfert_bdd_help_description}")
     public void onTransferBddPaper(Player playerSender) {
 
         plugin.getTransfertManager().transfertBDD(true);
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.TRANSFERT_BDD);
     }
 
-    @Subcommand("admin transfertToBukkit")
-    @CommandPermission("fauction.admin.transfertBddToPaper")
-    @Description("{@@fauction.transfert_bdd_help_description}")
+    @Command(ROOT + "admin transfertToBukkit")
+    @Permission("fauction.admin.transfertBddToPaper")
+    @CommandDescription("{@@fauction.transfert_bdd_help_description}")
     public void onTransferBddSpigot(Player playerSender) {
 
         plugin.getTransfertManager().transfertBDD(false);
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.TRANSFERT_BDD);
     }
 
-    @Subcommand("admin migrate")
-    @CommandPermission("fauction.admin.migrate")
-    @Description("{@@fauction.migrate_help_description}")
-    public void onMigrate(Player playerSender, String migrateVersion) {
+    @Command(ROOT + "admin migrate <migrateVersion>")
+    @Permission("fauction.admin.migrate")
+    @CommandDescription("{@@fauction.migrate_help_description}")
+    public void onMigrate(Player playerSender,
+                          @Argument(value = "migrateVersion", parserName = MIGRATE_VERSION_PARSER) MigrateVersion migrateVersion) {
 
         plugin.migrate(migrateVersion);
-        MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIGRATE, "{version}", migrateVersion);
+        MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIGRATE, "{version}", migrateVersion.getId());
     }
 
-    @HelpCommand
-    @Description("{@@fauction.help_description}")
-    public void doHelp(CommandSender sender, CommandHelp help) {
-        help.showHelp();
+    @Command(ROOT + "help [query]")
+    @CommandDescription("{@@fauction.help_description}")
+    public void doHelp(CommandSender sender, @Argument("query") @Greedy String query) {
+        plugin.getCommandManager().help(sender, query == null ? "" : query);
+    }
+
+    /**
+     * The price of a sale, checked before the handler runs — so before the ClaimManager reservation
+     * and before the item leaves the inventory.
+     * <p>
+     * Every comparison involving {@code NaN} is false, so {@code price < 0}, {@code minPrice > price}
+     * and {@code maxPrice < price} all let it through, and {@code applyMoneyFormat} hands the input
+     * back unchanged when it cannot parse it. {@code Infinity} only ever hit a maximum price when one
+     * happened to be configured. Neither can reach the business code any more.
+     */
+    @Parser(name = PRICE_PARSER)
+    public double parsePrice(CommandInput input) {
+        String token = input.readString();
+
+        double price;
+        try {
+            price = Double.parseDouble(token);
+        } catch (NumberFormatException e) {
+            throw new NotANumberException(token);
+        }
+
+        if (!Double.isFinite(price) || price < 0) {
+            throw new InvalidPriceException(token);
+        }
+
+        return price;
+    }
+
+    /**
+     * A migration version the plugin actually knows how to run. An unknown version is refused here
+     * instead of being announced as a success by the handler.
+     */
+    @Parser(name = MIGRATE_VERSION_PARSER, suggestions = MIGRATE_VERSION_SUGGESTIONS)
+    public MigrateVersion parseMigrateVersion(CommandInput input) {
+        String token = input.readString();
+        return MigrateVersion.byId(token).orElseThrow(() -> new UnknownMigrateVersionException(token));
+    }
+
+    @Suggestions(MIGRATE_VERSION_SUGGESTIONS)
+    public List<String> migrateVersionSuggestions(CommandContext<CommandSender> context, CommandInput input) {
+        return MigrateVersion.ids();
+    }
+
+    /**
+     * The input is not a number at all. Carries the input so the message can name it, like the
+     * {@code must_be_a_number} of ACF did.
+     */
+    public static final class NotANumberException extends IllegalArgumentException {
+
+        private final transient String input;
+
+        NotANumberException(String input) {
+            super("Not a number : " + input);
+            this.input = input;
+        }
+
+        public String getInput() {
+            return input;
+        }
+    }
+
+    /**
+     * The input is a number, but not a price : negative, {@code NaN} or infinite.
+     */
+    public static final class InvalidPriceException extends IllegalArgumentException {
+
+        private final transient String input;
+
+        InvalidPriceException(String input) {
+            super("Not a valid price : " + input);
+            this.input = input;
+        }
+
+        public String getInput() {
+            return input;
+        }
+    }
+
+    public static final class UnknownMigrateVersionException extends IllegalArgumentException {
+
+        private final transient String input;
+
+        UnknownMigrateVersionException(String input) {
+            super("Unknown migration version : " + input);
+            this.input = input;
+        }
+
+        public String getInput() {
+            return input;
+        }
     }
 }

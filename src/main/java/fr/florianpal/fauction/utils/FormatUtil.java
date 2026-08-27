@@ -3,6 +3,8 @@ package fr.florianpal.fauction.utils;
 import fr.florianpal.fauction.FAuction;
 import me.seetch.mlang.MLang;
 import me.seetch.mlang.TranslationKeyGenerator;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +17,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FormatUtil {
+
+    /**
+     * Reads back what {@link #format(String)} produces : the section codes, and the
+     * {@code §x§R§R§G§G§B§B} form the hex colours are written in.
+     */
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+            .character('\u00a7')
+            .hexColors()
+            .useUnusualXRepeatedCharacterHexFormat()
+            .build();
+
+    /**
+     * The same string as everywhere else in the plugin, as a component — what Cloud expects for the
+     * messages of the framework. Keeps a single formatting path for the whole plugin.
+     */
+    public static Component component(String msg) {
+        return LEGACY.deserialize(msg);
+    }
 
     /**
      * Rounds a price entered by a player to the precision of the configured money format, when that

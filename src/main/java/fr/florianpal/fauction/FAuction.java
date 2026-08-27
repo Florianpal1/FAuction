@@ -4,6 +4,7 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import fr.florianpal.fauction.commands.AuctionCommand;
+import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.managers.*;
 import fr.florianpal.fauction.managers.commandmanagers.*;
@@ -159,7 +160,7 @@ public class FAuction extends JavaPlugin {
         claimManager = new ClaimManager();
         transfertManager = new TransfertManager(this);
 
-        commandManager.registerCommand(new AuctionCommand(this));
+        commandManager.register(new AuctionCommand(this));
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new FPlaceholderExpansion(this).register();
@@ -262,12 +263,16 @@ public class FAuction extends JavaPlugin {
         historicCommandManager.deleteAll();
     }
 
-    public void migrate(String migrateVersion) {
+    /**
+     * Runs the migration of a version the plugin knows about. The version is validated by the command
+     * parser, so a version that was never handled cannot reach this point and be reported as a
+     * success ; a new constant added without its case here fails loudly instead of doing nothing.
+     */
+    public void migrate(MigrateVersion migrateVersion) {
 
         switch (migrateVersion) {
-            case "1.7.8":
-                historicQueries.addBuyDate();
-                break;
+            case V_1_7_8 -> historicQueries.addBuyDate();
+            default -> throw new IllegalStateException("Unhandled migration version " + migrateVersion);
         }
     }
 }
