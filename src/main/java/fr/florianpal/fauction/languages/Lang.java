@@ -78,7 +78,7 @@ public final class Lang {
 
         try (InputStream defaults = defaultsStream(plugin, code)) {
 
-            boolean bundled = getClass().getResource("/lang_" + code + ".yml") != null;
+            boolean bundled = Lang.class.getResource("/lang_" + code + ".yml") != null;
             backupLegacyFile(plugin, file);
 
             YamlDocument document = YamlDocument.create(
@@ -130,14 +130,14 @@ public final class Lang {
      * disable the plugin on a server that works today.
      */
     private InputStream defaultsStream(FAuction plugin, String code) {
-        InputStream in = getClass().getResourceAsStream("/lang_" + code + ".yml");
+        InputStream in = Lang.class.getResourceAsStream("/lang_" + code + ".yml");
         if (in != null) {
             return in;
         }
 
         plugin.getLogger().info("No bundled defaults for language '" + code
                 + "', merging against the English defaults ; your own keys are preserved.");
-        return getClass().getResourceAsStream("/lang_en.yml");
+        return Lang.class.getResourceAsStream("/lang_en.yml");
     }
 
     /**

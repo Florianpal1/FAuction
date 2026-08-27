@@ -31,7 +31,6 @@ import org.incendo.cloud.annotations.CommandDescription;
 import org.incendo.cloud.annotations.Permission;
 import org.incendo.cloud.annotations.parser.Parser;
 import org.incendo.cloud.annotations.suggestion.Suggestions;
-import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.context.CommandInput;
 
 import java.text.DecimalFormat;
@@ -521,8 +520,12 @@ public class AuctionCommand {
         return MigrateVersion.byId(token).orElseThrow(() -> new UnknownMigrateVersionException(token));
     }
 
+    /**
+     * Cloud passes the context and the input to a suggestion method only if it asks for them ; the
+     * list of versions depends on neither, and Brigadier filters the suggestions on what is typed.
+     */
     @Suggestions(MIGRATE_VERSION_SUGGESTIONS)
-    public List<String> migrateVersionSuggestions(CommandContext<CommandSender> context, CommandInput input) {
+    public List<String> migrateVersionSuggestions() {
         return MigrateVersion.ids();
     }
 

@@ -103,6 +103,6 @@ class AuctionCommandTest extends FAuctionTestBase {
     @Test
     @DisplayName("The versions suggested are the versions the plugin can migrate to")
     void migrateVersionSuggestionsComeFromTheSameSource() {
-        assertEquals(MigrateVersion.ids(), command.migrateVersionSuggestions(null, CommandInput.empty()));
+        assertEquals(MigrateVersion.ids(), command.migrateVersionSuggestions());
     }
 }
