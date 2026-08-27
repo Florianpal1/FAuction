@@ -135,11 +135,11 @@ All commands use the `/ah` alias (or `/hdv`).
 
 | Permission         | Description                  | Default |
 |--------------------|------------------------------|---------|
-| `fauction.user`    | Parent — grants all children | `op`    |
-| `fauction.list`    | Open the auction GUI         | `op`    |
-| `fauction.sell`    | Sell items on the auction    | `op`    |
-| `fauction.expire`  | View expired items           | `op`    |
-| `fauction.search`  | Search auctions by material  | `op`    |
+| `fauction.user`    | Parent — grants all children | `true`  |
+| `fauction.list`    | Open the auction GUI         | `true`  |
+| `fauction.sell`    | Sell items on the auction    | `true`  |
+| `fauction.expire`  | View expired items           | `true`  |
+| `fauction.search`  | Search auctions by material  | `true`  |
 | `fauction.bypass.spam` | Ignore the anti-spam protection | `op` |
 
 ### Moderator Permissions
@@ -186,7 +186,7 @@ expiration:
   checkEvery: 72000                # Check interval in ticks (default: 1 hour)
 
 currencyCheck:                     # Delivery of the payments owed to offline sellers
-  time: 3600                       # In seconds (default: 1 hour)
+  time: 3600                       # In seconds — reserved, currently unused
   checkEvery: 72000                # Check interval in ticks (default: 1 hour)
 
 cacheUpdate: 72000                 # Cache refresh interval in ticks (default: 1 hour)
