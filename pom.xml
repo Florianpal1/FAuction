@@ -11,6 +11,10 @@
         <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <!--Cloud : cloud-paper/extras follow the cloud-minecraft train, cloud-core/annotations the cloud one-->
+        <cloud.core.version>2.1.0</cloud.core.version>
+        <cloud.paper.version>2.0.0</cloud.paper.version>
+        <cloud.minecraft.version>2.0.0</cloud.minecraft.version>
     </properties>
 
     <distributionManagement>
@@ -187,6 +191,23 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
             <version>0.5.1-SNAPSHOT</version>
+        </dependency>
+
+        <!--Cloud (command framework) - pinned, Folia-capable-->
+        <dependency>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-paper</artifactId>
+            <version>${cloud.paper.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-annotations</artifactId>
+            <version>${cloud.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${cloud.minecraft.version}</version>
         </dependency>
 
         <dependency>

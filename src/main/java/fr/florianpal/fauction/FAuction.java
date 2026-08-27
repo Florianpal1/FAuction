@@ -126,7 +126,6 @@ public class FAuction extends JavaPlugin {
         FileUtil.createDefaultConfiguration(this, this.getFile(), languageFile, "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
 
         commandManager = new CommandManager(this);
-        commandManager.registerDependency(ConfigurationManager.class, configurationManager);
 
         limitationManager = new LimitationManager(this);
 
