@@ -1,6 +1,7 @@
 package fr.florianpal.fauction.commands;
 
 import fr.florianpal.fauction.FAuctionTestBase;
+import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.languages.Lang;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
@@ -10,10 +11,13 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.incendo.cloud.context.CommandInput;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -69,5 +73,36 @@ class AuctionCommandTest extends FAuctionTestBase {
         meta.setBlockState(shulkerBox);
         shulkerItem.setItemMeta(meta);
         return shulkerItem;
+    }
+
+    @Test
+    @DisplayName("A price that is not a finite positive number never reaches the handler")
+    void priceParserRefusesWhatTheChecksLetThrough() {
+
+        assertEquals(12.5, command.parsePrice(CommandInput.of("12.5")));
+        assertEquals(0.0, command.parsePrice(CommandInput.of("0")));
+
+        // Every comparison involving NaN is false, so the price checks of the handler let it through.
+        assertThrows(AuctionCommand.InvalidPriceException.class, () -> command.parsePrice(CommandInput.of("NaN")));
+        assertThrows(AuctionCommand.InvalidPriceException.class, () -> command.parsePrice(CommandInput.of("Infinity")));
+        assertThrows(AuctionCommand.InvalidPriceException.class, () -> command.parsePrice(CommandInput.of("-1")));
+
+        assertThrows(AuctionCommand.NotANumberException.class, () -> command.parsePrice(CommandInput.of("abc")));
+    }
+
+    @Test
+    @DisplayName("An unknown migration version is refused instead of being announced as a success")
+    void migrateVersionParserRefusesUnknownVersions() {
+
+        assertEquals(MigrateVersion.V_1_7_8, command.parseMigrateVersion(CommandInput.of("1.7.8")));
+
+        assertThrows(AuctionCommand.UnknownMigrateVersionException.class,
+                () -> command.parseMigrateVersion(CommandInput.of("1.7.9")));
+    }
+
+    @Test
+    @DisplayName("The versions suggested are the versions the plugin can migrate to")
+    void migrateVersionSuggestionsComeFromTheSameSource() {
+        assertEquals(MigrateVersion.ids(), command.migrateVersionSuggestions(null, CommandInput.empty()));
     }
 }
