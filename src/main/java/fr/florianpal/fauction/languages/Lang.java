@@ -62,7 +62,11 @@ public final class Lang {
         RELOCATIONS_V2 = Map.copyOf(relocations);
     }
 
-    private final Map<String, String> messages = new HashMap<>();
+    /**
+     * Swapped whole rather than cleared and refilled : {@code /ah admin reload} can reload the
+     * messages while an asynchronous chain is sending one.
+     */
+    private volatile Map<String, String> messages = Map.of();
 
     /**
      * Loads the language file of the configured language code. Safe to call again : this is what
@@ -105,16 +109,17 @@ public final class Lang {
      * tests can feed a document straight from a fixture.
      */
     void load(YamlDocument document) {
-        messages.clear();
+        Map<String, String> loaded = new HashMap<>();
         for (String route : document.getRoutesAsStrings(true)) {
             if (VERSION_ROUTE.equals(route)) {
                 continue;
             }
             String value = document.getString(route);
             if (value != null) {
-                messages.put(route, value);
+                loaded.put(route, value);
             }
         }
+        messages = Map.copyOf(loaded);
     }
 
     /**

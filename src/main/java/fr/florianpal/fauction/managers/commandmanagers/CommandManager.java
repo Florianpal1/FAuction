@@ -23,6 +23,8 @@ import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.minecraft.extras.caption.ComponentCaptionFormatter;
 import org.incendo.cloud.paper.LegacyPaperCommandManager;
 
+import java.util.logging.Level;
+
 /**
  * The command framework of the plugin : a facade over Cloud.
  * <p>
@@ -132,8 +134,8 @@ public class CommandManager {
                 })
                 .handler(ArgumentParseException.class, this::parseFailure)
                 .handler(CommandExecutionException.class, (formatter, ctx) -> {
-                    plugin.getLogger().severe("Error while performing " + ctx.context().rawInput().input());
-                    ctx.exception().getCause().printStackTrace();
+                    plugin.getLogger().log(Level.SEVERE,
+                            "Error while performing " + ctx.context().rawInput().input(), ctx.exception().getCause());
                     return error("internal");
                 })
                 .registerTo(manager);
