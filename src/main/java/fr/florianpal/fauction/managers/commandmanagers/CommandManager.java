@@ -178,7 +178,11 @@ public class CommandManager {
         return FormatUtil.component(plugin.getLang().messageOr(ERROR_PREFIX + key, key, replacements));
     }
 
+    /**
+     * A message of the plugin as a component, or {@code null} — which Cloud reads as "send nothing",
+     * the same silence a key absent from the language file gets everywhere else.
+     */
     private ComponentLike message(MessageKeys key) {
-        return FormatUtil.component(plugin.getLang().message(key).orElse(""));
+        return plugin.getLang().message(key).map(FormatUtil::component).orElse(null);
     }
 }
