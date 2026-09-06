@@ -75,7 +75,7 @@
 
 | Requirement   | Version       |
 |---------------|---------------|
-| Minecraft     | 1.13+         |
+| Minecraft     | 1.16.5+       |
 | Server        | [Paper](https://papermc.io/) (or forks) |
 | Java          | 21 or newer   |
 
@@ -112,7 +112,7 @@ All commands use the `/ah` alias (or `/hdv`).
 | `/ah sell <price>`     | Sell the item in your main hand at the given price   |
 | `/ah search <material>`| Search auctions by item material (e.g. `DIAMOND_SWORD`) |
 | `/ah expire`           | View and collect your expired items                  |
-| `/ah help`             | Show the command help menu                           |
+| `/ah help [query]`     | Show the command help menu, optionally for one command |
 
 ### Admin Commands
 
@@ -125,7 +125,7 @@ All commands use the `/ah` alias (or `/hdv`).
 | `/ah admin purge historic`      | Purge all transaction history            |
 | `/ah admin transfertToPaper`    | Migrate database items to Paper serialization |
 | `/ah admin transfertToBukkit`   | Migrate database items to Bukkit serialization |
-| `/ah admin migrate <version>`   | Run data migration for a specific version |
+| `/ah admin migrate <version>`   | Run data migration for a specific version (tab-completes the versions it knows) |
 
 ---
 
@@ -349,6 +349,14 @@ FAuction ships with four language files:
 - `lang_zhcn.yml` — Simplified Chinese
 
 Set the active language in `config.yml` with the `lang` key. You can create additional translation files following the same naming pattern (`lang_<code>.yml`).
+
+Language files are versioned and updated automatically, like the other configuration files: new keys are
+added, obsolete ones are removed, and any text you have edited is kept. The `version` key at the top is
+managed by the plugin — leave it alone. The first time a file from an older version is updated, a
+`lang_<code>.yml.bak` copy is left next to it.
+
+A language the plugin does not ship is supported: none of your keys are removed, and the keys you have
+not translated fall back to the English texts.
 
 ---
 

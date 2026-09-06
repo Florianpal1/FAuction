@@ -4,9 +4,11 @@ import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import fr.florianpal.fauction.commands.AuctionCommand;
+import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.managers.*;
 import fr.florianpal.fauction.managers.commandmanagers.*;
+import fr.florianpal.fauction.languages.Lang;
 import fr.florianpal.fauction.managers.implementations.LuckPermsImplementation;
 import fr.florianpal.fauction.placeholders.FPlaceholderExpansion;
 import fr.florianpal.fauction.queries.AuctionQueries;
@@ -16,7 +18,6 @@ import fr.florianpal.fauction.queries.HistoricQueries;
 import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
-import fr.florianpal.fauction.utils.FileUtil;
 import fr.florianpal.fauction.utils.FormatUtil;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
@@ -27,7 +28,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -54,6 +54,9 @@ public class FAuction extends JavaPlugin {
 
     @Getter
     private CommandManager commandManager;
+
+    @Getter
+    private Lang lang;
 
     @Getter
     private VaultIntegrationManager vaultIntegrationManager;
@@ -122,11 +125,10 @@ public class FAuction extends JavaPlugin {
             luckPermsImplementation = new LuckPermsImplementation();
         }
 
-        File languageFile = new File(getDataFolder(), "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
-        FileUtil.createDefaultConfiguration(this, this.getFile(), languageFile, "lang_" + configurationManager.getGlobalConfig().getLang() + ".yml");
+        lang = new Lang();
+        lang.load(this);
 
         commandManager = new CommandManager(this);
-        commandManager.registerDependency(ConfigurationManager.class, configurationManager);
 
         limitationManager = new LimitationManager(this);
 
@@ -158,7 +160,7 @@ public class FAuction extends JavaPlugin {
         claimManager = new ClaimManager();
         transfertManager = new TransfertManager(this);
 
-        commandManager.registerCommand(new AuctionCommand(this));
+        commandManager.register(new AuctionCommand(this));
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new FPlaceholderExpansion(this).register();
@@ -240,6 +242,7 @@ public class FAuction extends JavaPlugin {
 
     public void reloadConfiguration() {
         configurationManager.reload(this);
+        lang.load(this);
     }
 
     public void purgeAllData() {
@@ -260,12 +263,16 @@ public class FAuction extends JavaPlugin {
         historicCommandManager.deleteAll();
     }
 
-    public void migrate(String migrateVersion) {
+    /**
+     * Runs the migration of a version the plugin knows about. The version is validated by the command
+     * parser, so a version that was never handled cannot reach this point and be reported as a
+     * success ; a new constant added without its case here fails loudly instead of doing nothing.
+     */
+    public void migrate(MigrateVersion migrateVersion) {
 
         switch (migrateVersion) {
-            case "1.7.8":
-                historicQueries.addBuyDate();
-                break;
+            case V_1_7_8 -> historicQueries.addBuyDate();
+            default -> throw new IllegalStateException("Unhandled migration version " + migrateVersion);
         }
     }
 }

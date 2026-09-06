@@ -7,7 +7,6 @@ import fr.florianpal.fauction.configurations.gui.AbstractGuiConfig;
 import fr.florianpal.fauction.gui.subGui.*;
 import fr.florianpal.fauction.managers.SpamManager;
 import fr.florianpal.fauction.managers.commandmanagers.AuctionCommandManager;
-import fr.florianpal.fauction.managers.commandmanagers.CommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.ExpireCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.HistoricCommandManager;
 import fr.florianpal.fauction.objects.Barrier;
@@ -50,8 +49,6 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
 
     protected final GlobalConfig globalConfig;
 
-    protected final CommandManager commandManager;
-
     protected final AuctionCommandManager auctionCommandManager;
 
     protected final ExpireCommandManager expireCommandManager;
@@ -73,7 +70,6 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         this.plugin = plugin;
         this.player = player;
         this.page = page;
-        this.commandManager = plugin.getCommandManager();
         this.inv = null;
         this.globalConfig = plugin.getConfigurationManager().getGlobalConfig();
         this.auctionCommandManager = plugin.getAuctionCommandManager();

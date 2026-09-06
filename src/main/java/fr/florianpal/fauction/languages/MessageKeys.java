@@ -1,10 +1,7 @@
 package fr.florianpal.fauction.languages;
 
 
-import co.aikar.locales.MessageKey;
-import co.aikar.locales.MessageKeyProvider;
-
-public enum MessageKeys implements MessageKeyProvider {
+public enum MessageKeys {
     NO_AUCTION,
     AUCTION_OPEN,
     AUCTION_ADD_SUCCESS,
@@ -46,9 +43,14 @@ public enum MessageKeys implements MessageKeyProvider {
 
     private static final String PREFIX = "fauction";
 
-    private final MessageKey key = MessageKey.of(PREFIX + "." + this.name().toLowerCase());
+    /**
+     * The route of the key in the language file. The prefix and the lower-cased name are kept
+     * exactly as ACF built them : the four language files are deployed on the servers of the users
+     * and their keys depend on it.
+     */
+    private final String key = PREFIX + "." + this.name().toLowerCase();
 
-    public MessageKey getMessageKey() {
+    public String getKey() {
         return key;
     }
 }

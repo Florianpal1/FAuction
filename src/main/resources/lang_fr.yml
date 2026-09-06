@@ -1,3 +1,6 @@
+# Language file of FAuction. "version" is managed by the plugin : leave it alone,
+# it is what lets your own texts be kept when new keys are added.
+version: 2
 fauction:
   help_description: "Affiche cette aide."
   auction_list_help_description: "Pour ouvrir l'hôtel des ventes"
@@ -40,46 +43,28 @@ fauction:
   migrate: "Vous avez effectué une migration vers la version {version}."
 
   auction_purge: "Vous avez effacé toutes les données."
-acf-minecraft:
-  invalid_world: "Ce monde n'existe pas !"
-  you_must_be_holding_item: "Vous devez avoir un item dans votre main !"
-  acf-minecraft.player_is_vanished_confirm: " Attention: <c2>{vanished}</c2> est vanish. Ne le démasquez pas !
-  Pour confirmer, ajoutez <c2>:confirm</c2> à la fin de son nom.
-  Ex = <c2>{vanished}:confirm</c2>"
-  username_too_short: "Pseudo trop court, il doit faire au moins trois caractères !"
-  is_not_a_valid_name: "<c2>{name}</c2> n'est pas un pseudo valide !"
-  multiple_players_match: "Plusieurs joueurs correspondent à <c2>{search}</c2> (<c2>{all}</c2>), soyez plus spécifique !"
-  no_player_found_server: "Aucun joueur correspondant à <c2>{search}</c2> n'est connecté sur ce serveur !"
-  no_player_found_offline: "Aucun joueur correspondant à <c2>{search}</c2> n'a été trouvé !"
-  no_player_found: "Aucun joueur correspondant à <c2>{search}</c2> n'a été trouvé !"
-  location_please_specify_world: "Veuillez spécifier le monde. Exemple: <c2>world:x,y,z</c2> !"
-  location_please_specify_xyz: "Merci d'indiquer au format x,y,z. Exemple: <c2>world:x,y,z</c2> !"
-  location_console_not_relative: "La console ne peut pas utiliser des coordonnées relatives pour la location !"
 
+  # Messages of the command framework itself (permissions, syntax, parsing).
+  error:
+    permission_denied: "&cVous n'avez pas la permission d'exécuter cette commande !"
+    invalid_syntax: "&cSyntaxe invalide ! Usage : &6{command} {syntax}"
+    not_allowed_on_console: "&cCette commande ne peut être utilisée que par un joueur."
+    must_be_a_number: "&6{num}&c doit être un nombre !"
+    internal: "&cUne erreur est survenue lors de l'exécution de cette commande !"
+    unknown_migrate_version: "&cVersion de migration inconnue : &6{version}&c. Versions disponibles : &6{versions}"
 
-acf-core:
-  permission_denied: "Vous n'avez pas la permission d'exécuter cette commande !"
-  error_generic_logged: "Une erreur est survenue ! Ce problème a été enregistré. Désolé pour le dérangement."
-  unknown_command: "Commande inconnue, merci de faire  <c2>/help </c2>!"
-  invalid_syntax: "Syntaxe invalide ! Usage: <c2>{command} </c2>{syntax}."
-  error_prefix: "{message}"
-  error_performing_command: "Une erreur est survenue lors de l'exécution de cette commande !"
-  info_message: "{message}"
-  please_specify_one_of: "Veuillez choisir parmi (<c2>{valid})</c2> !"
-  must_be_a_number: "<c2>{num}</c2> doit être un nombre !"
-  must_be_min_length: "Doit faire au moins <c2>{min}</c2> &ccaractères !"
-  must_be_max_length: "Doit faire moins de <c2>{max}</c2> caractères!"
-  please_specify_at_most: "Veuillez spécifier une valeur inférieure à <c2>{max}</c2> !"
-  please_specify_at_least: "Veuillez spécifier une valeur supérieure à <c2>{min}</c2> !"
-  not_allowed_on_console: "La console ne peut pas exécuter cette commande !"
-  could_not_find_player: "Impossible de trouver un joueur avec le nom: <c2>{search}</c2> !"
-  no_command_matched_search: "Aucune commande correspondant à <c2>{search}</c2> !"
-  help_page_information: "- Page <c2>{page} de <c2>{totalpages}</c2> (<c2>{results}</c2> résultats)."
-  help_no_results: "Plus aucun résultats."
-  help_header: "Affichage de l'aide pour la commande <c2>{commandprefix}{command}</c2>: "
-  help_format: "<c2>{command}</c2> <c3>{parameters}</c3> <c2>{separator}</c2> {description}"
-  help_detailed_header: "Affichage de l'aide détaillée pour <c2>{commandprefix}{command}</c2>: "
-  help_detailed_command_format: "<c2>{command}</c2> {parameters} <c2>{separator}</c2> {description}"
-  help_detailed_parameter_format: "<c2>{name}:</c2> {description}"
-  help_search_header: "Résultats de la recherche pour <c2>{commandprefix}{command}</c2>: <c2>{search}</c2>"
-  permission_denied_parameter: "Vous n'avez pas la permission d'effectuer cette commande."
+  # Texts of the generated help of /ah help.
+  help:
+    help: "Aide"
+    command: "Commande"
+    description: "Description"
+    no_description: "Aucune description"
+    arguments: "Arguments"
+    optional: "Optionnel"
+    showing_results_for_query: "Résultats de la recherche pour"
+    no_results_for_query: "Aucun résultat pour cette recherche"
+    available_commands: "Commandes disponibles"
+    click_to_show_help: "Cliquez pour afficher l'aide de cette commande"
+    page_out_of_range: "Erreur : la page <page> n'existe pas. Elle doit être comprise entre 1 et <max_pages>."
+    click_for_next_page: "Cliquez pour la page suivante"
+    click_for_previous_page: "Cliquez pour la page précédente"

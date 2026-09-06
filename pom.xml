@@ -11,6 +11,10 @@
         <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <!--Cloud : cloud-paper/extras follow the cloud-minecraft train, cloud-core/annotations the cloud one-->
+        <cloud.core.version>2.1.0</cloud.core.version>
+        <cloud.paper.version>2.0.0</cloud.paper.version>
+        <cloud.minecraft.version>2.0.0</cloud.minecraft.version>
     </properties>
 
     <distributionManagement>
@@ -73,12 +77,16 @@
                 <version>3.6.2</version>
 
                 <configuration>
-                    <minimizeJar>true</minimizeJar>
+                    <!-- Cloud resolves its parsers, handlers and suggestions by reflection, so the
+                         minimizer prunes classes no direct call references. The breakage would only
+                         show up at runtime, on the path of one precise command. -->
+                    <minimizeJar>false</minimizeJar>
                     <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                     <relocations>
+                        <!-- Required by Cloud when it is shaded. -->
                         <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>fr.florianpal.fauction.acf</shadedPattern>
+                            <pattern>org.incendo.cloud</pattern>
+                            <shadedPattern>fr.florianpal.fauction.cloud</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
@@ -115,6 +123,14 @@
                             <exclude>net.md-5:bungeecord-chat:*</exclude>
                             <exclude>org.jspecify:*</exclude>
                             <exclude>com.google.errorprone:*</exclude>
+                            <!-- Compile-time annotations only : nothing of them is looked up at
+                                 runtime, and minimizeJar is no longer there to prune them. Cloud's
+                                 own runtime dependency, io.leangen.geantyref, is NOT in this list. -->
+                            <exclude>org.checkerframework:*</exclude>
+                            <exclude>org.jetbrains:*</exclude>
+                            <exclude>org.intellij:*</exclude>
+                            <exclude>org.immutables:*</exclude>
+                            <exclude>org.apiguardian:*</exclude>
                         </excludes>
                     </artifactSet>
                 </configuration>
@@ -137,7 +153,7 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <!--Aikar Repo-->
+        <!--Aikar Repo, still needed by taskchain-bukkit-->
         <repository>
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
@@ -182,11 +198,21 @@
             <version>1.0.8</version>
             <scope>compile</scope>
         </dependency>
-        <!--ACF-->
+        <!--Cloud (command framework) - pinned, Folia-capable-->
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-paper</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-paper</artifactId>
+            <version>${cloud.paper.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-annotations</artifactId>
+            <version>${cloud.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.incendo</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${cloud.minecraft.version}</version>
         </dependency>
 
         <dependency>
