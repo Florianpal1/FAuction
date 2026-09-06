@@ -2,14 +2,16 @@ version: 1
 gui:
   size: 54
   type: CHEST
-  name: "Auction House {Page}/{TotalPage}"
+  name: "Auction House - Bids {Page}/{TotalPage}"
   title: "&eItem : &6{ItemName}"
   replaceTitle: false
   hideFlag: false
   description:
     - "&5Sold by : &6{OwnerName}"
-    - "&5Price : &6{Price}"
-    - "&5Expires on : &6{ExpireTime}"
+    - "&5Start price : &6{StartPrice}"
+    - "&5Current bid : &6{CurrentBid}"
+    - "&5Current bidder : &6{CurrentBidder}"
+    - "&5Bid ends on : &6{ExpireTime}"
     - "&5Remaining time : &6{RemainingTime}"
     - "&5Lore :"
     - "{lore}"
@@ -65,19 +67,19 @@ block:
     title: " "
     description: {}
   '10':
-    utility: auction
+    utility: bid
   '11':
-    utility: auction
+    utility: bid
   '12':
-    utility: auction
+    utility: bid
   '13':
-    utility: auction
+    utility: bid
   '14':
-    utility: auction
+    utility: bid
   '15':
-    utility: auction
+    utility: bid
   '16':
-    utility: auction
+    utility: bid
   '17':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -89,19 +91,19 @@ block:
     title: " "
     description: {}
   '19':
-    utility: auction
+    utility: bid
   '20':
-    utility: auction
+    utility: bid
   '21':
-    utility: auction
+    utility: bid
   '22':
-    utility: auction
+    utility: bid
   '23':
-    utility: auction
+    utility: bid
   '24':
-    utility: auction
+    utility: bid
   '25':
-    utility: auction
+    utility: bid
   '26':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -113,19 +115,19 @@ block:
     title: " "
     description: {}
   '28':
-    utility: auction
+    utility: bid
   '29':
-    utility: auction
+    utility: bid
   '30':
-    utility: auction
+    utility: bid
   '31':
-    utility: auction
+    utility: bid
   '32':
-    utility: auction
+    utility: bid
   '33':
-    utility: auction
+    utility: bid
   '34':
-    utility: auction
+    utility: bid
   '35':
     utility: barrier
     material: GRAY_STAINED_GLASS_PANE
@@ -137,40 +139,39 @@ block:
     title: " "
     description: {}
   '37':
-    utility: auction
+    utility: bid
   '38':
-    utility: auction
+    utility: bid
   '39':
-    utility: auction
+    utility: bid
   '40':
-    utility: auction
+    utility: bid
   '41':
-    utility: auction
+    utility: bid
   '42':
-    utility: auction
+    utility: bid
   '43':
-    utility: auction
+    utility: bid
   '44':
-    utility: bidGui
-    material: GOLD_INGOT
-    title: "&5See the ongoing bids"
-    description:
-      - "&eClick here to see the items on auction"
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
+    description: { }
   '45':
-    utility: player
-    material: NETHER_STAR
-    title: "&5My Items"
+    utility: auctionGui
+    material: GOLD_INGOT
+    title: "&5Back to the Auction House"
     description:
-      - "&eClick here to see your items for sale"
+      - "&eClick here to see the classic sale listings"
   '46':
-    utility: expireGui
-    material: CHEST_MINECART
-    title: "&cCollect your expired items"
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
     description: { }
   '47':
-    utility: historicGui
-    material: WRITABLE_BOOK
-    title: "&cSee our item historic"
+    utility: barrier
+    material: GRAY_STAINED_GLASS_PANE
+    title: " "
     description: { }
   '48':
     utility: previous
@@ -188,13 +189,13 @@ block:
     texture: "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTY0MzlkMmUzMDZiMjI1NTE2YWE5YTZkMDA3YTdlNzVlZGQyZDUwMTVkMTEzYjQyZjQ0YmU2MmE1MTdlNTc0ZiJ9fX0="
     title: "Informations"
     description:
-      - "&7Welcome to the auction house"
-      - "&7Here, all players can sell"
-      - "&7and buy things."
+      - "&7Welcome to the bid house"
+      - "&7Here, all players can put an"
+      - "&7item up for auction and bid"
+      - "&7on each other's items."
       - ""
-      - "&7To sell an item, you must:"
-      - "&a/ah sell &7<&aprice&7>"
-      - "&7Number of sales in progress: &b{TotalSale}"
+      - "&7To start a bid, you must:"
+      - "&a/ah bid &7<&astartPrice&7>"
   '50':
     utility: next
     material: ARROW

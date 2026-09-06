@@ -38,6 +38,51 @@ class GlobalConfigTest {
         assertFalse(config.isFeatureFlippingMoneyFormat());
         assertFalse(config.isFeatureDuplicationHashCodeControl());
         assertEquals(5, config.getLimitations().get("default"));
+
+        // Bid duration/checks default separately from the classic auction's expiration section.
+        assertTrue(config.isBidFeatureFlippingExpiration());
+        assertEquals(3600, config.getBidTime());
+        assertEquals(72000, config.getBidCheckEvery());
+        assertEquals(1.0, config.getBidMinIncrement());
+        assertFalse(config.isBidApplyDefaultPriceLimits());
+        assertTrue(config.getBidLimitations().isEmpty());
+    }
+
+    @Test
+    @DisplayName("The bid section is independent from the classic auction expiration section")
+    void bidSectionIsReadIndependently() {
+
+        GlobalConfig config = new GlobalConfig();
+        config.load(TestConfigs.of("""
+                lang: "en"
+                expiration:
+                  time: 60
+                  checkEvery: 1200
+                bid:
+                  feature-flipping:
+                    item-expiration: false
+                  expiration:
+                    time: 600
+                    checkEvery: 2400
+                  minIncrement: 5.0
+                  applyDefaultPriceLimits: true
+                  limitations:
+                    default: 2
+                    vip: 10
+                limitations:
+                  default: 5
+                """));
+
+        assertEquals(60, config.getTime());
+        assertEquals(1200, config.getCheckEvery());
+
+        assertFalse(config.isBidFeatureFlippingExpiration());
+        assertEquals(600, config.getBidTime());
+        assertEquals(2400, config.getBidCheckEvery());
+        assertEquals(5.0, config.getBidMinIncrement());
+        assertTrue(config.isBidApplyDefaultPriceLimits());
+        assertEquals(10, config.getBidLimitations().get("vip"));
+        assertEquals(5, config.getLimitations().get("default"));
     }
 
     @Test

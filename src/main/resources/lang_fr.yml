@@ -9,6 +9,9 @@ fauction:
   clear_cache_help_description: "Pour vider le cache"
   migrate_help_description: "Faire une migration vers une autre version."
   auction_search_help_description: "Rechercher un item"
+  bid_help_description: "Démarrer une enchère pour le stack d'items dans votre main"
+  bid_list_help_description: "Pour ouvrir la salle des enchères"
+  bid_cancel_help_description: "Annuler une de vos enchères n'ayant pas encore reçu de mise"
 
   buy_auction_success: "Vous venez d'acheter l'item {item} pour le prix de {price}."
   buy_auction_target_success: "Le joueur {player} a acheté l'item {item} au prix de {price}."
@@ -40,6 +43,20 @@ fauction:
   migrate: "Vous avez effectué une migration vers la version {version}."
 
   auction_purge: "Vous avez effacé toutes les données."
+
+  bid_add_success: "Vous venez de démarrer une enchère sur l'item {item} au prix de départ de {price}."
+  bid_placed_success: "Vous avez placé une enchère de {price} sur l'item {item}."
+  bid_too_low: "Quelqu'un d'autre vient de surenchérir, veuillez réessayer."
+  outbid_notification: "Vous avez été surenchéri sur l'item {item}, la nouvelle enchère est de {price}. Vous avez été remboursé."
+  bid_won: "Vous avez remporté l'enchère sur l'item {item} pour {price}."
+  bid_sold: "Votre enchère sur l'item {item} est terminée, vendue pour {price}."
+  bid_ended_no_winner: "Une de vos enchères sur l'item {item} s'est terminée sans enchérisseur, l'item vous attend dans les objets expirés."
+  bid_your_item: "Vous ne pouvez pas enchérir sur votre propre item."
+  bid_already_yours: "Vous êtes déjà le meilleur enchérisseur sur cet item."
+  max_bid: "Vous avez atteint le maximum d'enchères possible pour votre grade."
+  bid_cancelled: "Vous avez annulé votre enchère."
+  bid_cancel_success: "Vous avez retiré l'item {item} de la salle des enchères."
+  bid_cancel_has_bidder: "Cette enchère a déjà reçu une mise et ne peut plus être annulée."
 acf-minecraft:
   invalid_world: "Ce monde n'existe pas !"
   you_must_be_holding_item: "Vous devez avoir un item dans votre main !"

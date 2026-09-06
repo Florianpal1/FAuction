@@ -4,7 +4,10 @@ import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.enums.Gui;
 import fr.florianpal.fauction.gui.subGui.AuctionConfirmGui;
 import fr.florianpal.fauction.gui.subGui.AuctionsGui;
+import fr.florianpal.fauction.gui.subGui.BidConfirmGui;
+import fr.florianpal.fauction.gui.subGui.BidsGui;
 import fr.florianpal.fauction.objects.Auction;
+import fr.florianpal.fauction.objects.Bid;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Barrel;
 import org.bukkit.block.ShulkerBox;
@@ -32,6 +35,8 @@ public class InventoryVisualization implements InventoryHolder, Listener {
 
     private final Auction auction;
 
+    private final Bid bid;
+
     private boolean isClosed = false;
 
     public InventoryVisualization(FAuction plugin, Player player, ShulkerBox shulkerBox, Gui gui, Auction auction) {
@@ -39,6 +44,7 @@ public class InventoryVisualization implements InventoryHolder, Listener {
         this.plugin = plugin;
         this.gui = gui;
         this.auction = auction;
+        this.bid = null;
         createInventory(shulkerBox.getInventory(), InventoryType.SHULKER_BOX);
     }
 
@@ -47,6 +53,25 @@ public class InventoryVisualization implements InventoryHolder, Listener {
         this.plugin = plugin;
         this.gui = gui;
         this.auction = auction;
+        this.bid = null;
+        createInventory(barrel.getInventory(), InventoryType.BARREL);
+    }
+
+    public InventoryVisualization(FAuction plugin, Player player, ShulkerBox shulkerBox, Gui gui, Bid bid) {
+        this.player = player;
+        this.plugin = plugin;
+        this.gui = gui;
+        this.auction = null;
+        this.bid = bid;
+        createInventory(shulkerBox.getInventory(), InventoryType.SHULKER_BOX);
+    }
+
+    public InventoryVisualization(FAuction plugin, Player player, Barrel barrel, Gui gui, Bid bid) {
+        this.player = player;
+        this.plugin = plugin;
+        this.gui = gui;
+        this.auction = null;
+        this.bid = bid;
         createInventory(barrel.getInventory(), InventoryType.BARREL);
     }
 
@@ -106,6 +131,16 @@ public class InventoryVisualization implements InventoryHolder, Listener {
             FAuction.newChain().sync(() -> {
                 AuctionConfirmGui auctionConfirmGui = new AuctionConfirmGui(plugin, player, 1, auction);
                 auctionConfirmGui.initialize();
+            }).execute();
+        } else if (Gui.BID.equals(gui)) {
+            FAuction.newChain().asyncFirst(() -> plugin.getBidCommandManager().getBids()).syncLast(bids -> {
+                BidsGui bidsGui = new BidsGui(plugin, player, bids, 1, null, null);
+                bidsGui.initialize();
+            }).execute();
+        } else if (Gui.BID_CONFIRM.equals(gui)) {
+            FAuction.newChain().sync(() -> {
+                BidConfirmGui bidConfirmGui = new BidConfirmGui(plugin, player, 1, bid);
+                bidConfirmGui.initialize();
             }).execute();
         }
     }

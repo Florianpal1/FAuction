@@ -12,5 +12,9 @@ public enum Gui {
 
     CONFIRM,
 
-    PLAYER
+    PLAYER,
+
+    BID,
+
+    BID_CONFIRM
 }

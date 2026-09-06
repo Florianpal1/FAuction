@@ -59,6 +59,13 @@ public class GlobalConfig {
 
     private int updateCacheEvery;
 
+    private int bidTime;
+    private int bidCheckEvery;
+    private double bidMinIncrement;
+    private boolean bidApplyDefaultPriceLimits;
+    private Map<String, Integer> bidLimitations = new HashMap<>();
+    private boolean bidFeatureFlippingExpiration;
+
     private boolean featureFlippingExpiration;
 
     private boolean featureFlippingCacheUpdate;
@@ -113,6 +120,22 @@ public class GlobalConfig {
 
         timeCurrency = config.getInt("currencyCheck.time", 3600);
         checkEveryCurrency = config.getInt("currencyCheck.checkEvery", 72000);
+
+        bidFeatureFlippingExpiration = config.getBoolean("bid.feature-flipping.item-expiration", true);
+        bidTime = config.getInt("bid.expiration.time", 3600);
+        bidCheckEvery = config.getInt("bid.expiration.checkEvery", 72000);
+        // A zero or negative increment would let a bid be raised for free (or below the previous
+        // bid, creating money out of nothing on the refund), so it is floored the same way the
+        // anti-spam limits are above.
+        bidMinIncrement = Math.max(0.01, config.getDouble("bid.minIncrement", 1.0));
+        bidApplyDefaultPriceLimits = config.getBoolean("bid.applyDefaultPriceLimits", false);
+
+        bidLimitations = new HashMap<>();
+        if (config.contains("bid.limitations")) {
+            for (Object limitationGroup : config.getSection("bid.limitations").getKeys()) {
+                bidLimitations.put(limitationGroup.toString(), config.getInt("bid.limitations." + limitationGroup));
+            }
+        }
 
         minPrice = new HashMap<>();
         maxPrice = new HashMap<>();

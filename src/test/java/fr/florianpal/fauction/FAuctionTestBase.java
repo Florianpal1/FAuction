@@ -5,7 +5,9 @@ import fr.florianpal.fauction.configurations.GlobalConfig;
 import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.managers.ConfigurationManager;
 import fr.florianpal.fauction.objects.Auction;
+import fr.florianpal.fauction.objects.Bid;
 import fr.florianpal.fauction.queries.AuctionQueries;
+import fr.florianpal.fauction.queries.BidQueries;
 import fr.florianpal.fauction.queries.ExpireQueries;
 import fr.florianpal.fauction.utils.SerializationUtil;
 import org.bukkit.Material;
@@ -46,6 +48,8 @@ public abstract class FAuctionTestBase {
 
     protected ExpireQueries expireQueries;
 
+    protected BidQueries bidQueries;
+
     protected DatabaseConfig databaseConfig;
 
     protected GlobalConfig globalConfig;
@@ -57,6 +61,7 @@ public abstract class FAuctionTestBase {
         plugin = mock(FAuction.class);
         auctionQueries = mock(AuctionQueries.class);
         expireQueries = mock(ExpireQueries.class);
+        bidQueries = mock(BidQueries.class);
         databaseConfig = mock(DatabaseConfig.class);
         globalConfig = mock(GlobalConfig.class);
 
@@ -67,6 +72,7 @@ public abstract class FAuctionTestBase {
         when(plugin.getConfigurationManager()).thenReturn(configurationManager);
         when(plugin.getAuctionQueries()).thenReturn(auctionQueries);
         when(plugin.getExpireQueries()).thenReturn(expireQueries);
+        when(plugin.getBidQueries()).thenReturn(bidQueries);
         when(plugin.getLogger()).thenReturn(Logger.getLogger("FAuctionTest"));
 
         // The cache mode is the one keeping the auctions in memory, where the reservation is
@@ -82,10 +88,14 @@ public abstract class FAuctionTestBase {
         // cache.
         AtomicInteger nextAuctionId = new AtomicInteger(1000);
         AtomicInteger nextExpireId = new AtomicInteger(1000);
+        AtomicInteger nextBidId = new AtomicInteger(1000);
         when(auctionQueries.addAuction(any(), anyString(), any(), anyDouble(), any())).thenAnswer(invocation -> nextAuctionId.getAndIncrement());
         when(auctionQueries.deleteAuctions(anyInt())).thenReturn(true);
         when(expireQueries.addExpire(any(), anyString(), any(), anyDouble(), any())).thenAnswer(invocation -> nextExpireId.getAndIncrement());
         when(expireQueries.deleteExpire(anyInt())).thenReturn(true);
+        when(bidQueries.addBid(any(), anyString(), any(), anyDouble(), any(), any())).thenAnswer(invocation -> nextBidId.getAndIncrement());
+        when(bidQueries.updateBid(anyInt(), anyDouble(), anyDouble(), any(), anyString())).thenReturn(true);
+        when(bidQueries.deleteBid(anyInt())).thenReturn(true);
     }
 
     @AfterEach
@@ -99,6 +109,15 @@ public abstract class FAuctionTestBase {
 
     protected Auction auction(int id, UUID owner, double price) {
         return auction(id, owner, price, namedItem(Material.DIAMOND, 1, "Auction " + id));
+    }
+
+    protected Bid bid(int id, UUID seller, double startPrice, double currentPrice, UUID bidder, String bidderName, ItemStack item) {
+        long now = Calendar.getInstance().getTime().getTime();
+        return new Bid(id, seller, "Seller", SerializationUtil.serialize(item), startPrice, currentPrice, bidder, bidderName, now, now + 60_000L);
+    }
+
+    protected Bid bid(int id, UUID seller, double startPrice) {
+        return bid(id, seller, startPrice, startPrice, null, null, namedItem(Material.DIAMOND, 1, "Bid " + id));
     }
 
     protected ItemStack namedItem(Material material, int amount, String name) {

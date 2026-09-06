@@ -10,9 +10,12 @@ import fr.florianpal.fauction.managers.commandmanagers.*;
 import fr.florianpal.fauction.managers.implementations.LuckPermsImplementation;
 import fr.florianpal.fauction.placeholders.FPlaceholderExpansion;
 import fr.florianpal.fauction.queries.AuctionQueries;
+import fr.florianpal.fauction.queries.BidHistoricQueries;
+import fr.florianpal.fauction.queries.BidQueries;
 import fr.florianpal.fauction.queries.CurrencyPendingQueries;
 import fr.florianpal.fauction.queries.ExpireQueries;
 import fr.florianpal.fauction.queries.HistoricQueries;
+import fr.florianpal.fauction.schedules.BidSchedule;
 import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
@@ -50,6 +53,12 @@ public class FAuction extends JavaPlugin {
     private HistoricQueries historicQueries;
 
     @Getter
+    private BidQueries bidQueries;
+
+    @Getter
+    private BidHistoricQueries bidHistoricQueries;
+
+    @Getter
     private CurrencyPendingQueries currencyPendingQueries;
 
     @Getter
@@ -72,6 +81,12 @@ public class FAuction extends JavaPlugin {
 
     @Getter
     private HistoricCommandManager historicCommandManager;
+
+    @Getter
+    private BidCommandManager bidCommandManager;
+
+    @Getter
+    private BidHistoricCommandManager bidHistoricCommandManager;
 
     @Getter
     private SpamManager spamManager;
@@ -142,17 +157,23 @@ public class FAuction extends JavaPlugin {
         auctionQueries = new AuctionQueries(this);
         expireQueries = new ExpireQueries(this);
         historicQueries = new HistoricQueries(this);
+        bidQueries = new BidQueries(this);
+        bidHistoricQueries = new BidHistoricQueries(this);
         currencyPendingQueries = new CurrencyPendingQueries(this);
 
         databaseManager.addRepository(expireQueries);
         databaseManager.addRepository(auctionQueries);
         databaseManager.addRepository(historicQueries);
+        databaseManager.addRepository(bidQueries);
+        databaseManager.addRepository(bidHistoricQueries);
         databaseManager.addRepository(currencyPendingQueries);
         databaseManager.initializeTables();
 
         auctionCommandManager = new AuctionCommandManager(this);
         expireCommandManager = new ExpireCommandManager(this);
         historicCommandManager = new HistoricCommandManager(this);
+        bidCommandManager = new BidCommandManager(this);
+        bidHistoricCommandManager = new BidHistoricCommandManager(this);
 
         spamManager = new SpamManager(this);
         claimManager = new ClaimManager();
@@ -167,6 +188,9 @@ public class FAuction extends JavaPlugin {
 
         if (configurationManager.getGlobalConfig().isFeatureFlippingExpiration()) {
             Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new ExpireSchedule(this), configurationManager.getGlobalConfig().getCheckEvery(), configurationManager.getGlobalConfig().getCheckEvery());
+        }
+        if (configurationManager.getGlobalConfig().isBidFeatureFlippingExpiration()) {
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new BidSchedule(this), configurationManager.getGlobalConfig().getBidCheckEvery(), configurationManager.getGlobalConfig().getBidCheckEvery());
         }
         if (configurationManager.getGlobalConfig().isFeatureFlippingCacheUpdate()) {
             Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new CacheSchedule(this), configurationManager.getGlobalConfig().getUpdateCacheEvery(), configurationManager.getGlobalConfig().getUpdateCacheEvery());
@@ -212,6 +236,8 @@ public class FAuction extends JavaPlugin {
         if (configurationManager.getDatabase().getSqlType().equals(SQLType.SQLite)) {
             auctionCommandManager.deleteAllOnlyOnDB();
             auctionCommandManager.saveAllAuctionInBddFromSQLiteCache();
+            bidCommandManager.deleteAllOnlyOnDB();
+            bidCommandManager.saveAllBidInBddFromSQLiteCache();
         }
 
         databaseManager.close();
@@ -246,6 +272,8 @@ public class FAuction extends JavaPlugin {
         auctionCommandManager.deleteAll();
         expireCommandManager.deleteAll();
         historicCommandManager.deleteAll();
+        bidCommandManager.deleteAll();
+        bidHistoricCommandManager.deleteAll();
     }
 
     public void purgeAllExpire() {
@@ -258,6 +286,14 @@ public class FAuction extends JavaPlugin {
 
     public void purgeAllHistoric() {
         historicCommandManager.deleteAll();
+    }
+
+    public void purgeAllBid() {
+        bidCommandManager.deleteAll();
+    }
+
+    public void purgeAllBidHistoric() {
+        bidHistoricCommandManager.deleteAll();
     }
 
     public void migrate(String migrateVersion) {

@@ -42,7 +42,33 @@ public enum MessageKeys implements MessageKeyProvider {
 
     MIGRATE,
 
-    DATABASEERROR;
+    DATABASEERROR,
+
+    BID_ADD_SUCCESS,
+
+    BID_PLACED_SUCCESS,
+
+    BID_TOO_LOW,
+
+    OUTBID_NOTIFICATION,
+
+    BID_WON,
+
+    BID_SOLD,
+
+    BID_ENDED_NO_WINNER,
+
+    BID_YOUR_ITEM,
+
+    BID_ALREADY_YOURS,
+
+    MAX_BID,
+
+    BID_CANCELLED,
+
+    BID_CANCEL_SUCCESS,
+
+    BID_CANCEL_HAS_BIDDER;
 
     private static final String PREFIX = "fauction";
 

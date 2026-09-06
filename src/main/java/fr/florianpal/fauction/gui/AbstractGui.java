@@ -7,6 +7,7 @@ import fr.florianpal.fauction.configurations.gui.AbstractGuiConfig;
 import fr.florianpal.fauction.gui.subGui.*;
 import fr.florianpal.fauction.managers.SpamManager;
 import fr.florianpal.fauction.managers.commandmanagers.AuctionCommandManager;
+import fr.florianpal.fauction.managers.commandmanagers.BidCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.CommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.ExpireCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.HistoricCommandManager;
@@ -58,6 +59,8 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
 
     protected final HistoricCommandManager historicCommandManager;
 
+    protected final BidCommandManager bidCommandManager;
+
     protected final SpamManager spamManager;
 
     protected AbstractGuiConfig abstractGuiConfig;
@@ -79,6 +82,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         this.auctionCommandManager = plugin.getAuctionCommandManager();
         this.expireCommandManager = plugin.getExpireCommandManager();
         this.historicCommandManager = plugin.getHistoricCommandManager();
+        this.bidCommandManager = plugin.getBidCommandManager();
         this.spamManager = plugin.getSpamManager();
         this.abstractGuiConfig = abstractGuiConfig;
         this.categoriesConfig = plugin.getConfigurationManager().getCategoriesConfig();
@@ -139,6 +143,10 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
 
         for (Barrier historic : abstractGuiConfig.getHistoricBlocks()) {
             inv.setItem(historic.getIndex(), createGuiItem(getItemStack(historic, false)));
+        }
+
+        for (Barrier bidGui : abstractGuiConfig.getBidGuiBlocks()) {
+            inv.setItem(bidGui.getIndex(), createGuiItem(getItemStack(bidGui, false)));
         }
 
         for (Barrier menu : abstractGuiConfig.getMenuBlocks()) {
@@ -230,6 +238,16 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
 
             FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(auctions -> {
                 ExpireGui gui = new ExpireGui(plugin, player, auctions, 1, expireGuiBarrierOptional.get().getCategory(), null);
+                gui.initialize();
+            }).execute();
+            return true;
+        }
+
+        Optional<BarrierWithCategory> bidGuiBarrierOptional = abstractGuiConfig.getBidGuiBlocks().stream().filter(bidGui -> e.getRawSlot() == bidGui.getIndex()).findFirst();
+        if (bidGuiBarrierOptional.isPresent()) {
+
+            FAuction.newChain().asyncFirst(bidCommandManager::getBids).syncLast(bids -> {
+                BidsGui gui = new BidsGui(plugin, player, bids, 1, bidGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
             return true;

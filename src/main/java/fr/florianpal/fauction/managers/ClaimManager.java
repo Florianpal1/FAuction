@@ -38,6 +38,12 @@ public class ClaimManager {
     private final Map<UUID, Long> playerClaims = new ConcurrentHashMap<>();
 
     /**
+     * Bids being started, kept separate from playerClaims so starting a bid never blocks on (or gets
+     * blocked by) a classic sale in flight for the same player, and vice versa.
+     */
+    private final Map<UUID, Long> playerBidClaims = new ConcurrentHashMap<>();
+
+    /**
      * Origin of the monotonic clock, so a system time change cannot freeze an auction.
      */
     private final long startNano = System.nanoTime();
@@ -82,6 +88,17 @@ public class ClaimManager {
 
     public void release(UUID playerUUID, long token) {
         release(playerClaims, playerUUID, token);
+    }
+
+    /**
+     * Reserves the start of a bid for a player, the same way tryClaim(UUID) does for a classic sale.
+     */
+    public long tryClaimBid(UUID playerUUID) {
+        return tryClaim(playerBidClaims, playerUUID);
+    }
+
+    public void releaseBid(UUID playerUUID, long token) {
+        release(playerBidClaims, playerUUID, token);
     }
 
     private <K> long tryClaim(Map<K, Long> reservations, K key) {

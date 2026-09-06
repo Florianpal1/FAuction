@@ -41,6 +41,8 @@ public abstract class AbstractGuiConfig {
 
     private List<BarrierWithCategory> expireBlocks = new ArrayList<>();
 
+    private List<BarrierWithCategory> bidGuiBlocks = new ArrayList<>();
+
     public void load(FAuction plugin, YamlDocument config, String baseBlock) {
 
         barrierBlocks = new ArrayList<>();
@@ -51,6 +53,7 @@ public abstract class AbstractGuiConfig {
         auctionGuiBlocks = new ArrayList<>();
         menuBlocks = new ArrayList<>();
         commandBlocks = new ArrayList<>();
+        bidGuiBlocks = new ArrayList<>();
 
         size = config.getInt("gui.size");
         nameGui = config.getString("gui.name");
@@ -88,6 +91,17 @@ public abstract class AbstractGuiConfig {
                         plugin.getConfigurationManager().getCategoriesConfig().getCategories().getOrDefault(config.getString("block." + index + ".category", null), null)
                 );
                 expireBlocks.add(barrier);
+            } else if (BIDGUI.equalsIgnoreCase(currentUtility)) {
+                BarrierWithCategory barrier = new BarrierWithCategory(
+                        Integer.parseInt(index),
+                        Material.getMaterial(config.getString("block." + index + ".material", Material.BARRIER.toString())),
+                        config.getString("block." + index + ".title"),
+                        config.getStringList("block." + index + ".description"),
+                        config.getString("block." + index + ".texture", ""),
+                        config.getInt("block." + index + ".customModelData", 0),
+                        plugin.getConfigurationManager().getCategoriesConfig().getCategories().getOrDefault(config.getString("block." + index + ".category", null), null)
+                );
+                bidGuiBlocks.add(barrier);
             } else if (HISTORICGUI.equalsIgnoreCase(currentUtility)) {
                 BarrierWithCategory barrier = new BarrierWithCategory(
                         Integer.parseInt(index),

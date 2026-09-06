@@ -1,6 +1,7 @@
 package fr.florianpal.fauction.utils;
 
 import fr.florianpal.fauction.objects.Auction;
+import fr.florianpal.fauction.objects.Bid;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.objects.Historic;
 import fr.florianpal.fauction.objects.Sort;
@@ -44,48 +45,76 @@ public class ListUtil {
             return auctions;
         }
 
-        return auctions.stream().filter(auction -> {
-            ItemStack item = auction.getItemStack();
-            Material type = item.getType();
+        return auctions.stream().filter(auction -> matchesCategory(auction.getItemStack(), category)).collect(Collectors.toList());
+    }
 
-            if (category.containsEnchanted() && !item.getEnchantments().isEmpty()) {
-                return true;
+    public static List<Bid> applyBidSorting(List<Bid> bids, Sort sort) {
+        switch (sort.getType()) {
+            case DATE_NEWER_TO_OLDER -> {
+                return bids.stream().sorted(Comparator.comparing(Bid::getStartDate)).collect(Collectors.toList());
             }
-
-            if (category.containsWeapons() && isWeapon(type)) {
-                return true;
+            case DATE_OLDER_TO_NEWER -> {
+                return bids.stream().sorted(Comparator.comparing(Bid::getStartDate)).collect(Collectors.toList()).reversed();
             }
-
-            if (category.containsTools() && isTool(type)) {
-                return true;
+            case PRICE_HIGHER_TO_LOWER -> {
+                return bids.stream().sorted(Comparator.comparing(Bid::getCurrentPrice)).collect(Collectors.toList()).reversed();
             }
-
-            if (category.containsArmor() && isArmor(type)) {
-                return true;
+            case PRICE_LOWER_TO_HIGHER -> {
+                return bids.stream().sorted(Comparator.comparing(Bid::getCurrentPrice)).collect(Collectors.toList());
             }
+        }
+        return bids;
+    }
 
-            if (category.containsBlocks() && isBlock(type)) {
-                return true;
-            }
+    public static List<Bid> getBidsByCategory(List<Bid> bids, Category category) {
 
-            if (category.containsFood() && (isFood(type) || isPotion(type))) {
-                return true;
-            }
+        if (category.containsAll()) {
+            return bids;
+        }
 
-            if (category.containsPotions() && isPotion(type)) {
-                return true;
-            }
+        return bids.stream().filter(bid -> matchesCategory(bid.getItemStack(), category)).collect(Collectors.toList());
+    }
 
-            if (category.containsMisc() && isMisc(type)) {
-                return true;
-            }
+    private static boolean matchesCategory(ItemStack item, Category category) {
+        Material type = item.getType();
 
-            if (category.containsCustom() && hasCustomData(item)) {
-                return true;
-            }
+        if (category.containsEnchanted() && !item.getEnchantments().isEmpty()) {
+            return true;
+        }
 
-            return category.getMaterials().contains(type);
-        }).collect(Collectors.toList());
+        if (category.containsWeapons() && isWeapon(type)) {
+            return true;
+        }
+
+        if (category.containsTools() && isTool(type)) {
+            return true;
+        }
+
+        if (category.containsArmor() && isArmor(type)) {
+            return true;
+        }
+
+        if (category.containsBlocks() && isBlock(type)) {
+            return true;
+        }
+
+        if (category.containsFood() && (isFood(type) || isPotion(type))) {
+            return true;
+        }
+
+        if (category.containsPotions() && isPotion(type)) {
+            return true;
+        }
+
+        if (category.containsMisc() && isMisc(type)) {
+            return true;
+        }
+
+        if (category.containsCustom() && hasCustomData(item)) {
+            return true;
+        }
+
+        return category.getMaterials().contains(type);
     }
 
     private static boolean isWeapon(Material type) {

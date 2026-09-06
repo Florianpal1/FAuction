@@ -9,6 +9,9 @@ fauction:
   clear_cache_help_description: "To clear the cache"
   auction_search_help_description: "Search for an item"
   migrate_help_description: "Migrate to another version."
+  bid_help_description: "Start a bid for the stack of items in your hand"
+  bid_list_help_description: "To open the bid house"
+  bid_cancel_help_description: "Cancel one of your bids that has no bidder yet"
 
   buy_auction_success: "You just bought {item} for {price}."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -39,6 +42,20 @@ fauction:
 
   transfert_bdd: "Transfert of the database finished."
   auction_purge: "You have erased all data."
+
+  bid_add_success: "You just started a bid on {item} at {price}."
+  bid_placed_success: "You placed a bid of {price} on {item}."
+  bid_too_low: "Someone else has already raised this bid, please try again."
+  outbid_notification: "You have been outbid on {item}, the new bid is {price}. You were refunded."
+  bid_won: "You won the bid on {item} for {price}."
+  bid_sold: "Your bid on {item} ended, sold for {price}."
+  bid_ended_no_winner: "One of your bids on {item} has ended with no bidder, the item is waiting in the expired items."
+  bid_your_item: "You cannot bid on your own item."
+  bid_already_yours: "You are already the highest bidder on this item."
+  max_bid: "You have reached the maximum bids possible for your grade."
+  bid_cancelled: "You cancelled your bid."
+  bid_cancel_success: "You removed {item} from the bid house."
+  bid_cancel_has_bidder: "This bid already has a bidder and cannot be cancelled anymore."
 acf-minecraft:
   invalid_world: "Error: That world does not exist."
   you_must_be_holding_item: "Error: You must be holding an item in your main hand."
