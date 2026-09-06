@@ -7,6 +7,7 @@ import fr.florianpal.fauction.managers.ConfigurationManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -33,7 +34,14 @@ import static org.mockito.Mockito.when;
  */
 class LangMigrationTest {
 
-    @TempDir
+    // BoostedYAML's YamlDocument.create(File, ...) never closes the FileInputStream it opens to
+    // read an existing file (dev.dejvokep:boosted-yaml, still true as of 1.3.7) : the handle is
+    // only released whenever the JVM happens to garbage-collect it. Harmless in production — the
+    // plugin loads the file at most a few times per session — but on Windows, unlike POSIX, a file
+    // with an open handle cannot be deleted, so JUnit's own cleanup of this directory fails right
+    // after almost every test here. CleanupMode.NEVER leaves the directory for the OS to reclaim
+    // instead of failing the test over a leak in a dependency we do not control.
+    @TempDir(cleanup = CleanupMode.NEVER)
     Path dataFolder;
 
     private FAuction plugin;
@@ -89,7 +97,12 @@ class LangMigrationTest {
      * an updated file gets it quoted, a freshly written one does not, and only the value matters.
      */
     private String versionOf(String code) throws IOException {
-        return YamlDocument.create(dataFolder.resolve("lang_" + code + ".yml").toFile()).getString("version");
+        // The InputStream overload, not YamlDocument.create(File) : the latter never closes the
+        // FileInputStream it opens (see the note on the @TempDir field), and this is a read-only
+        // probe with no need to keep a File-backed, saveable document around.
+        try (InputStream in = Files.newInputStream(dataFolder.resolve("lang_" + code + ".yml"))) {
+            return YamlDocument.create(in).getString("version");
+        }
     }
 
     @ParameterizedTest

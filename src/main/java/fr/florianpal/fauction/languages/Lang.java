@@ -150,8 +150,12 @@ public final class Lang {
             return;
         }
 
-        try {
-            YamlDocument probe = YamlDocument.create(file);
+        // The InputStream overload, not YamlDocument.create(file) : the latter never closes the
+        // FileInputStream it opens to read an existing file (dev.dejvokep:boosted-yaml, still true
+        // as of 1.3.7), and this probe only ever reads — it has no need for a File-backed, saveable
+        // document that would justify leaking a handle on it.
+        try (InputStream in = Files.newInputStream(file.toPath())) {
+            YamlDocument probe = YamlDocument.create(in);
             if (probe.contains(VERSION_ROUTE)) {
                 return;
             }
