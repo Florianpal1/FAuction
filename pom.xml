@@ -28,7 +28,7 @@
     <build>
         <plugins>
             <plugin>
-                <version>3.15.0</version>
+                <version>3.16.0</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -64,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.6</version>
+                <version>3.6.0</version>
                 <configuration>
                     <!-- Mockito as an agent, it is no longer allowed to attach itself -->
                     <argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
