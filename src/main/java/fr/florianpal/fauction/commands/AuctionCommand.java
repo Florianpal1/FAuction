@@ -12,10 +12,12 @@ import fr.florianpal.fauction.managers.SpamManager;
 import fr.florianpal.fauction.managers.commandmanagers.AuctionCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.ExpireCommandManager;
 import fr.florianpal.fauction.managers.commandmanagers.HistoricCommandManager;
+import fr.florianpal.fauction.objects.Auction;
 import fr.florianpal.fauction.objects.Category;
 import fr.florianpal.fauction.utils.FormatUtil;
 import fr.florianpal.fauction.utils.ListUtil;
 import fr.florianpal.fauction.utils.MessageUtil;
+import fr.florianpal.fauction.utils.SerializationUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -246,6 +248,25 @@ public class AuctionCommand {
                 Bukkit.getPluginManager().callEvent(new AuctionAddEvent(playerSender, itemToSell, price));
 
                 MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_ADD_SUCCESS, "{item}", FormatUtil.titleItemFormat(itemToSell), "{price}", df.format(price));
+            }, added -> {
+
+                // Same reason as above : the hash must not survive the round trip, and it is no
+                // longer removed by the sync step that has just been skipped.
+                if (globalConfig.isFeatureDuplicationHashCodeControl()) {
+                    itemHash.remove((Integer) itemToSell.hashCode());
+                }
+
+                if (!Boolean.TRUE.equals(added)) {
+                    // The item left the inventory, was never saved, and the seller is gone : park it
+                    // in their expired items rather than losing it. The id is the database's to
+                    // assign, addExpire() ignores the one carried here.
+                    Auction lost = new Auction(-1, playerSender.getUniqueId(), playerSender.getName(), price, SerializationUtil.serialize(itemToSell), System.currentTimeMillis());
+                    if (!plugin.getExpireCommandManager().addExpire(lost)) {
+                        plugin.getLogger().severe("Auction of " + playerSender.getName() + " could not be saved, and the seller left before the item could be given back ; the item is lost.");
+                        return;
+                    }
+                    plugin.getLogger().severe("Auction of " + playerSender.getName() + " could not be saved, and the seller left before the item could be given back ; moved to their expired items.");
+                }
             }).execute(() -> plugin.getClaimManager().release(playerSender.getUniqueId(), saleClaim));
 
         }).execute(() -> {

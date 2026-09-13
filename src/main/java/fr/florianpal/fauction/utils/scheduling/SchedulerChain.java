@@ -70,14 +70,33 @@ public final class SchedulerChain<T> {
         return chainSync(ignored -> {
             runnable.run();
             return null;
-        });
+        }, null);
+    }
+
+    /**
+     * A sync step that produces the value the rest of the chain works on. When the step is skipped
+     * because the entity is gone, that value is {@code null} : a chain that only commits something
+     * once the step really ran can simply test for it, instead of needing a repair.
+     */
+    public <U> SchedulerChain<U> syncFirst(Supplier<U> supplier) {
+        return chainSync(ignored -> supplier.get(), null);
     }
 
     public SchedulerChain<Void> syncLast(Consumer<T> consumer) {
+        return syncLast(consumer, null);
+    }
+
+    /**
+     * @param onEntityGone repair run asynchronously when the entity disappeared before the sync step
+     *                     could run (Folia only) : the step is skipped, so whatever the async step
+     *                     already committed has to be undone here. Must not touch the entity, which
+     *                     by definition is no longer there.
+     */
+    public SchedulerChain<Void> syncLast(Consumer<T> consumer, Consumer<T> onEntityGone) {
         return chainSync(value -> {
             consumer.accept(value);
             return null;
-        });
+        }, onEntityGone);
     }
 
     public void execute() {
@@ -105,8 +124,8 @@ public final class SchedulerChain<T> {
         return new SchedulerChain<>(foliaLib, entity, logger, next);
     }
 
-    private <U> SchedulerChain<U> chainSync(Function<T, U> step) {
-        CompletableFuture<U> next = future.thenCompose(value -> runSync(() -> step.apply(value)));
+    private <U> SchedulerChain<U> chainSync(Function<T, U> step, Consumer<T> onEntityGone) {
+        CompletableFuture<U> next = future.thenCompose(value -> runSync(value, () -> step.apply(value), onEntityGone));
         return new SchedulerChain<>(foliaLib, entity, logger, next);
     }
 
@@ -116,20 +135,42 @@ public final class SchedulerChain<T> {
         return result;
     }
 
-    private <U> CompletableFuture<U> runSync(Supplier<U> step) {
+    private <U> CompletableFuture<U> runSync(T value, Supplier<U> step, Consumer<T> onEntityGone) {
         CompletableFuture<U> result = new CompletableFuture<>();
         if (entity != null) {
             // The player may have logged off (or the entity died/unloaded) while the async step ran ;
-            // the fallback quietly skips the sync step instead of failing.
+            // the sync step is then skipped, so a chain that already committed something has to
+            // repair it through onEntityGone.
             foliaLib.getScheduler().runAtEntityWithFallback(
                     entity,
                     task -> complete(result, step),
-                    () -> result.complete(null)
+                    () -> entityGone(result, value, onEntityGone)
             );
         } else {
             foliaLib.getScheduler().runNextTick(task -> complete(result, step));
         }
         return result;
+    }
+
+    private <U> void entityGone(CompletableFuture<U> result, T value, Consumer<T> onEntityGone) {
+        if (onEntityGone == null) {
+            // Nothing was committed by the async step (opening a gui for a player who left, and the
+            // like) : skipping is exactly what has to happen, and logging it would only flood the
+            // console on every disconnection.
+            result.complete(null);
+            return;
+        }
+        // Off the region thread : the repair goes to the database. The chain carries on with a null
+        // value either way, the sync step never having produced one.
+        foliaLib.getScheduler().runAsync(task -> {
+            try {
+                onEntityGone.accept(value);
+            } catch (Throwable t) {
+                logError(t);
+            } finally {
+                result.complete(null);
+            }
+        });
     }
 
     private <U> void complete(CompletableFuture<U> result, Supplier<U> step) {

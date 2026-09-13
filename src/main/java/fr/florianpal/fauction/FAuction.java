@@ -242,7 +242,9 @@ public class FAuction extends JavaPlugin {
         if (currencyTask != null) {
             currencyTask.cancel();
         }
-        spamManager.shutdown();
+        if (spamManager != null) {
+            spamManager.shutdown();
+        }
 
         if (configurationManager.getDatabase().getSqlType().equals(SQLType.SQLite)) {
             auctionCommandManager.deleteAllOnlyOnDB();

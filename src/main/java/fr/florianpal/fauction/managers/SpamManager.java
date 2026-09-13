@@ -76,7 +76,9 @@ public class SpamManager implements Listener {
      * Cancels the purge task ; called from {@link FAuction#onDisable()}.
      */
     public void shutdown() {
-        purgeTask.cancel();
+        if (purgeTask != null) {
+            purgeTask.cancel();
+        }
     }
 
     @EventHandler

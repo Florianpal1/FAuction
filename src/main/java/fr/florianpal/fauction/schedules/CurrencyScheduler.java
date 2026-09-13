@@ -5,7 +5,7 @@ import fr.florianpal.fauction.objects.CurrencyPending;
 import fr.florianpal.fauction.queries.CurrencyPendingQueries;
 import fr.florianpal.fauction.utils.CurrencyUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 public class CurrencyScheduler implements Runnable {
 
@@ -20,16 +20,30 @@ public class CurrencyScheduler implements Runnable {
 
     @Override
     public void run() {
-        FAuction.newChain().asyncFirst(currencyPendingQueries::getCurrencyPending).syncLast(currencyPendings -> {
+        FAuction.newChain().asyncFirst(currencyPendingQueries::getCurrencyPending).asyncLast(currencyPendings -> {
 
             for (CurrencyPending currencyPending : currencyPendings) {
 
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(currencyPending.getPlayerUUID());
+                Player player = Bukkit.getPlayer(currencyPending.getPlayerUUID());
 
-                if (offlinePlayer.isOnline()) {
-                    CurrencyUtil.giveCurrency(plugin, offlinePlayer, currencyPending.getCurrencyType(), currencyPending.getAmount());
-                    currencyPendingQueries.deleteCurrencyPending(currencyPending.getId());
+                // Still offline : the row stays pending for a later pass.
+                if (player == null) {
+                    continue;
                 }
+
+                // The payment goes through the region thread of the player : the EXPERIENCE and
+                // LEVEL modes write to the player themselves, which the global region may not do
+                // under Folia. The row is only cleared once the payment is confirmed, so a refused
+                // deposit, or a player who left before being paid (the sync step is then skipped and
+                // given is null), leaves the money owed instead of losing it.
+                FAuction.newChain(player)
+                        .syncFirst(() -> CurrencyUtil.giveCurrency(plugin, player, currencyPending.getCurrencyType(), currencyPending.getAmount()))
+                        .asyncLast(given -> {
+                            if (Boolean.TRUE.equals(given)) {
+                                currencyPendingQueries.deleteCurrencyPending(currencyPending.getId());
+                            }
+                        })
+                        .execute();
             }
 
         }).execute();

@@ -130,6 +130,19 @@ public class ExpireGui extends AbstractGuiWithAuctions {
                             ExpireGui gui = new ExpireGui(plugin, player, expires, 1, category, sort);
                             gui.initialize();
                         }).execute();
+                    }, a -> {
+                        // The player left before the item could be handed over : the row is already
+                        // gone, so put it back in their expired items rather than destroying it.
+                        // There is no restore() here, addExpire() re-inserting the row under the id
+                        // the database assigns is the same thing.
+                        if (a == null) {
+                            return;
+                        }
+                        if (!expireCommandManager.addExpire(a)) {
+                            plugin.getLogger().severe("Expired item " + a.getId() + " of " + a.getPlayerName() + " could not be put back after " + player.getName() + " left before it could be handed over ; the item is lost.");
+                            return;
+                        }
+                        plugin.getLogger().severe("Expired item " + a.getId() + " of " + a.getPlayerName() + " was claimed by " + player.getName() + ", who left before the item could be handed over ; put back in their expired items instead of being lost.");
                     }).execute(() -> plugin.getClaimManager().release(ClaimType.EXPIRE, expireId, expireClaim));
                 }
             }

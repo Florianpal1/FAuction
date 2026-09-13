@@ -153,6 +153,14 @@ public class AuctionsGui extends AbstractGuiWithAuctions {
                             AuctionsGui gui = new AuctionsGui(plugin, player, auctionsNew, 1, category, sort);
                             gui.initialize();
                         }).execute();
+                    }, a -> {
+                        // The player left before the item could be handed over : the row is already
+                        // gone, so put it back rather than destroying the item.
+                        if (a == null) {
+                            return;
+                        }
+                        plugin.getLogger().severe("Auction " + a.getId() + " of " + a.getPlayerName() + " was claimed by " + player.getName() + ", who left before the item could be handed over ; put back on the market instead of being lost.");
+                        auctionCommandManager.restore(a);
                     }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim));
                 } else if (e.isLeftClick()) {
                     if (auction.getPlayerUUID().equals(player.getUniqueId())) {

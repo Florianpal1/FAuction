@@ -312,6 +312,15 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                         AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                         gui.initialize();
                     }).execute();
+                }, a -> {
+                    // The buyer left before being charged and handed the item : the row is already
+                    // gone, so put the auction back on sale rather than destroying the item. Nothing
+                    // was taken from the buyer, the sale simply never happened.
+                    if (a == null) {
+                        return;
+                    }
+                    plugin.getLogger().severe("Auction " + a.getId() + " of " + a.getPlayerName() + " was claimed by buyer " + player.getName() + ", who left before the sale could be completed ; put back on the market instead of being lost.");
+                    auctionCommandManager.restore(a);
                 }).execute(() -> plugin.getClaimManager().release(ClaimType.AUCTION, auctionId, auctionClaim));
                 break;
             }
