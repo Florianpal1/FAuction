@@ -54,7 +54,7 @@ public class CommandManager {
         // simpleCoordinator : the handler starts on the calling thread, so on the region thread of
         // the player under Folia. The 13 handlers touch the inventory of the player and open
         // inventories ; an async coordinator would drop them on an arbitrary thread and every one of
-        // them would have to jump back. Going asynchronous stays explicit, through newChain().
+        // them would have to jump back. Going asynchronous stays explicit, through FAuction.newChain().
         this.manager = LegacyPaperCommandManager.createNative(plugin, ExecutionCoordinator.simpleCoordinator());
 
         registerBrigadier();

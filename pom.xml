@@ -92,6 +92,12 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>fr.florianpal.fauction.bstats</shadedPattern>
                         </relocation>
+                        <!-- Required by FoliaLib : it checks at runtime that it was relocated and
+                             warns (conflicts with other plugins bundling it) otherwise. -->
+                        <relocation>
+                            <pattern>com.tcoded.folialib</pattern>
+                            <shadedPattern>fr.florianpal.fauction.folialib</shadedPattern>
+                        </relocation>
                     </relocations>
                     <artifactSet>
                         <excludes>
@@ -153,10 +159,10 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
-        <!--Aikar Repo, still needed by taskchain-bukkit-->
+        <!--TCoded Repo, needed by FoliaLib-->
         <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
+            <id>tcoded</id>
+            <url>https://repo.tcoded.com/releases</url>
         </repository>
         <!--Vault Repo-->
         <repository>
@@ -242,11 +248,11 @@
             <version>7.1.0</version>
             <scope>compile</scope>
         </dependency>
-        <!--TaskChain-->
+        <!--FoliaLib : Paper/Folia-aware scheduling, replaces TaskChain-->
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>taskchain-bukkit</artifactId>
-            <version>3.7.2</version>
+            <groupId>com.tcoded</groupId>
+            <artifactId>FoliaLib</artifactId>
+            <version>0.5.1</version>
         </dependency>
         <!--Vault-->
         <dependency>

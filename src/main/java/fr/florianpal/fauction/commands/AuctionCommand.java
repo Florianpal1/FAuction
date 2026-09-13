@@ -98,28 +98,28 @@ public class AuctionCommand {
 
         switch (globalConfig.getDefaultGui()) {
             case "AUCTION":
-                FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+                FAuction.newChain(playerSender).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
                     AuctionsGui auctionsGui = new AuctionsGui(plugin, playerSender, auctions, 1, null, null);
                     auctionsGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "EXPIRE":
-                FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(expires -> {
+                FAuction.newChain(playerSender).asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(expires -> {
                     ExpireGui expireGui = new ExpireGui(plugin, playerSender, expires, 1, null, null);
                     expireGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "HISTORIC":
-                FAuction.newChain().asyncFirst(() -> historicCommandManager.getHistorics(playerSender.getUniqueId())).syncLast(historics -> {
+                FAuction.newChain(playerSender).asyncFirst(() -> historicCommandManager.getHistorics(playerSender.getUniqueId())).syncLast(historics -> {
                     HistoricGui historicGui = new HistoricGui(plugin, playerSender, ListUtil.historicToAuction(historics), 1, null, null);
                     historicGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
                 }).execute();
                 break;
             case "PLAYER":
-                FAuction.newChain().asyncFirst(() -> auctionCommandManager.getAuctions(playerSender.getUniqueId())).syncLast(auctions -> {
+                FAuction.newChain(playerSender).asyncFirst(() -> auctionCommandManager.getAuctions(playerSender.getUniqueId())).syncLast(auctions -> {
                     PlayerViewGui playerViewGui = new PlayerViewGui(plugin, playerSender, auctions, 1, null, null);
                     playerViewGui.initialize();
                     MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
@@ -155,7 +155,7 @@ public class AuctionCommand {
             return;
         }
 
-        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+        FAuction.newChain(playerSender).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
             AuctionsGui auctionsGui = new AuctionsGui(plugin, playerSender, auctions, 1, new Category("-1", material.name(), List.of(material.toString())), null);
             auctionsGui.initialize();
             MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
@@ -191,7 +191,7 @@ public class AuctionCommand {
 
         AtomicBoolean itemTaken = new AtomicBoolean(false);
 
-        FAuction.newChain().asyncFirst(() -> plugin.getAuctionCommandManager().getAuctions(playerSender.getUniqueId())).syncLast(auctions -> {
+        FAuction.newChain(playerSender).asyncFirst(() -> plugin.getAuctionCommandManager().getAuctions(playerSender.getUniqueId())).syncLast(auctions -> {
 
             int limitations;
             if (plugin.getConfigurationManager().getGlobalConfig().isLimitationsUseMetaLuckperms()) {
@@ -225,7 +225,7 @@ public class AuctionCommand {
             playerSender.updateInventory();
             itemTaken.set(true);
 
-            FAuction.newChain().asyncFirst(() -> auctionCommandManager.addAuction(playerSender, itemToSell, price)).syncLast(added -> {
+            FAuction.newChain(playerSender).asyncFirst(() -> auctionCommandManager.addAuction(playerSender, itemToSell, price)).syncLast(added -> {
 
                 // The hash only guards this sale while it is in flight ; it must not survive the
                 // round trip, or every future sale of a visually identical item would be blocked
@@ -389,7 +389,7 @@ public class AuctionCommand {
     @CommandDescription("{@@fauction.expire_add_help_description}")
     public void onExpire(Player playerSender) {
 
-        FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(auctions -> {
+        FAuction.newChain(playerSender).asyncFirst(() -> expireCommandManager.getExpires(playerSender.getUniqueId())).syncLast(auctions -> {
             ExpireGui gui = new ExpireGui(plugin, playerSender, auctions, 1, null, null);
             gui.initialize();
             MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_OPEN);
