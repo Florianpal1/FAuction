@@ -214,7 +214,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         Optional<BarrierWithCategory> auctionGuiBarrierOptional = abstractGuiConfig.getAuctionGuiBlocks().stream().filter(auctionGui -> e.getRawSlot() == auctionGui.getIndex()).findFirst();
         if (auctionGuiBarrierOptional.isPresent()) {
 
-            FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+            FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
                 AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, auctionGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
@@ -224,7 +224,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         Optional<BarrierWithCategory> expireGuiBarrierOptional = abstractGuiConfig.getExpireBlocks().stream().filter(expire -> e.getRawSlot() == expire.getIndex()).findFirst();
         if (expireGuiBarrierOptional.isPresent()) {
 
-            FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(auctions -> {
+            FAuction.newChain(player).asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(auctions -> {
                 ExpireGui gui = new ExpireGui(plugin, player, auctions, 1, expireGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
@@ -248,7 +248,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         Optional<BarrierWithCategory> playerGuiBarrierOptional = abstractGuiConfig.getPlayerBlocks().stream().filter(p -> e.getRawSlot() == p.getIndex()).findFirst();
         if (playerGuiBarrierOptional.isPresent()) {
 
-            FAuction.newChain().asyncFirst(() ->  auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
+            FAuction.newChain(player).asyncFirst(() ->  auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
                 PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, 1, playerGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();
@@ -258,7 +258,7 @@ public abstract class AbstractGui implements InventoryHolder, Listener {
         Optional<BarrierWithCategory> historicGuiBarrierOptional = abstractGuiConfig.getHistoricBlocks().stream().filter(p -> e.getRawSlot() == p.getIndex()).findFirst();
         if (historicGuiBarrierOptional.isPresent()) {
 
-            FAuction.newChain().asyncFirst(() -> historicCommandManager.getHistorics(player.getUniqueId())).syncLast(historics -> {
+            FAuction.newChain(player).asyncFirst(() -> historicCommandManager.getHistorics(player.getUniqueId())).syncLast(historics -> {
                 HistoricGui gui = new HistoricGui(plugin, player, ListUtil.historicToAuction(historics), 1, historicGuiBarrierOptional.get().getCategory(), null);
                 gui.initialize();
             }).execute();

@@ -1,8 +1,6 @@
 package fr.florianpal.fauction;
 
-import co.aikar.taskchain.BukkitTaskChainFactory;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
+import com.tcoded.folialib.FoliaLib;
 import fr.florianpal.fauction.commands.AuctionCommand;
 import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.enums.SQLType;
@@ -19,12 +17,14 @@ import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.utils.FormatUtil;
+import fr.florianpal.fauction.utils.scheduling.SchedulerChain;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import me.seetch.mlang.MLang;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,7 +35,7 @@ public class FAuction extends JavaPlugin {
 
     private static FAuction api;
 
-    private static TaskChainFactory taskChainFactory;
+    private static FoliaLib foliaLib;
 
     @Getter
     private ConfigurationManager configurationManager;
@@ -93,12 +93,24 @@ public class FAuction extends JavaPlugin {
     @Getter
     private boolean placeholderAPIEnabled = false;
 
-    public static <T> TaskChain<T> newChain() {
-        return taskChainFactory.newChain();
+    /**
+     * A chain whose sync step runs on the global region ; use {@link #newChain(Entity)} instead
+     * when the sync step touches a specific player/entity (e.g. their inventory).
+     */
+    public static SchedulerChain<Void> newChain() {
+        return SchedulerChain.newChain(foliaLib, api.getLogger());
     }
 
-    public static TaskChainFactory getTaskChainFactory() {
-        return taskChainFactory;
+    /**
+     * A chain whose sync step runs on the region owning {@code entity}, even if that region moves
+     * under Folia.
+     */
+    public static SchedulerChain<Void> newChain(Entity entity) {
+        return SchedulerChain.newChain(foliaLib, api.getLogger(), entity);
+    }
+
+    public static FoliaLib getFoliaLib() {
+        return foliaLib;
     }
 
     @Getter
@@ -110,7 +122,7 @@ public class FAuction extends JavaPlugin {
         metrics = new Metrics(this, 24018);
         PaperLib.suggestPaper(this);
 
-        taskChainFactory = BukkitTaskChainFactory.create(this);
+        foliaLib = new FoliaLib(this);
 
         try {
             configurationManager = new ConfigurationManager(this);

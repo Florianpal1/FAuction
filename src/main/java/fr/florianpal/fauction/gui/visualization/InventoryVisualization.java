@@ -98,12 +98,12 @@ public class InventoryVisualization implements InventoryHolder, Listener {
         isClosed = true;
 
         if (Gui.AUCTION.equals(gui)) {
-            FAuction.newChain().asyncFirst(() -> plugin.getAuctionCommandManager().getAuctions()).syncLast(auctions -> {
+            FAuction.newChain(player).asyncFirst(() -> plugin.getAuctionCommandManager().getAuctions()).syncLast(auctions -> {
                 AuctionsGui auctionsGui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                 auctionsGui.initialize();
             }).execute();
         } else if (Gui.CONFIRM.equals(gui)) {
-            FAuction.newChain().sync(() -> {
+            FAuction.newChain(player).sync(() -> {
                 AuctionConfirmGui auctionConfirmGui = new AuctionConfirmGui(plugin, player, 1, auction);
                 auctionConfirmGui.initialize();
             }).execute();

@@ -32,7 +32,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void previousAction() {
-        FAuction.newChain().asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
+        FAuction.newChain(player).asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
             ExpireGui gui = new ExpireGui(plugin, player, expires, this.page - 1, category, sort);
             gui.initialize();
         }).execute();
@@ -40,7 +40,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void nextAction() {
-        FAuction.newChain().asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
+        FAuction.newChain(player).asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
             ExpireGui gui = new ExpireGui(plugin, player, expires, this.page + 1, category, sort);
             gui.initialize();
         }).execute();
@@ -48,7 +48,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void categoryAction(Category nextCategory) {
-        FAuction.newChain().asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
+        FAuction.newChain(player).asyncFirst(expireCommandManager::getExpires).syncLast(expires -> {
             ExpireGui gui = new ExpireGui(plugin, player, auctions,1 , nextCategory, sort);
             gui.initialize();
         }).execute();
@@ -56,7 +56,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void sortingAction(Sort nextSort) {
-        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+        FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
             AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, category, nextSort);
             gui.initialize();
         }).execute();
@@ -108,7 +108,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
                         return;
                     }
 
-                    FAuction.newChain().asyncFirst(() -> expireCommandManager.claim(expireId)).syncLast(a -> {
+                    FAuction.newChain(player).asyncFirst(() -> expireCommandManager.claim(expireId)).syncLast(a -> {
 
                         // The row is already gone : nothing can be handed over twice from here.
                         if (a == null) {
@@ -126,7 +126,7 @@ public class ExpireGui extends AbstractGuiWithAuctions {
 
                         MessageUtil.sendMessage(plugin, player, MessageKeys.REMOVE_EXPIRE_SUCCESS);
 
-                        FAuction.newChain().asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(expires -> {
+                        FAuction.newChain(player).asyncFirst(() -> expireCommandManager.getExpires(player.getUniqueId())).syncLast(expires -> {
                             ExpireGui gui = new ExpireGui(plugin, player, expires, 1, category, sort);
                             gui.initialize();
                         }).execute();

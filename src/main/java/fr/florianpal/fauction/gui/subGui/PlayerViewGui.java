@@ -36,7 +36,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void previousAction() {
-        FAuction.newChain().asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
+        FAuction.newChain(player).asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, this.page - 1, category, sort);
             gui.initialize();
         }).execute();
@@ -44,7 +44,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void nextAction() {
-        FAuction.newChain().asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
+        FAuction.newChain(player).asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions, this.page + 1, category, sort);
             gui.initialize();
         }).execute();
@@ -52,7 +52,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void categoryAction(Category nextCategory) {
-        FAuction.newChain().asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
+        FAuction.newChain(player).asyncFirst(() -> auctionCommandManager.getAuctions(player.getUniqueId())).syncLast(auctions -> {
             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctions,1 , nextCategory, sort);
             gui.initialize();
         }).execute();
@@ -60,7 +60,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
 
     @Override
     protected void sortingAction(Sort nextSort) {
-        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+        FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
             AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, category, nextSort);
             gui.initialize();
         }).execute();
@@ -107,7 +107,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                         return;
                     }
 
-                    FAuction.newChain().asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(a -> {
+                    FAuction.newChain(player).asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(a -> {
 
                         // The row is already gone : nothing can be handed over twice from here.
                         if (a == null) {
@@ -134,7 +134,7 @@ public class PlayerViewGui extends AbstractGuiWithAuctions {
                         }
                         player.closeInventory();
 
-                        FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctionsNew -> {
+                        FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctionsNew -> {
                             PlayerViewGui gui = new PlayerViewGui(plugin, player, auctionsNew, this.page, category, sort);
                             gui.initialize();
                         }).execute();

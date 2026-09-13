@@ -234,7 +234,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                 Confirm confirm = confirmList.get(e.getRawSlot());
                 if (!confirm.isValue()) {
                     MessageUtil.sendMessage(plugin, player, MessageKeys.BUY_AUCTION_CANCELLED);
-                    FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+                    FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
                         AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                         gui.initialize();
                     }).execute();
@@ -257,7 +257,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
                     return;
                 }
 
-                FAuction.newChain().asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(auctionGood -> {
+                FAuction.newChain(player).asyncFirst(() -> auctionCommandManager.claim(auctionId)).syncLast(auctionGood -> {
 
                     // The row is already gone : the item cannot be handed over twice from here.
                     if (auctionGood == null) {
@@ -308,7 +308,7 @@ public class AuctionConfirmGui extends AbstractGuiWithAuctions {
 
                     plugin.getLogger().info("Player : " + player.getName() + " buy " + auctionGood.getItemStack().getItemMeta().getDisplayName() + " at " + auctionGood.getPlayerName());
 
-                    FAuction.newChain().asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
+                    FAuction.newChain(player).asyncFirst(auctionCommandManager::getAuctions).syncLast(auctions -> {
                         AuctionsGui gui = new AuctionsGui(plugin, player, auctions, 1, null, null);
                         gui.initialize();
                     }).execute();
