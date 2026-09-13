@@ -18,6 +18,7 @@ import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
 import fr.florianpal.fauction.utils.FormatUtil;
 import fr.florianpal.fauction.utils.scheduling.SchedulerChain;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import io.papermc.lib.PaperLib;
 import lombok.Getter;
 import me.seetch.mlang.MLang;
@@ -92,6 +93,12 @@ public class FAuction extends JavaPlugin {
 
     @Getter
     private boolean placeholderAPIEnabled = false;
+
+    private WrappedTask expireTask;
+
+    private WrappedTask cacheTask;
+
+    private WrappedTask currencyTask;
 
     /**
      * A chain whose sync step runs on the global region ; use {@link #newChain(Entity)} instead
@@ -180,13 +187,16 @@ public class FAuction extends JavaPlugin {
         }
 
         if (configurationManager.getGlobalConfig().isFeatureFlippingExpiration()) {
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new ExpireSchedule(this), configurationManager.getGlobalConfig().getCheckEvery(), configurationManager.getGlobalConfig().getCheckEvery());
+            long checkEvery = configurationManager.getGlobalConfig().getCheckEvery();
+            expireTask = foliaLib.getScheduler().runTimer(new ExpireSchedule(this), checkEvery, checkEvery);
         }
         if (configurationManager.getGlobalConfig().isFeatureFlippingCacheUpdate()) {
-            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new CacheSchedule(this), configurationManager.getGlobalConfig().getUpdateCacheEvery(), configurationManager.getGlobalConfig().getUpdateCacheEvery());
+            long updateCacheEvery = configurationManager.getGlobalConfig().getUpdateCacheEvery();
+            cacheTask = foliaLib.getScheduler().runTimer(new CacheSchedule(this), updateCacheEvery, updateCacheEvery);
         }
 
-        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new CurrencyScheduler(this), configurationManager.getGlobalConfig().getCheckEveryCurrency(), configurationManager.getGlobalConfig().getCheckEveryCurrency());
+        long checkEveryCurrency = configurationManager.getGlobalConfig().getCheckEveryCurrency();
+        currencyTask = foliaLib.getScheduler().runTimer(new CurrencyScheduler(this), checkEveryCurrency, checkEveryCurrency);
 
         api = this;
 
@@ -222,6 +232,17 @@ public class FAuction extends JavaPlugin {
         if (databaseManager == null) {
             return;
         }
+
+        if (expireTask != null) {
+            expireTask.cancel();
+        }
+        if (cacheTask != null) {
+            cacheTask.cancel();
+        }
+        if (currencyTask != null) {
+            currencyTask.cancel();
+        }
+        spamManager.shutdown();
 
         if (configurationManager.getDatabase().getSqlType().equals(SQLType.SQLite)) {
             auctionCommandManager.deleteAllOnlyOnDB();

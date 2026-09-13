@@ -7,6 +7,7 @@ import fr.florianpal.fauction.languages.MessageKeys;
 import fr.florianpal.fauction.objects.SpamLimit;
 import fr.florianpal.fauction.objects.TokenBucket;
 import fr.florianpal.fauction.utils.MessageUtil;
+import com.tcoded.folialib.wrapper.task.WrappedTask;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -61,12 +62,21 @@ public class SpamManager implements Listener {
      */
     private final long startNano = System.nanoTime();
 
+    private final WrappedTask purgeTask;
+
     public SpamManager(FAuction plugin) {
         this.plugin = plugin;
         this.globalConfig = plugin.getConfigurationManager().getGlobalConfig();
 
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        Bukkit.getScheduler().runTaskTimer(plugin, this::purge, PURGE_INTERVAL, PURGE_INTERVAL);
+        this.purgeTask = FAuction.getFoliaLib().getScheduler().runTimer(this::purge, PURGE_INTERVAL, PURGE_INTERVAL);
+    }
+
+    /**
+     * Cancels the purge task ; called from {@link FAuction#onDisable()}.
+     */
+    public void shutdown() {
+        purgeTask.cancel();
     }
 
     @EventHandler
