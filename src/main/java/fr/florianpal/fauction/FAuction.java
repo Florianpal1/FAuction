@@ -274,6 +274,21 @@ public class FAuction extends JavaPlugin {
             valueMap.put(TimeZone.getDefault().getID(), count);
             return valueMap;
         }));
+
+        metrics.addCustomChart(new AdvancedPie("player_per_version", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
+            List<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+
+            int count = 0;
+            for (Player player : onlinePlayers) {
+                if (player.isValid() && player.isOnline()) {
+                    count = count + 1;
+                }
+            }
+
+            valueMap.put(this.getPluginMeta().getVersion(), count);
+            return valueMap;
+        }));
     }
 
     /**
