@@ -27,6 +27,7 @@
 - [Permissions](#permissions)
 - [Configuration](#configuration)
   - [Main Configuration](#main-configuration-configyml)
+  - [Command names and aliases](#command-names-and-aliases)
   - [Database](#database-databaseyml)
   - [Categories](#categories-categoriesyml)
   - [Sorting](#sorting-sortyml)
@@ -101,7 +102,9 @@
 
 ## Commands
 
-All commands use the `/ah` alias (or `/hdv`).
+All commands use the `/ah` alias (or `/hdv`). Every name below is a default: the `commands:` section
+of `config.yml` renames them and gives them as many aliases as you want — see
+[Command names and aliases](#command-names-and-aliases).
 
 ### Player Commands
 
@@ -175,6 +178,15 @@ currencyUse: VAULT                 # VAULT, EXPERIENCE, or LEVEL
 
 defaultGui: AUCTION                # Default GUI: AUCTION, EXPIRE, HISTORIC, PLAYER, or MENU:<name>
 
+commands:                          # Names and aliases of the commands, see below
+  root: ["ah", "hdv"]
+  list: ["list"]
+  search: ["search"]
+  sell: ["sell"]
+  expire: ["expire"]
+  help: ["help"]
+  admin: ["admin"]
+
 feature-flipping:
   item-expiration: true            # Enable automatic auction expiration
   cache-update: true               # Enable periodic cache refresh
@@ -224,6 +236,31 @@ anti-spam:                         # One budget per action type: "burst" actions
     burst: 4
     perSecond: 2
 ```
+
+### Command names and aliases
+
+The `commands:` section of `config.yml` decides the name each command answers to. The **first value
+of a list is the main name** — the one `/ah help` and the error messages show — and the next ones are
+aliases:
+
+```yaml
+commands:
+  root: ["marche", "ah", "hdv"]    # /marche, /ah and /hdv all open the auction house
+  sell: ["vendre", "sell"]         # /marche vendre 10 and /marche sell 10 both sell
+  admin: ["gestion"]               # /marche gestion reload
+```
+
+- **Permissions never move.** Renaming `sell` into `vendre` keeps `fauction.sell`: your LuckPerms
+  setup is untouched.
+- **A change takes effect on the next server start.** The server only takes the commands a plugin
+  registers while it is starting, so `/ah admin reload` re-reads the file and tells you a restart is
+  needed — it cannot rename a command that is already registered.
+- **A name is one word**, without any of `| < > [ ] { } : / \ $ " '`, and is lowercased.
+- **A mistake is never fatal.** An unusable name is ignored, and two subcommands claiming the same
+  name send the whole section back to the defaults. Either way the plugin starts and the console says
+  exactly what was refused.
+- Leaving the section out, or leaving a key out, keeps the historical names.
+- If another plugin already owns the name you chose, `/fauction:<name>` always reaches FAuction.
 
 ### Database (`database.yml`)
 

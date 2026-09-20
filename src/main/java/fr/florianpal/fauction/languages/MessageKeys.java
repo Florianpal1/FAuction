@@ -27,6 +27,8 @@ public enum MessageKeys {
 
     AUCTION_RELOAD,
 
+    COMMANDS_RESTART_REQUIRED,
+
     CLEAR_CACHE,
 
     REMOVE_EXPIRE_SUCCESS,

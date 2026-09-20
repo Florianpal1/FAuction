@@ -1,9 +1,28 @@
-version: 11
+version: 12
 lang: "en"
 
 currencyUse: VAULT # VAULT, EXPERIENCE, LEVEL
 
 defaultGui: AUCTION # The default gui open with /ah command
+
+# Names and aliases of the commands.
+# The FIRST value of a list is the main name, the one shown in /ah help and in the error messages ;
+# the next ones are aliases. Ex : sell: ["vendre", "sell"] makes /ah vendre 10 and /ah sell 10 work,
+# and the help shows "vendre".
+# - The permissions never change : renaming "sell" keeps fauction.sell.
+# - A name must be a single word, without any of | < > [ ] { } : / \ $ " '
+# - An unusable entry, or two subcommands sharing a name, is ignored and the defaults are used
+#   instead : look at the server console, it says exactly what was refused.
+# - The commands are registered when the server starts : a change here needs a full restart,
+#   /ah admin reload is not enough.
+commands:
+  root: ["ah", "hdv"]
+  list: ["list"]
+  search: ["search"]
+  sell: ["sell"]
+  expire: ["expire"]
+  help: ["help"]
+  admin: ["admin"]
 
 feature-flipping:
   item-expiration: true

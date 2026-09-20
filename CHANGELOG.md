@@ -2,6 +2,28 @@
 
 ## Unreleased
 
+### Command names and aliases are yours
+
+The `commands:` section of `config.yml` decides the name every command answers to. `/ah` can become
+`/marche`, `/ah sell 10` can become `/marche vendre 10`, and each command takes as many aliases as
+you want — the first name of a list is the main one, the one the help and the error messages show.
+
+```yaml
+commands:
+  root: ["marche", "ah", "hdv"]
+  sell: ["vendre", "sell"]
+```
+
+- **Your permissions do not move.** Renaming `sell` keeps `fauction.sell`.
+- **A change needs a server restart.** The server only takes the commands a plugin registers while it
+  is starting. `/ah admin reload` re-reads the section and tells you — in the console and in game —
+  that a restart is needed, rather than pretending the new name works.
+- **A mistake in the section is never fatal**: an unusable name is ignored, two subcommands claiming
+  the same name send the whole section back to the defaults, and the console says exactly what was
+  refused.
+- Leaving the section out keeps `/ah` and `/hdv` exactly as they were. An existing `config.yml` gains
+  the section on update without losing a single value.
+
 ### Command framework replaced: ACF → Cloud
 
 The commands no longer run on [ACF](https://github.com/aikar/commands), which is no longer maintained

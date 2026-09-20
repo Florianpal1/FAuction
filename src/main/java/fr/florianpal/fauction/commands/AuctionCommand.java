@@ -47,10 +47,18 @@ import static java.lang.Math.ceil;
 public class AuctionCommand {
 
     /**
-     * The root of every command path. {@code hdv} is the historical alias, declared as a literal of
-     * the path exactly like ACF's {@code @CommandAlias} did.
+     * The root of every command path.
+     * <p>
+     * The {@code ${...}} are not read by Cloud : {@link fr.florianpal.fauction.commands.CommandPlaceholders}
+     * replaces each of them with the names of the {@code commands:} section of config.yml —
+     * {@code ah|hdv} by default — while the annotations are parsed. Every placeholder used here must
+     * be a {@link fr.florianpal.fauction.enums.CommandKey}, which {@code AuctionCommandAnnotationsTest}
+     * checks at build time.
+     * <p>
+     * The permissions below are deliberately left out of that mechanism : renaming a command must
+     * not move its permission node.
      */
-    private static final String ROOT = "ah|hdv ";
+    private static final String ROOT = "${root} ";
 
     static final String PRICE_PARSER = "fauction:price";
 
@@ -88,8 +96,8 @@ public class AuctionCommand {
 
     // Two paths, one handler, as under ACF (@Default + @Subcommand("list")) : a bare /ah is the
     // main entry point of the plugin and must not be lost.
-    @Command("ah|hdv")
-    @Command(ROOT + "list")
+    @Command("${root}")
+    @Command(ROOT + "${list}")
     @Permission("fauction.list")
     @CommandDescription("{@@fauction.auction_list_help_description}")
     public void onList(Player playerSender) {
@@ -143,7 +151,7 @@ public class AuctionCommand {
 
     }
 
-    @Command(ROOT + "search <material>")
+    @Command(ROOT + "${search} <material>")
     @Permission("fauction.search")
     @CommandDescription("{@@fauction.auction_search_help_description}")
     public void onSearch(Player playerSender, Material material) {
@@ -164,7 +172,7 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "sell <priceEntry>")
+    @Command(ROOT + "${sell} <priceEntry>")
     @Permission("fauction.sell")
     @CommandDescription("{@@fauction.auction_add_help_description}")
     public void onAdd(Player playerSender, @Argument(value = "priceEntry", parserName = PRICE_PARSER) double priceEntry) {
@@ -405,7 +413,7 @@ public class AuctionCommand {
         return true;
     }
 
-    @Command(ROOT + "expire")
+    @Command(ROOT + "${expire}")
     @Permission("fauction.expire")
     @CommandDescription("{@@fauction.expire_add_help_description}")
     public void onExpire(Player playerSender) {
@@ -417,16 +425,22 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "admin reload")
+    @Command(ROOT + "${admin} reload")
     @Permission("fauction.admin.reload")
     @CommandDescription("{@@fauction.reload_help_description}")
     public void onReload(Player playerSender) {
 
-        plugin.reloadConfiguration();
+        boolean commandNamesChanged = plugin.reloadConfiguration();
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.AUCTION_RELOAD);
+
+        // The commands answer under the names Bukkit was given when the plugin enabled ; the ones
+        // just read from config.yml only take effect on the next start.
+        if (commandNamesChanged) {
+            MessageUtil.sendMessage(plugin, playerSender, MessageKeys.COMMANDS_RESTART_REQUIRED);
+        }
     }
 
-    @Command(ROOT + "admin purge all")
+    @Command(ROOT + "${admin} purge all")
     @Permission("fauction.admin.purge.all")
     @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAll(Player playerSender) {
@@ -437,7 +451,7 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "admin purge historic")
+    @Command(ROOT + "${admin} purge historic")
     @Permission("fauction.admin.purge.hictoric")
     @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllHistoric(Player playerSender) {
@@ -448,7 +462,7 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "admin purge expire")
+    @Command(ROOT + "${admin} purge expire")
     @Permission("fauction.admin.purge.expire")
     @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllExpire(Player playerSender) {
@@ -459,7 +473,7 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "admin purge auction")
+    @Command(ROOT + "${admin} purge auction")
     @Permission("fauction.admin.purge.auction")
     @CommandDescription("{@@fauction.reload_help_description}")
     public void onPurgeAllAucton(Player playerSender) {
@@ -470,7 +484,7 @@ public class AuctionCommand {
         }).execute();
     }
 
-    @Command(ROOT + "admin transfertToPaper")
+    @Command(ROOT + "${admin} transfertToPaper")
     @Permission("fauction.admin.transfertBddToPaper")
     @CommandDescription("{@@fauction.transfert_bdd_help_description}")
     public void onTransferBddPaper(Player playerSender) {
@@ -479,7 +493,7 @@ public class AuctionCommand {
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.TRANSFERT_BDD);
     }
 
-    @Command(ROOT + "admin transfertToBukkit")
+    @Command(ROOT + "${admin} transfertToBukkit")
     @Permission("fauction.admin.transfertBddToPaper")
     @CommandDescription("{@@fauction.transfert_bdd_help_description}")
     public void onTransferBddSpigot(Player playerSender) {
@@ -488,7 +502,7 @@ public class AuctionCommand {
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.TRANSFERT_BDD);
     }
 
-    @Command(ROOT + "admin migrate <migrateVersion>")
+    @Command(ROOT + "${admin} migrate <migrateVersion>")
     @Permission("fauction.admin.migrate")
     @CommandDescription("{@@fauction.migrate_help_description}")
     public void onMigrate(Player playerSender,
@@ -498,7 +512,7 @@ public class AuctionCommand {
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIGRATE, "{version}", migrateVersion.getId());
     }
 
-    @Command(ROOT + "help [query]")
+    @Command(ROOT + "${help} [query]")
     @CommandDescription("{@@fauction.help_description}")
     public void doHelp(CommandSender sender, @Argument("query") @Greedy String query) {
         plugin.getCommandManager().help(sender, query == null ? "" : query);

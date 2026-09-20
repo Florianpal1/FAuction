@@ -10,12 +10,12 @@ import java.nio.charset.StandardCharsets;
 /**
  * Builds a configuration from a yaml written inline, with the same settings as the plugin.
  */
-final class TestConfigs {
+public final class TestConfigs {
 
     private TestConfigs() {
     }
 
-    static YamlDocument of(String yaml) {
+    public static YamlDocument of(String yaml) {
         try {
             return YamlDocument.create(
                     new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8)),

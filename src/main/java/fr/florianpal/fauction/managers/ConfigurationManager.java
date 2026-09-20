@@ -8,6 +8,7 @@ import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.configurations.CategoriesConfig;
+import fr.florianpal.fauction.configurations.CommandsConfig;
 import fr.florianpal.fauction.configurations.DatabaseConfig;
 import fr.florianpal.fauction.configurations.GlobalConfig;
 import fr.florianpal.fauction.configurations.SortConfig;
@@ -47,6 +48,9 @@ public class ConfigurationManager {
     @Getter
     private final GlobalConfig globalConfig = new GlobalConfig();
     private YamlDocument globalConfiguration;
+
+    @Getter
+    private final CommandsConfig commandsConfig = new CommandsConfig();
 
     @Getter
     private final CategoriesConfig categoriesConfig = new CategoriesConfig();
@@ -155,6 +159,8 @@ public class ConfigurationManager {
         categoriesConfig.load(categoriesConfiguration);
         sortConfig.load(sortConfiguration);
         globalConfig.load(globalConfiguration);
+        // The commands are registered once, at startup, from the names read here.
+        commandsConfig.load(globalConfiguration, plugin.getLogger());
         auctionConfig.load(plugin, auctionConfiguration);
         historicConfig.load(plugin, historicConfiguration);
         auctionConfirmConfig.load(plugin, auctionConfirmConfiguration);
