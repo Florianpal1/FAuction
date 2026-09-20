@@ -2,6 +2,7 @@ package fr.florianpal.fauction.managers.commandmanagers;
 
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.commands.AuctionCommand;
+import fr.florianpal.fauction.commands.CommandPlaceholders;
 import fr.florianpal.fauction.commands.FAuctionHelp;
 import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.languages.MessageKeys;
@@ -61,6 +62,12 @@ public class CommandManager {
         registerExceptionHandlers();
 
         this.annotationParser = new AnnotationParser<>(manager, CommandSender.class);
+
+        // The names the commands are registered under come from config.yml, not from the annotations.
+        // Read once here : Bukkit keeps the commands it was given at startup, so /ah admin reload can
+        // only warn that they changed (FAuction#reloadConfiguration).
+        this.annotationParser.stringProcessor(
+                new CommandPlaceholders(plugin.getConfigurationManager().getCommandsConfig()));
 
         // ACF resolved {@@key} against the language file. Cloud knows nothing of that syntax, so the
         // resolution happens here : the four language files keep driving the help.

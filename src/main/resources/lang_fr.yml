@@ -32,6 +32,7 @@ fauction:
   min_price: "Votre prix est en dessous du prix minimum de {minPrice}."
   max_price: "Votre prix est au dessus du prix maximum de {maxPrice}."
   auction_reload: "La configuration du plugin a été recharger."
+  commands_restart_required: "&eLes noms des commandes ont changé : redémarrez le serveur pour qu'ils prennent effet."
   spam: "&cStop! Vous tentez d'effectuer trop d'actions dans un délai très court! Veuillez patienter quelques secondes..."
   clear_cache: "Vous avez vidé le cache."
 

@@ -32,6 +32,7 @@ fauction:
   min_price: "你设置的价格低于最低价 {minPrice}."
   max_price: "你设置的价格高于最高价 {maxPrice}."
   auction_reload: "插件配置已重载."
+  commands_restart_required: "&e命令名称已更改：请重启服务器以使其生效."
   clear_cache: "你已清空缓存."
   migrate: "你已迁移至版本 {version}."
   spam: "&c等等! 你在短时间内执行了太多次购买操作! 请再等一会..."
