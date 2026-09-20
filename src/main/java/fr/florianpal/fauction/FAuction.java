@@ -2,6 +2,7 @@ package fr.florianpal.fauction;
 
 import com.tcoded.folialib.FoliaLib;
 import fr.florianpal.fauction.commands.AuctionCommand;
+import fr.florianpal.fauction.enums.CommandKey;
 import fr.florianpal.fauction.enums.MigrateVersion;
 import fr.florianpal.fauction.enums.SQLType;
 import fr.florianpal.fauction.managers.*;
@@ -273,11 +274,45 @@ public class FAuction extends JavaPlugin {
             valueMap.put(TimeZone.getDefault().getID(), count);
             return valueMap;
         }));
+
+        metrics.addCustomChart(new AdvancedPie("player_per_version", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
+            List<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+
+            int count = 0;
+            for (Player player : onlinePlayers) {
+                if (player.isValid() && player.isOnline()) {
+                    count = count + 1;
+                }
+            }
+
+            valueMap.put(this.getPluginMeta().getVersion(), count);
+            return valueMap;
+        }));
     }
 
-    public void reloadConfiguration() {
+    /**
+     * Reloads every configuration file and the language file.
+     *
+     * @return whether the names of the commands changed. Bukkit only takes the commands a plugin
+     * registers while it is enabling, so the new names cannot answer before the server is
+     * restarted ; saying nothing would leave the administrator typing a command that does not
+     * exist yet.
+     */
+    public boolean reloadConfiguration() {
+
+        Map<CommandKey, List<String>> namesBefore = configurationManager.getCommandsConfig().snapshot();
+
         configurationManager.reload(this);
         lang.load(this);
+
+        boolean commandNamesChanged = !namesBefore.equals(configurationManager.getCommandsConfig().snapshot());
+        if (commandNamesChanged) {
+            getLogger().warning("The commands section of config.yml changed. The commands are registered when the "
+                    + "server starts : restart it for the new names to answer.");
+        }
+
+        return commandNamesChanged;
     }
 
     public void purgeAllData() {
