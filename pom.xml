@@ -14,7 +14,7 @@
         <!--Cloud : cloud-paper/extras follow the cloud-minecraft train, cloud-core/annotations the cloud one-->
         <cloud.core.version>2.1.0</cloud.core.version>
         <cloud.paper.version>2.0.1</cloud.paper.version>
-        <cloud.minecraft.version>2.0.0</cloud.minecraft.version>
+        <cloud.minecraft.version>2.0.1</cloud.minecraft.version>
     </properties>
 
     <distributionManagement>
