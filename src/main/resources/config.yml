@@ -1,4 +1,4 @@
-version: 11
+version: 12
 lang: "en"
 
 currencyUse: VAULT # VAULT, EXPERIENCE, LEVEL
@@ -12,6 +12,9 @@ feature-flipping:
   duplication-hashcode-control: false
 
 decimalFormat: "0.00"
+
+update-checker:
+  enabled: true # Check GitHub at startup and on reload for a new release and warn the console
 
 orderBy: "ASC" # ASC or DESC / ASC : More recent to older / DESC : Older to more recent || Deprecated use sort.yml
 dateFormat: "dd/MM/yyyy ':' HH:mm"

@@ -236,6 +236,32 @@ class GlobalConfigTest {
         assertEquals(1, config.getLimitations().size());
     }
 
+    @Test
+    @DisplayName("The update check is on by default")
+    void updateCheckerIsOnByDefault() {
+
+        GlobalConfig config = new GlobalConfig();
+        config.load(TestConfigs.of(MINIMAL));
+
+        assertTrue(config.isUpdateCheckerEnabled());
+    }
+
+    @Test
+    @DisplayName("The update check can be turned off")
+    void updateCheckerCanBeDisabled() {
+
+        GlobalConfig config = new GlobalConfig();
+        config.load(TestConfigs.of("""
+                lang: "en"
+                update-checker:
+                  enabled: false
+                limitations:
+                  default: 5
+                """));
+
+        assertFalse(config.isUpdateCheckerEnabled());
+    }
+
     private void assertLimit(double burst, double perSecond, SpamLimit limit) {
         assertEquals(burst, limit.burst(), "burst");
         assertEquals(perSecond, limit.perSecond(), "perSecond");
