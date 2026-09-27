@@ -86,6 +86,9 @@ public class FAuction extends JavaPlugin {
     @Getter
     private TransfertManager transfertManager;
 
+    @Getter
+    private UpdateCheckerManager updateCheckerManager;
+
     private Metrics metrics;
 
     @Getter
@@ -198,6 +201,10 @@ public class FAuction extends JavaPlugin {
         long checkEveryCurrency = configurationManager.getGlobalConfig().getCheckEveryCurrency();
         currencyTask = foliaLib.getScheduler().runTimer(new CurrencyScheduler(this), checkEveryCurrency, checkEveryCurrency);
 
+        // Delayed so the warning is not drowned in the startup logs.
+        updateCheckerManager = new UpdateCheckerManager(this);
+        updateCheckerManager.checkAsync(20L * 30);
+
         api = this;
 
         initChart();
@@ -273,11 +280,27 @@ public class FAuction extends JavaPlugin {
             valueMap.put(TimeZone.getDefault().getID(), count);
             return valueMap;
         }));
+
+        metrics.addCustomChart(new AdvancedPie("player_per_version", () -> {
+            Map<String, Integer> valueMap = new HashMap<>();
+            List<Player> onlinePlayers = new ArrayList<>(Bukkit.getServer().getOnlinePlayers());
+
+            int count = 0;
+            for (Player player : onlinePlayers) {
+                if (player.isValid() && player.isOnline()) {
+                    count = count + 1;
+                }
+            }
+
+            valueMap.put(this.getPluginMeta().getVersion(), count);
+            return valueMap;
+        }));
     }
 
     public void reloadConfiguration() {
         configurationManager.reload(this);
         lang.load(this);
+        updateCheckerManager.checkAsync(0);
     }
 
     public void purgeAllData() {

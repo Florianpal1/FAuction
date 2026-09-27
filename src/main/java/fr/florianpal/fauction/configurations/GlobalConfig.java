@@ -73,6 +73,8 @@ public class GlobalConfig {
 
     private CurrencyType currencyType;
 
+    private boolean updateCheckerEnabled = true;
+
     public void load(YamlDocument config) {
         lang = config.getString("lang");
 
@@ -86,6 +88,8 @@ public class GlobalConfig {
         featureFlippingCacheUpdate = config.getBoolean("feature-flipping.cache-update", true);
         featureFlippingMoneyFormat = config.getBoolean("feature-flipping.money-format", false);
         featureDuplicationHashCodeControl = config.getBoolean("feature-flipping.duplication-hashcode-control", false);
+
+        updateCheckerEnabled = config.getBoolean("update-checker.enabled", true);
 
         orderBy = config.getString("orderBy");
         dateFormat = config.getString("dateFormat");

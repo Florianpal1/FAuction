@@ -181,6 +181,9 @@ feature-flipping:
   money-format: false              # Format currency values with decimal pattern
   duplication-hashcode-control: false  # Extra duplication prevention
 
+update-checker:
+  enabled: true                    # Warn the console at startup and on reload when a newer release is published on GitHub
+
 expiration:
   time: 3600                       # Expiration time in seconds (default: 1 hour)
   checkEvery: 72000                # Check interval in ticks (default: 1 hour)
