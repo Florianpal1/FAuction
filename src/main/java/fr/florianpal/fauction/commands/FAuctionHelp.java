@@ -1,6 +1,8 @@
 package fr.florianpal.fauction.commands;
 
 import fr.florianpal.fauction.FAuction;
+import fr.florianpal.fauction.configurations.CommandsConfig;
+import fr.florianpal.fauction.enums.CommandKey;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.CommandManager;
@@ -45,11 +47,14 @@ public final class FAuctionHelp {
     private final MinecraftHelp<CommandSender> help;
 
     public FAuctionHelp(FAuction plugin, CommandManager<CommandSender> manager) {
+        CommandsConfig commandsConfig = plugin.getConfigurationManager().getCommandsConfig();
         this.help = MinecraftHelp.<CommandSender>builder()
                 .commandManager(manager)
                 // CommandSender is an Audience on Paper, no adventure platform to bundle.
                 .audienceProvider(AudienceProvider.nativeAudience())
-                .commandPrefix("/ah help")
+                // The names the owner configured, not the defaults : every line of the help is a
+                // command the player can click and run.
+                .commandPrefix("/" + commandsConfig.primary(CommandKey.ROOT) + " " + commandsConfig.primary(CommandKey.HELP))
                 // Close to the yellow / gold / red ACF was configured with.
                 .colors(MinecraftHelp.helpColors(
                         NamedTextColor.GOLD,
