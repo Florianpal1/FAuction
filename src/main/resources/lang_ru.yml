@@ -12,6 +12,10 @@ fauction:
   clear_cache_help_description: "Очистить кэш"
   auction_search_help_description: "Поиск предмета"
   migrate_help_description: "Мигрировать на другую версию."
+  import_list_help_description: "Список модулей импорта и их доступность."
+  import_run_help_description: "Импортировать данные другого плагина аукциона."
+  import_status_help_description: "Ход текущего импорта."
+  import_cancel_help_description: "Отменить текущий импорт."
 
   buy_auction_success: "Вы успешно купили {item} за {price}."
   buy_auction_target_success: "Игрок {player} купил ваш предмет {item} за {price}."
@@ -44,6 +48,35 @@ fauction:
   transfert_bdd: "Перенос данных базы данных завершен."
   auction_purge: "Все данные были удалены."
 
+  import_sqlite_refused: "&cИмпорт требует общей SQL базы данных (MySQL, MariaDB или PostgreSQL): в SQLite продажи перезаписываются из памяти при остановке, и импортированные данные будут потеряны. Сначала переведите FAuction на одну из них."
+  import_already_running: "&cИмпорт уже выполняется: /ah admin import status или /ah admin import cancel."
+  import_no_type: "&cНи один из запрошенных типов не поддерживается этим модулем. Поддерживаются: &6{types}"
+  import_cancelled_by_event: "&cИмпорт отменён другим плагином."
+  import_invalid_options: "&cНеверные параметры: {error}"
+  import_confirm: "&eБудут импортированы данные &6{id}&e. Убедитесь, что база сохранена, а исходный плагин удалён, затем введите &6/ah admin import run {id} confirm&e в течение {seconds} секунд. Сначала пробный запуск: &6--dry-run"
+  import_no_confirmation: "&cНечего подтверждать для {id}: снова введите /ah admin import run {id}, затем подтвердите в течение {seconds} секунд."
+  import_unavailable: "&cИмпорт {id} невозможен: {reason}"
+  import_started: "&aИмпорт {id} запущен ({mode}). /ah admin import status для отслеживания."
+  import_list_header: "&6Модули импорта:"
+  import_list_entry: "&e{id} &7- {name} &7[{types}] &7: {availability}"
+  import_list_empty: "&7Нет зарегистрированных модулей импорта."
+  import_status: "&eИмпорт {id} выполняется: &7{progress}"
+  import_status_none: "&7Импорт не выполняется."
+  import_cancel: "&eИмпорт остановится после текущего пакета."
+  import_cancel_none: "&7Импорт не выполняется."
+  import_finished: "&aИмпорт {id} завершён ({mode}): {status}"
+  import_report_line: "&7{type}: прочитано {read}, &aимпортировано {imported}&7 (возвращено продавцу {moved}), уже импортировано {already}, &cотклонено {rejected}&7, &cошибок {failed}"
+  import_report_skipped: "&7Строк пропущено модулем: {skipped}"
+  import_report_failure: "&c{reason}"
+  import_report_file: "&7Подробный отчёт: {file}"
+  import_force_warning: "&c&lВнимание: --force-reimport игнорирует журнал. Всё, что {id} уже импортировал, будет импортировано СНОВА: предметы и деньги дважды, если вы не удалили эти строки вручную."
+  import_mode_dry_run: "пробный запуск"
+  import_mode_import: "импорт"
+  import_status_completed: "завершён"
+  import_status_cancelled: "отменён"
+  import_status_failed: "ошибка"
+  import_status_unavailable: "недоступен"
+
   # Messages of the command framework itself (permissions, syntax, parsing).
   error:
     permission_denied: "&cИзвините, у Вас нет прав для выполнения этой команды."
@@ -52,6 +85,7 @@ fauction:
     must_be_a_number: "&6{num}&c должно быть числом."
     internal: "&cИзвините, но при выполнении команды произошла ошибка."
     unknown_migrate_version: "&cНеизвестная версия миграции: &6{version}&c. Доступные версии: &6{versions}"
+    unknown_importer: "&cНеизвестный модуль импорта &6{id}&c. Зарегистрированы: &6{ids}"
 
   # Texts of the generated help of /ah help.
   help:

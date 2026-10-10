@@ -12,6 +12,10 @@ fauction:
   auction_search_help_description: "搜索物品"
   clear_cache_help_description: "清空缓存"
   migrate_help_description: "迁移至其他版本."
+  import_list_help_description: "列出导入模块及其是否可用."
+  import_run_help_description: "导入其他拍卖行插件的数据."
+  import_status_help_description: "当前导入的进度."
+  import_cancel_help_description: "取消当前导入."
 
   buy_auction_success: "你购买了一个物品."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -56,6 +60,35 @@ fauction:
 
   auction_purge: "You have erased all data."
 
+  import_sqlite_refused: "&c导入需要共享的 SQL 数据库 (MySQL, MariaDB 或 PostgreSQL): 在 SQLite 下, 关服时会从内存重写拍卖数据, 导入的数据将会丢失. 请先将 FAuction 迁移至上述数据库之一."
+  import_already_running: "&c已有导入正在进行: /ah admin import status 或 /ah admin import cancel."
+  import_no_type: "&c该模块不支持任何所请求的类型. 支持的类型: &6{types}"
+  import_cancelled_by_event: "&c导入已被其他插件取消."
+  import_invalid_options: "&c无效的选项: {error}"
+  import_confirm: "&e即将导入 &6{id}&e 的数据. 请确认数据库已备份且源插件已移除, 然后在 {seconds} 秒内输入 &6/ah admin import run {id} confirm&e. 建议先试运行: &6--dry-run"
+  import_no_confirmation: "&c{id} 没有待确认的导入: 请重新输入 /ah admin import run {id}, 然后在 {seconds} 秒内确认."
+  import_unavailable: "&c无法运行导入 {id}: {reason}"
+  import_started: "&a导入 {id} 已开始 ({mode}). 使用 /ah admin import status 查看进度."
+  import_list_header: "&6导入模块:"
+  import_list_entry: "&e{id} &7- {name} &7[{types}] &7: {availability}"
+  import_list_empty: "&7没有已注册的导入模块."
+  import_status: "&e导入 {id} 进行中: &7{progress}"
+  import_status_none: "&7当前没有进行中的导入."
+  import_cancel: "&e导入将在当前批次完成后停止."
+  import_cancel_none: "&7当前没有进行中的导入."
+  import_finished: "&a导入 {id} 已结束 ({mode}): {status}"
+  import_report_line: "&7{type}: 读取 {read}, &a导入 {imported}&7 (退还卖家 {moved}), 已导入过 {already}, &c拒绝 {rejected}&7, &c失败 {failed}"
+  import_report_skipped: "&7模块跳过了 {skipped} 行"
+  import_report_failure: "&c{reason}"
+  import_report_file: "&7详细报告: {file}"
+  import_force_warning: "&c&l警告: --force-reimport 会忽略导入记录. {id} 已导入的所有内容将被再次导入: 物品和货币将会重复, 除非你已手动删除这些数据."
+  import_mode_dry_run: "试运行"
+  import_mode_import: "导入"
+  import_status_completed: "已完成"
+  import_status_cancelled: "已取消"
+  import_status_failed: "失败"
+  import_status_unavailable: "不可用"
+
   # Messages of the command framework itself (permissions, syntax, parsing).
   error:
     permission_denied: "&c抱歉, 你没有权限执行该命令."
@@ -64,6 +97,7 @@ fauction:
     must_be_a_number: "&6{num}&c 必须为数字."
     internal: "&c抱歉, 但执行命令时出现未知错误."
     unknown_migrate_version: "&c未知的迁移版本: &6{version}&c. 可用版本: &6{versions}"
+    unknown_importer: "&c未知的导入模块 &6{id}&c. 已注册: &6{ids}"
 
   # Texts of the generated help of /ah help.
   help:
