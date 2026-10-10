@@ -175,6 +175,13 @@ public class CommandManager {
                     "{versions}", String.join(", ", MigrateVersion.ids()));
         }
 
+        if (cause instanceof AuctionCommand.UnknownImporterException unknownImporter) {
+            return error("unknown_importer",
+                    "{id}", unknownImporter.getInput(),
+                    "{ids}", plugin.getImportManager() == null ? ""
+                            : String.join(", ", plugin.getImportManager().registry().list().stream().map(importer -> importer.id()).toList()));
+        }
+
         // Anything else (an unknown material, for instance) keeps Cloud's own wording, which names
         // what it could not parse.
         return MinecraftExceptionHandler.<CommandSender>createDefaultArgumentParsingHandler()
