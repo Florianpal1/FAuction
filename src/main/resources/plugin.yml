@@ -43,6 +43,7 @@ permissions:
       fauction.admin.purge.hictoric: true
       fauction.admin.transfertBddToPaper: true
       fauction.admin.migrate: true
+      fauction.admin.import: true
   fauction.admin.reload:
     description: Reload the configuration
     default: op
@@ -63,4 +64,7 @@ permissions:
     default: op
   fauction.admin.migrate:
     description: Run the migration of a given version
+    default: op
+  fauction.admin.import:
+    description: Import the data of another auction house plugin (list, run, status, cancel)
     default: op

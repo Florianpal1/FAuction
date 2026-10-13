@@ -2,6 +2,7 @@ package fr.florianpal.fauction.utils;
 
 import fr.florianpal.fauction.FAuction;
 import fr.florianpal.fauction.languages.MessageKeys;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class MessageUtil {
@@ -16,5 +17,12 @@ public class MessageUtil {
         // Legacy string on purpose : the same rendering path as ACF used, so the colour codes and
         // the hex sequences produced by FormatUtil keep behaving exactly as they do today.
         plugin.getLang().message(messageKeys, replacements).ifPresent(player::sendMessage);
+    }
+
+    /**
+     * Same, for a command the console can run too.
+     */
+    public static void sendMessage(FAuction plugin, CommandSender sender, MessageKeys messageKeys, String... replacements) {
+        plugin.getLang().message(messageKeys, replacements).ifPresent(sender::sendMessage);
     }
 }

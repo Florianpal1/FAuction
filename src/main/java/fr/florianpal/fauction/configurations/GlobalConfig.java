@@ -8,9 +8,11 @@ import lombok.Getter;
 import org.bukkit.Material;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -74,6 +76,15 @@ public class GlobalConfig {
     private CurrencyType currencyType;
 
     private boolean updateCheckerEnabled = true;
+
+    private int importBatchSize = 500;
+
+    private int importProgressIntervalSeconds = 10;
+
+    /**
+     * Source currency of an import, in lower case, to the currency of FAuction.
+     */
+    private Map<String, CurrencyType> importCurrencyMap = new HashMap<>();
 
     public void load(YamlDocument config) {
         lang = config.getString("lang");
@@ -151,6 +162,21 @@ public class GlobalConfig {
             maxPrice = new HashMap<>();
             for (Object material : config.getSection("max-price").getKeys()) {
                 maxPrice.put(Material.valueOf(material.toString()), config.getDouble("max-price." + material));
+            }
+        }
+
+        importBatchSize = Math.max(1, config.getInt("import.batch-size", 500));
+        importProgressIntervalSeconds = Math.max(0, config.getInt("import.progress-interval-seconds", 10));
+        importCurrencyMap = new HashMap<>();
+        if (config.isSection("import.currency-map")) {
+            for (Object sourceCurrency : config.getSection("import.currency-map").getKeys()) {
+                String target = config.getString("import.currency-map." + sourceCurrency, "");
+                // An unknown target is left out : the rows in that currency are then refused with a
+                // reason naming it, rather than paid in a currency nobody chose.
+                Arrays.stream(CurrencyType.values())
+                        .filter(type -> type.name().equalsIgnoreCase(target.trim()))
+                        .findFirst()
+                        .ifPresent(type -> importCurrencyMap.put(sourceCurrency.toString().trim().toLowerCase(Locale.ROOT), type));
             }
         }
 

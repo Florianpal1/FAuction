@@ -1,0 +1,6 @@
+{
+  "players": [
+    {"uuid": "${SELLER}", "items": ["${ITEM_EMERALD_1}", "${ITEM_EMERALD_1}", "${ITEM_IRON_1}"]},
+    {"uuid": "${BUYER}", "items": ["${ITEM_DIAMOND_2}"]}
+  ]
+}

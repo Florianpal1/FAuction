@@ -1,0 +1,4 @@
+tax: 0.01
+auction-setup-time: 30
+bin-auction-duration: 172800
+bid-auction-duration: 7200

@@ -1,0 +1,11 @@
+{
+  "money": 12345.0,
+  "bins": [
+    {"id": ${ID_1}, "seller": "${SELLER}", "item": "${ITEM_DIAMOND_1}", "price": 100, "expiry": ${E_PLUS_1D}, "buyer": ""},
+    {"id": ${ID_2}, "seller": "${SELLER}", "item": "${ITEM_EMERALD_1}", "price": 20, "expiry": ${E_MINUS_1D}, "buyer": ""},
+    {"id": ${ID_3}, "seller": "${SELLER}", "item": "${ITEM_GOLD_1}", "price": 30, "expiry": ${E_MINUS_2D}, "buyer": ""},
+    {"id": ${ID_4}, "seller": "${SELLER}", "item": "${ITEM_DIAMOND_1}", "price": 40, "expiry": ${E_MINUS_1D}, "buyer": "${BUYER}"},
+    {"id": ${ID_5}, "seller": "${SELLER}", "item": "${ITEM_DIAMOND_1}", "price": 50, "expiry": ${E_PLUS_1D}, "buyer": "${SELLER}"},
+    {"id": ${ID_6}, "seller": "nope", "item": "${ITEM_DIAMOND_1}", "price": 60, "expiry": ${E_PLUS_1D}, "buyer": ""}
+  ]
+}

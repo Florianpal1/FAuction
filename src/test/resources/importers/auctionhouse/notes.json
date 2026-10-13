@@ -1,0 +1,67 @@
+[
+  {"playerName": "§aSeller", "playerUUID": "${SELLER}", "price": 100.0, "dateCreated": "${D_1H}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000001", "auctionTime": 172800, "itemName": "Diamond",
+   "isBIDAuction": false, "bidHistory": [], "claimedPlayers": []},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "buyerName": "Buyer", "buyerUUID": "${BUYER}", "price": 80.0,
+   "dateCreated": "${D_1H}", "itemData": "${ITEM_DIAMOND_8}", "isSold": true, "partiallySoldAmountLeft": 3,
+   "noteID": "00000000-0000-0000-0000-000000000002", "auctionTime": 172800, "isBIDAuction": false},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 10.0, "dateCreated": "${D_3D}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000003", "auctionTime": 172800},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 10.0, "dateCreated": "${D_10M}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0, "adminMessage": "Spam",
+   "noteID": "00000000-0000-0000-0000-000000000004", "auctionTime": -1, "isBIDAuction": false},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 10.0, "dateCreated": "${D_10M}",
+   "itemData": "${ITEM_DIRT_DELETED}", "isSold": false, "partiallySoldAmountLeft": 0, "adminMessage": "Forbidden item",
+   "noteID": "00000000-0000-0000-0000-000000000005", "auctionTime": -1, "isBIDAuction": false},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "buyerName": "Buyer", "buyerUUID": "${BUYER}", "price": 200.0,
+   "dateCreated": "${D_1H}", "itemData": "${ITEM_DIAMOND_1}", "isSold": true, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000006", "auctionTime": 172800, "isBIDAuction": false},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "buyerName": "OldBuyer", "price": 50.0,
+   "dateCreated": "${D_1D_OLDJDK}", "itemData": "${ITEM_DIAMOND_1}", "isSold": true, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000007", "auctionTime": 172800},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 5.0, "dateCreated": "${D_10M}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000008", "auctionTime": 7200, "isBIDAuction": true, "bidHistory": []},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 20.0, "dateCreated": "${D_10M}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000009", "auctionTime": 7200, "isBIDAuction": true,
+   "bidHistory": [
+     {"player": "${BIDDER}", "playerName": "Bidder", "date": "${D_10M}", "bid": 10.0},
+     {"player": "${BUYER}", "playerName": "Buyer", "date": "${D_10M}", "bid": 15.0},
+     {"player": "${BIDDER}", "playerName": "Bidder", "date": "${D_10M}", "bid": 20.0}],
+   "claimedPlayers": []},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 25.0, "dateCreated": "${D_1D}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000010", "auctionTime": 7200, "isBIDAuction": true,
+   "bidHistory": [
+     {"player": "${BIDDER}", "playerName": "Bidder", "date": "${D_1D}", "bid": 10.0},
+     {"player": "${BUYER}", "playerName": "Buyer", "date": "${D_1D}", "bid": 25.0}],
+   "claimedPlayers": []},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 25.0, "dateCreated": "${D_1D}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": true, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000011", "auctionTime": 7200, "isBIDAuction": true,
+   "bidHistory": [
+     {"player": "${BIDDER}", "playerName": "Bidder", "date": "${D_1D}", "bid": 10.0},
+     {"player": "${BUYER}", "playerName": "Buyer", "date": "${D_1D}", "bid": 25.0}],
+   "claimedPlayers": ["${BUYER}", "${BIDDER}"]},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 30.0, "dateCreated": "${D_1D_NNBSP}",
+   "itemData": "${ITEM_DIAMOND_1}", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000012", "auctionTime": 0},
+
+  {"playerName": "Seller", "playerUUID": "${SELLER}", "price": 30.0, "dateCreated": "${D_1H}",
+   "itemData": "%%%%", "isSold": false, "partiallySoldAmountLeft": 0,
+   "noteID": "00000000-0000-0000-0000-000000000013", "auctionTime": 172800}
+]

@@ -83,6 +83,26 @@ public class AuctionQueries implements IDatabaseTable {
         return -1;
     }
 
+    /**
+     * Inserts many auctions on a connection the caller holds in a transaction : nothing is committed
+     * nor rolled back here, and an error is thrown instead of logged so the caller can roll back.
+     *
+     * @return the ids assigned, in the order of {@code rows} (see {@link BatchInserts#execute}).
+     */
+    public List<Integer> addAuctionsBatch(Connection connection, List<ItemRow> rows) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(ADD_AUCTION, Statement.RETURN_GENERATED_KEYS)) {
+            for (ItemRow row : rows) {
+                statement.setString(1, row.playerUuid().toString());
+                statement.setString(2, row.playerName());
+                statement.setBytes(3, row.item());
+                statement.setDouble(4, row.price());
+                statement.setLong(5, row.date());
+                statement.addBatch();
+            }
+            return BatchInserts.execute(statement, rows.size());
+        }
+    }
+
     public void updateItem(int id, byte[] item) {
 
         try (Connection connection = databaseManager.getConnection()) {
