@@ -22,6 +22,7 @@ import org.mockbukkit.mockbukkit.ServerMock;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.time.Instant;
 import java.util.EnumSet;
@@ -125,9 +126,21 @@ class DocumentationExamplesTest {
         try (Connection connection = DriverManager.getConnection(url); Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE sales (id BIGINT, seller VARCHAR(36), buyer VARCHAR(36), item CLOB, price DOUBLE, sold_at BIGINT)");
             statement.execute("CREATE TABLE unpaid (player VARCHAR(36), amount DOUBLE)");
-            statement.execute("INSERT INTO sales VALUES (1, '" + SELLER + "', '" + UUID.randomUUID() + "', '" + item + "', 30, 1760000000)");
-            statement.execute("INSERT INTO sales VALUES (2, 'broken', 'broken', '" + item + "', 30, 1760000000)");
-            statement.execute("INSERT INTO unpaid VALUES ('" + SELLER + "', 12.5)");
+            try (PreparedStatement sale = connection.prepareStatement("INSERT INTO sales VALUES (?, ?, ?, ?, 30, 1760000000)")) {
+                sale.setLong(1, 1);
+                sale.setString(2, SELLER.toString());
+                sale.setString(3, UUID.randomUUID().toString());
+                sale.setString(4, item);
+                sale.executeUpdate();
+                sale.setLong(1, 2);
+                sale.setString(2, "broken");
+                sale.setString(3, "broken");
+                sale.executeUpdate();
+            }
+            try (PreparedStatement unpaid = connection.prepareStatement("INSERT INTO unpaid VALUES (?, 12.5)")) {
+                unpaid.setString(1, SELLER.toString());
+                unpaid.executeUpdate();
+            }
         }
 
         MySqlImporter importer = new MySqlImporter();

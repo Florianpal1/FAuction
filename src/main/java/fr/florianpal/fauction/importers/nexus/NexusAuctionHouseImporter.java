@@ -58,6 +58,8 @@ public class NexusAuctionHouseImporter implements DataImporter {
     static final String PLUGIN_NAME = "NexusAuctionHouse";
 
     private static final Pattern DURATION = Pattern.compile("(\\d+)\\s*(mo|y|w|d|h|m|s)?", Pattern.CASE_INSENSITIVE);
+    /** 100 years, far beyond any real expiry. */
+    private static final long MAX_DURATION = 100L * 365 * 86_400;
 
     private record Bin(String sourceId, UUID seller, String item, long price, long expiry, String buyer) {
     }
@@ -265,20 +267,25 @@ public class NexusAuctionHouseImporter implements DataImporter {
         }
         long seconds = 0;
         Matcher matcher = DURATION.matcher(text.trim());
-        while (matcher.find()) {
-            long value = Long.parseLong(matcher.group(1));
-            String unit = matcher.group(2) == null ? "s" : matcher.group(2).toLowerCase(Locale.ROOT);
-            seconds += value * switch (unit) {
-                case "y" -> 365L * 86_400;
-                case "mo" -> 30L * 86_400;
-                case "w" -> 7L * 86_400;
-                case "d" -> 86_400L;
-                case "h" -> 3_600L;
-                case "m" -> 60L;
-                default -> 1L;
-            };
+        try {
+            while (matcher.find()) {
+                long value = Long.parseLong(matcher.group(1));
+                String unit = matcher.group(2) == null ? "s" : matcher.group(2).toLowerCase(Locale.ROOT);
+                seconds = Math.addExact(seconds, Math.multiplyExact(value, switch (unit) {
+                    case "y" -> 365L * 86_400;
+                    case "mo" -> 30L * 86_400;
+                    case "w" -> 7L * 86_400;
+                    case "d" -> 86_400L;
+                    case "h" -> 3_600L;
+                    case "m" -> 60L;
+                    default -> 1L;
+                }));
+            }
+        } catch (NumberFormatException | ArithmeticException e) {
+            // An absurdly long duration : capped so the listing date stays computable.
+            return MAX_DURATION;
         }
-        return seconds;
+        return Math.min(seconds, MAX_DURATION);
     }
 
     private static String normalize(String base64) {

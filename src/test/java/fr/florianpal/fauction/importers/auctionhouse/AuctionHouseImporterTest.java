@@ -375,7 +375,7 @@ class AuctionHouseImporterTest {
                 "\"bid\": 20.0}],\n   \"claimedPlayers\": [\"" + BUYER + "\"]");
         assertTrue(content.contains("\"claimedPlayers\": [\"" + BUYER + "\"]"), "the fixture changed, adapt the test");
         Files.writeString(notes, content);
-        notes.toFile().setLastModified(NOW.toEpochMilli());
+        assertTrue(notes.toFile().setLastModified(NOW.toEpochMilli()));
 
         RecordingImportSink sink = read(new TestImportContext(plugins.toFile()));
 
