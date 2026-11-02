@@ -7,6 +7,7 @@ import dev.dejvokep.boostedyaml.settings.general.GeneralSettings;
 import dev.dejvokep.boostedyaml.settings.loader.LoaderSettings;
 import dev.dejvokep.boostedyaml.settings.updater.UpdaterSettings;
 import fr.florianpal.fauction.enums.CommandKey;
+import fr.florianpal.fauction.enums.CurrencyType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ class ConfigUpdateTest {
 
         assertEquals(List.of("ah", "hdv"), updated.getStringList("commands.root"));
         assertEquals(List.of("sell"), updated.getStringList("commands.sell"));
-        assertEquals("12", String.valueOf(updated.get("version")));
+        assertEquals("13", String.valueOf(updated.get("version")));
 
         // Nothing the administrator wrote moved.
         assertEquals("fr", updated.getString("lang"));
@@ -77,6 +78,53 @@ class ConfigUpdateTest {
         assertEquals("market", commandsConfig.syntax(CommandKey.ROOT));
         assertEquals("vendre|sell", commandsConfig.syntax(CommandKey.SELL));
         assertEquals("list", commandsConfig.syntax(CommandKey.LIST));
+    }
+
+    @Test
+    @DisplayName("A config.yml of version 12 gains the import section and keeps its own values")
+    void theImportSectionArrivesOnUpdate() throws IOException {
+
+        YamlDocument updated = update("""
+                version: 12
+                lang: "fr"
+                currencyUse: EXPERIENCE
+                commands:
+                  root: ["market"]
+                """);
+
+        assertEquals("13", String.valueOf(updated.get("version")));
+        assertEquals(500, updated.getInt("import.batch-size"));
+        assertEquals("VAULT", updated.getString("import.currency-map.Vault"));
+        assertEquals("fr", updated.getString("lang"));
+        assertEquals("EXPERIENCE", updated.getString("currencyUse"));
+        assertEquals(List.of("market"), updated.getStringList("commands.root"));
+
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.load(updated);
+        assertEquals(500, globalConfig.getImportBatchSize());
+        assertEquals(10, globalConfig.getImportProgressIntervalSeconds());
+        assertEquals(CurrencyType.VAULT, globalConfig.getImportCurrencyMap().get("vault"));
+        assertEquals(CurrencyType.LEVEL, globalConfig.getImportCurrencyMap().get("level"));
+    }
+
+    @Test
+    @DisplayName("A currency map entry pointing to no FAuction currency is left out, never guessed")
+    void anInvalidCurrencyTargetIsLeftOut() throws IOException {
+
+        YamlDocument updated = update("""
+                version: 13
+                import:
+                  batch-size: 0
+                  currency-map:
+                    CoinsEngine-coins: VAULT
+                    PlayerPoints: POINTS
+                """);
+
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.load(updated);
+        assertEquals(1, globalConfig.getImportBatchSize(), "a batch has at least one row");
+        assertEquals(CurrencyType.VAULT, globalConfig.getImportCurrencyMap().get("coinsengine-coins"));
+        assertEquals(null, globalConfig.getImportCurrencyMap().get("playerpoints"));
     }
 
     /**

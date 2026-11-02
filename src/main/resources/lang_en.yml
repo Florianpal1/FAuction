@@ -12,6 +12,10 @@ fauction:
   clear_cache_help_description: "To clear the cache"
   auction_search_help_description: "Search for an item"
   migrate_help_description: "Migrate to another version."
+  import_list_help_description: "List the import modules and whether they can run."
+  import_run_help_description: "Import the data of another auction house plugin."
+  import_status_help_description: "Progress of the running import."
+  import_cancel_help_description: "Cancel the running import."
 
   buy_auction_success: "You just bought {item} for {price}."
   buy_auction_target_success: "The player {player} bought your item {item} at the price of {price}."
@@ -44,6 +48,35 @@ fauction:
   transfert_bdd: "Transfert of the database finished."
   auction_purge: "You have erased all data."
 
+  import_sqlite_refused: "&cThe import needs a shared SQL database (MySQL, MariaDB or PostgreSQL) : in SQLite the sales are rewritten from memory on shutdown and the imported data would be lost. Move FAuction to one of them first."
+  import_already_running: "&cAn import is already running : /ah admin import status, or /ah admin import cancel."
+  import_no_type: "&cNone of the requested types is supported by this module. Supported : &6{types}"
+  import_cancelled_by_event: "&cThe import was cancelled by another plugin."
+  import_invalid_options: "&cInvalid options : {error}"
+  import_confirm: "&eAbout to import the data of &6{id}&e. Make sure the database is backed up and the source plugin is removed, then type &6/ah admin import run {id} confirm&e within {seconds} seconds. A dry run first : &6--dry-run"
+  import_no_confirmation: "&cNothing to confirm for {id} : type /ah admin import run {id} again, then confirm within {seconds} seconds."
+  import_unavailable: "&cThe import {id} cannot run : {reason}"
+  import_started: "&aImport {id} started ({mode}). /ah admin import status to follow it."
+  import_list_header: "&6Import modules :"
+  import_list_entry: "&e{id} &7- {name} &7[{types}] &7: {availability}"
+  import_list_empty: "&7No import module is registered."
+  import_status: "&eImport {id} running : &7{progress}"
+  import_status_none: "&7No import is running."
+  import_cancel: "&eThe import stops after the batch in progress."
+  import_cancel_none: "&7No import is running."
+  import_finished: "&aImport {id} finished ({mode}) : {status}"
+  import_report_line: "&7{type} : {read} read, &a{imported} imported&7 ({moved} given back to the seller), {already} already imported, &c{rejected} rejected&7, &c{failed} failed"
+  import_report_skipped: "&7{skipped} rows skipped by the module"
+  import_report_failure: "&c{reason}"
+  import_report_file: "&7Detailed report : {file}"
+  import_force_warning: "&c&lWarning : --force-reimport ignores the journal. Everything {id} already imported is imported AGAIN : items and money twice, unless you deleted those rows by hand."
+  import_mode_dry_run: "dry run"
+  import_mode_import: "import"
+  import_status_completed: "completed"
+  import_status_cancelled: "cancelled"
+  import_status_failed: "failed"
+  import_status_unavailable: "unavailable"
+
   # Messages of the command framework itself (permissions, syntax, parsing).
   error:
     permission_denied: "&cI'm sorry, but you do not have permission to perform this command."
@@ -52,6 +85,7 @@ fauction:
     must_be_a_number: "&6{num}&c must be a number."
     internal: "&cI'm sorry, but there was an error performing this command."
     unknown_migrate_version: "&cUnknown migration version &6{version}&c. Available versions: &6{versions}"
+    unknown_importer: "&cUnknown import module &6{id}&c. Registered : &6{ids}"
 
   # Texts of the generated help of /ah help.
   help:

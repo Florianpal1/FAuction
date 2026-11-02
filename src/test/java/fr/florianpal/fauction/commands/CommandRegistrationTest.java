@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -85,6 +86,29 @@ class CommandRegistrationTest extends FAuctionTestBase {
         assertTrue(paths.contains("ah admin reload"), paths.toString());
         assertTrue(paths.contains("ah admin purge all"), paths.toString());
         assertTrue(paths.contains("ah admin migrate migrateVersion"), paths.toString());
+        assertTrue(paths.contains("ah admin import list"), paths.toString());
+        assertTrue(paths.contains("ah admin import run importer options"), paths.toString());
+        assertTrue(paths.contains("ah admin import status"), paths.toString());
+        assertTrue(paths.contains("ah admin import cancel"), paths.toString());
+    }
+
+    @Test
+    @DisplayName("The import commands need their permission and accept the console")
+    void importCommandsAreForTheConsoleToo() {
+
+        CommandManager<Object> manager = register("lang: \"en\"\n");
+
+        List<org.incendo.cloud.Command<Object>> importCommands = manager.commands().stream()
+                .filter(command -> path(command.components()).startsWith("ah admin import"))
+                .toList();
+
+        assertEquals(4, importCommands.size());
+        for (org.incendo.cloud.Command<Object> command : importCommands) {
+            assertEquals("fauction.admin.import", command.commandPermission().permissionString());
+            // A Player sender type would refuse the console : the import is run during a maintenance.
+            assertTrue(command.senderType().map(type -> type.getType().equals(org.bukkit.command.CommandSender.class)).orElse(true),
+                    path(command.components()) + " must accept any CommandSender");
+        }
     }
 
     @Test

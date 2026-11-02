@@ -35,12 +35,25 @@ import org.incendo.cloud.annotations.parser.Parser;
 import org.incendo.cloud.annotations.suggestion.Suggestions;
 import org.incendo.cloud.context.CommandInput;
 
+import fr.florianpal.fauction.api.importer.DataImporter;
+import fr.florianpal.fauction.api.importer.ImportAvailability;
+import fr.florianpal.fauction.api.importer.ImportDataType;
+import fr.florianpal.fauction.api.importer.ImportReport;
+import fr.florianpal.fauction.managers.importer.ImportConfirmations;
+import fr.florianpal.fauction.managers.importer.ImportManager;
+import fr.florianpal.fauction.managers.importer.ImportOptions;
+import fr.florianpal.fauction.managers.importer.ImportRun;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.ceil;
 
@@ -79,6 +92,12 @@ public class AuctionCommand {
     static final String MIGRATE_VERSION_PARSER = "fauction:migrate_version";
 
     static final String MIGRATE_VERSION_SUGGESTIONS = "fauction:migrate_versions";
+
+    static final String IMPORTER_PARSER = "fauction:importer";
+
+    static final String IMPORTER_SUGGESTIONS = "fauction:importers";
+
+    private final ImportConfirmations importConfirmations = new ImportConfirmations(Clock.systemUTC());
 
     private final FAuction plugin;
 
@@ -526,6 +545,189 @@ public class AuctionCommand {
         MessageUtil.sendMessage(plugin, playerSender, MessageKeys.MIGRATE, "{version}", migrateVersion.getId());
     }
 
+    @Command(ROOT + SPACE + ADMIN + SPACE + "import list")
+    @Permission("fauction.admin.import")
+    @CommandDescription("{@@fauction.import_list_help_description}")
+    public void onImportList(CommandSender sender) {
+
+        ImportManager importManager = plugin.getImportManager();
+        if (importManager.isSqliteRefused()) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_SQLITE_REFUSED);
+        }
+
+        // The availability checks read the files or the database of the sources.
+        importManager.runAsync(() -> {
+            List<DataImporter> importers = importManager.registry().list();
+            if (importers.isEmpty()) {
+                MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_LIST_EMPTY);
+                return;
+            }
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_LIST_HEADER);
+            for (DataImporter importer : importers) {
+                ImportAvailability availability = importManager.checkAvailability(importer);
+                MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_LIST_ENTRY,
+                        "{id}", importer.id(),
+                        "{name}", importer.displayName(),
+                        "{types}", typesOf(ImportManager.supportedTypes(importer)),
+                        "{availability}", (availability.available() ? "&a" : "&c") + availability.message());
+            }
+        });
+    }
+
+    @Command(ROOT + SPACE + ADMIN + SPACE + "import run <importer> [options]")
+    @Permission("fauction.admin.import")
+    @CommandDescription("{@@fauction.import_run_help_description}")
+    public void onImportRun(CommandSender sender,
+                            @Argument(value = "importer", parserName = IMPORTER_PARSER) DataImporter importer,
+                            @Argument("options") @Greedy String rawOptions) {
+
+        ImportManager importManager = plugin.getImportManager();
+        if (importManager.isSqliteRefused()) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_SQLITE_REFUSED);
+            return;
+        }
+
+        ImportOptions options;
+        try {
+            options = ImportOptions.parse(rawOptions);
+        } catch (IllegalArgumentException e) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_INVALID_OPTIONS, "{error}", e.getMessage());
+            return;
+        }
+
+        String senderKey = senderKey(sender);
+        if (options.confirm()) {
+            Optional<ImportOptions> confirmed = importConfirmations.confirm(senderKey, importer.id());
+            if (confirmed.isEmpty()) {
+                MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_NO_CONFIRMATION, "{id}", importer.id(),
+                        "{seconds}", String.valueOf(ImportConfirmations.DELAY.toSeconds()));
+                return;
+            }
+            options = confirmed.get();
+        } else if (!options.dryRun()) {
+            // A real import writes thousands of rows that cannot be told apart from the others
+            // afterwards : it is typed twice. The availability is checked first, so the second typing
+            // is not asked for an import that cannot run anyway.
+            ImportOptions requested = options;
+            importManager.runAsync(() -> {
+                ImportAvailability availability = importManager.checkAvailability(importer, requested);
+                if (!availability.available()) {
+                    MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_UNAVAILABLE, "{id}", importer.id(), "{reason}", availability.message());
+                    return;
+                }
+                importConfirmations.request(senderKey, importer.id(), requested);
+                if (requested.forceReimport()) {
+                    MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_FORCE_WARNING, "{id}", importer.id());
+                }
+                MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_CONFIRM, "{id}", importer.id(),
+                        "{seconds}", String.valueOf(ImportConfirmations.DELAY.toSeconds()));
+            });
+            return;
+        }
+
+        ImportManager.StartResult result = importManager.start(importer.id(), options, report -> sendReport(sender, report));
+        switch (result) {
+            case STARTED -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_STARTED, "{id}", importer.id(),
+                    "{mode}", mode(options.dryRun()));
+            case REFUSED_SQLITE -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_SQLITE_REFUSED);
+            case ALREADY_RUNNING -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_ALREADY_RUNNING);
+            case NO_TYPE -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_NO_TYPE, "{types}", typesOf(ImportManager.supportedTypes(importer)));
+            case CANCELLED_BY_EVENT -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_CANCELLED_BY_EVENT);
+            case UNKNOWN_IMPORTER -> sender.sendMessage(plugin.getLang().messageOr("fauction.error.unknown_importer", "Unknown import module",
+                    "{id}", importer.id(), "{ids}", String.join(", ", importerSuggestions())));
+        }
+    }
+
+    @Command(ROOT + SPACE + ADMIN + SPACE + "import status")
+    @Permission("fauction.admin.import")
+    @CommandDescription("{@@fauction.import_status_help_description}")
+    public void onImportStatus(CommandSender sender) {
+
+        Optional<ImportRun> run = plugin.getImportManager().current();
+        if (run.isEmpty()) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_STATUS_NONE);
+            plugin.getImportManager().lastReport().ifPresent(report -> sendReport(sender, report));
+            return;
+        }
+        MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_STATUS, "{id}", run.get().importerId(), "{progress}", run.get().progressLine());
+    }
+
+    @Command(ROOT + SPACE + ADMIN + SPACE + "import cancel")
+    @Permission("fauction.admin.import")
+    @CommandDescription("{@@fauction.import_cancel_help_description}")
+    public void onImportCancel(CommandSender sender) {
+
+        if (plugin.getImportManager().cancel()) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_CANCEL);
+        } else {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_CANCEL_NONE);
+        }
+    }
+
+    private void sendReport(CommandSender sender, ImportReport report) {
+        MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_FINISHED, "{id}", report.importerId(),
+                "{status}", status(report.status()), "{mode}", mode(report.dryRun()));
+        if (report.failure() != null) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_REPORT_FAILURE, "{reason}", report.failure());
+        }
+        report.counts().forEach((type, counts) -> MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_REPORT_LINE,
+                "{type}", type.id(),
+                "{read}", String.valueOf(counts.read()),
+                "{imported}", String.valueOf(counts.imported()),
+                "{moved}", String.valueOf(counts.movedToExpires()),
+                "{already}", String.valueOf(counts.alreadyImported()),
+                "{rejected}", String.valueOf(counts.rejected()),
+                "{failed}", String.valueOf(counts.failed())));
+        if (report.skipped() > 0) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_REPORT_SKIPPED, "{skipped}", String.valueOf(report.skipped()));
+        }
+        if (report.logFile() != null) {
+            MessageUtil.sendMessage(plugin, sender, MessageKeys.IMPORT_REPORT_FILE, "{file}", report.logFile().getPath());
+        }
+    }
+
+    /**
+     * The words the import messages are completed with, in the language of the server.
+     */
+    private String mode(boolean dryRun) {
+        return plugin.getLang().messageOr(dryRun ? "fauction.import_mode_dry_run" : "fauction.import_mode_import", dryRun ? "dry run" : "import");
+    }
+
+    private String status(ImportReport.Status status) {
+        String name = status.name().toLowerCase(Locale.ROOT);
+        return plugin.getLang().messageOr("fauction.import_status_" + name, name);
+    }
+
+    private static String typesOf(Set<ImportDataType> types) {
+        return types.stream().map(ImportDataType::id).sorted().collect(Collectors.joining(", "));
+    }
+
+    /**
+     * The same player whatever their name, the console by its name.
+     */
+    private static String senderKey(CommandSender sender) {
+        return sender instanceof Player player ? player.getUniqueId().toString() : "console:" + sender.getName();
+    }
+
+    /**
+     * A module registered right now. Resolved at each typing : modules come and go with the plugins
+     * providing them.
+     */
+    @Parser(name = IMPORTER_PARSER, suggestions = IMPORTER_SUGGESTIONS)
+    public DataImporter parseImporter(CommandInput input) {
+        String token = input.readString();
+        return plugin.getImportManager().registry().find(token).orElseThrow(() -> new UnknownImporterException(token));
+    }
+
+    @Suggestions(IMPORTER_SUGGESTIONS)
+    public List<String> importerSuggestions() {
+        ImportManager importManager = plugin.getImportManager();
+        if (importManager == null) {
+            return List.of();
+        }
+        return importManager.registry().list().stream().map(DataImporter::id).collect(Collectors.toList());
+    }
+
     @Command(ROOT + SPACE + HELP + SPACE + "[query]")
     @CommandDescription("{@@fauction.help_description}")
     public void doHelp(CommandSender sender, @Argument("query") @Greedy String query) {
@@ -605,6 +807,20 @@ public class AuctionCommand {
 
         InvalidPriceException(String input) {
             super("Not a valid price : " + input);
+            this.input = input;
+        }
+
+        public String getInput() {
+            return input;
+        }
+    }
+
+    public static final class UnknownImporterException extends IllegalArgumentException {
+
+        private final transient String input;
+
+        UnknownImporterException(String input) {
+            super("Unknown importer : " + input);
             this.input = input;
         }
 

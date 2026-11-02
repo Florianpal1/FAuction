@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,6 +61,24 @@ public class CurrencyPendingQueries implements IDatabaseTable {
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when add auction. Error {} ", e.getMessage()));
+        }
+    }
+
+    /**
+     * Inserts many pending payments on a connection the caller holds in a transaction : nothing is
+     * committed nor rolled back here, and an error is thrown instead of logged.
+     *
+     * @return the ids assigned, in the order of {@code rows} (see {@link BatchInserts#execute}).
+     */
+    public List<Integer> addBatch(Connection connection, List<CurrencyPendingRow> rows) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(ADD_CURRENCY_PENDING, Statement.RETURN_GENERATED_KEYS)) {
+            for (CurrencyPendingRow row : rows) {
+                statement.setString(1, row.playerUuid().toString());
+                statement.setString(2, row.currencyType().toString());
+                statement.setDouble(3, row.amount());
+                statement.addBatch();
+            }
+            return BatchInserts.execute(statement, rows.size());
         }
     }
 

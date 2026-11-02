@@ -1,0 +1,4 @@
+expiry:
+  enable: ${EXPIRY_ENABLE}
+  time: 7d
+log-keep-time: 30d

@@ -1,4 +1,4 @@
-version: 12
+version: 13
 lang: "en"
 
 currencyUse: VAULT # VAULT, EXPERIENCE, LEVEL
@@ -78,3 +78,13 @@ min-price: # Min price per item. Ex : 1 CobbleStone at 0.5. Set {} to disable it
 max-price: # Max price per item. Ex : 1 CobbleStone at 0.5. Set {} to disable it
   COBBLESTONE: 5
 item-blacklist: []
+
+# Import of the data of another auction house plugin : /ah admin import
+# Only with a shared SQL database (MySQL, MariaDB, PostgreSQL) : the import refuses to run in SQLite.
+import:
+  batch-size: 500 # Rows written per transaction
+  progress-interval-seconds: 10 # Delay between two progress lines in the console, 0 to disable
+  currency-map: # Currency of the source plugin -> VAULT, EXPERIENCE or LEVEL. A currency not listed here is refused, never converted at random
+    Vault: VAULT
+    Experience: EXPERIENCE
+    Level: LEVEL

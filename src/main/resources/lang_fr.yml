@@ -11,6 +11,10 @@ fauction:
   transfert_bdd_help_description: "Transfert des données de la bdd vers spigot->paper ou paper->spigot"
   clear_cache_help_description: "Pour vider le cache"
   migrate_help_description: "Faire une migration vers une autre version."
+  import_list_help_description: "Lister les modules d'import et s'ils peuvent être lancés."
+  import_run_help_description: "Importer les données d'un autre plugin d'hôtel des ventes."
+  import_status_help_description: "Avancement de l'import en cours."
+  import_cancel_help_description: "Annuler l'import en cours."
   auction_search_help_description: "Rechercher un item"
 
   buy_auction_success: "Vous venez d'acheter l'item {item} pour le prix de {price}."
@@ -45,6 +49,35 @@ fauction:
 
   auction_purge: "Vous avez effacé toutes les données."
 
+  import_sqlite_refused: "&cL'import exige une base SQL partagée (MySQL, MariaDB ou PostgreSQL) : en SQLite les ventes sont réécrites depuis la mémoire à l'arrêt et les données importées seraient perdues. Passez d'abord FAuction sur l'une d'elles."
+  import_already_running: "&cUn import est déjà en cours : /ah admin import status, ou /ah admin import cancel."
+  import_no_type: "&cAucun des types demandés n'est géré par ce module. Gérés : &6{types}"
+  import_cancelled_by_event: "&cL'import a été annulé par un autre plugin."
+  import_invalid_options: "&cOptions invalides : {error}"
+  import_confirm: "&eVous allez importer les données de &6{id}&e. Vérifiez que la base est sauvegardée et que le plugin source est retiré, puis tapez &6/ah admin import run {id} confirm&e sous {seconds} secondes. Un essai d'abord : &6--dry-run"
+  import_no_confirmation: "&cRien à confirmer pour {id} : retapez /ah admin import run {id}, puis confirmez sous {seconds} secondes."
+  import_unavailable: "&cL'import {id} ne peut pas être lancé : {reason}"
+  import_started: "&aImport {id} lancé ({mode}). /ah admin import status pour le suivre."
+  import_list_header: "&6Modules d'import :"
+  import_list_entry: "&e{id} &7- {name} &7[{types}] &7: {availability}"
+  import_list_empty: "&7Aucun module d'import n'est enregistré."
+  import_status: "&eImport {id} en cours : &7{progress}"
+  import_status_none: "&7Aucun import en cours."
+  import_cancel: "&eL'import s'arrête après le paquet en cours."
+  import_cancel_none: "&7Aucun import en cours."
+  import_finished: "&aImport {id} terminé ({mode}) : {status}"
+  import_report_line: "&7{type} : {read} lues, &a{imported} importées&7 (dont {moved} rendues au vendeur), {already} déjà importées, &c{rejected} rejetées&7, &c{failed} en échec"
+  import_report_skipped: "&7{skipped} lignes ignorées par le module"
+  import_report_failure: "&c{reason}"
+  import_report_file: "&7Rapport détaillé : {file}"
+  import_force_warning: "&c&lAttention : --force-reimport ignore le journal. Tout ce que {id} a déjà importé est importé UNE NOUVELLE FOIS : objets et argent en double, sauf si vous avez supprimé ces lignes à la main."
+  import_mode_dry_run: "essai"
+  import_mode_import: "import"
+  import_status_completed: "terminé"
+  import_status_cancelled: "annulé"
+  import_status_failed: "en échec"
+  import_status_unavailable: "indisponible"
+
   # Messages of the command framework itself (permissions, syntax, parsing).
   error:
     permission_denied: "&cVous n'avez pas la permission d'exécuter cette commande !"
@@ -53,6 +86,7 @@ fauction:
     must_be_a_number: "&6{num}&c doit être un nombre !"
     internal: "&cUne erreur est survenue lors de l'exécution de cette commande !"
     unknown_migrate_version: "&cVersion de migration inconnue : &6{version}&c. Versions disponibles : &6{versions}"
+    unknown_importer: "&cModule d'import inconnu : &6{id}&c. Enregistrés : &6{ids}"
 
   # Texts of the generated help of /ah help.
   help:

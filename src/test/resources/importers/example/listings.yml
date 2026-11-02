@@ -1,0 +1,20 @@
+listings:
+  "17":
+    seller: 8667ba71-b85a-4004-af54-457a9734eed7
+    item: ${ITEM_DIAMOND}
+    price: 250.0
+    created: 1760000000000
+  "18":
+    item: ${ITEM_DIAMOND}
+    price: 10.0
+    created: 1760000000000
+  "19":
+    seller: not-a-uuid
+    item: ${ITEM_DIAMOND}
+    price: 10.0
+    created: 1760000000000
+  "20": "not a section"
+expired:
+  "3":
+    owner: 8667ba71-b85a-4004-af54-457a9734eed7
+    item: ${ITEM_DIAMOND}

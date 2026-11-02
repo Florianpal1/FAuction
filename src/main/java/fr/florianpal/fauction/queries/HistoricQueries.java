@@ -12,6 +12,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.*;
 
 public class HistoricQueries implements IDatabaseTable {
@@ -82,6 +84,34 @@ public class HistoricQueries implements IDatabaseTable {
             }
         } catch (SQLException e) {
             plugin.getLogger().severe(String.join("Error when add auction. Error {} ", e.getMessage()));
+        }
+    }
+
+    /**
+     * Inserts many sales with their original dates, on a connection the caller holds in a
+     * transaction : nothing is committed nor rolled back here, and an error is thrown instead of
+     * logged.
+     *
+     * @return the ids assigned, in the order of {@code rows} (see {@link BatchInserts#execute}).
+     */
+    public List<Integer> addHistoricsBatch(Connection connection, List<HistoricRow> rows) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(ADD_HISTORIC, Statement.RETURN_GENERATED_KEYS)) {
+            for (HistoricRow row : rows) {
+                statement.setString(1, row.playerUuid().toString());
+                statement.setString(2, row.playerName());
+                statement.setString(3, row.playerBuyerUuid().toString());
+                statement.setString(4, row.playerBuyerName());
+                statement.setBytes(5, row.item());
+                statement.setDouble(6, row.price());
+                statement.setLong(7, row.date());
+                if (row.buyDate() == null) {
+                    statement.setNull(8, Types.BIGINT);
+                } else {
+                    statement.setLong(8, row.buyDate());
+                }
+                statement.addBatch();
+            }
+            return BatchInserts.execute(statement, rows.size());
         }
     }
 
