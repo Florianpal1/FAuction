@@ -64,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <configuration>
                     <!-- Mockito as an agent, it is no longer allowed to attach itself -->
                     <argLine>-javaagent:${org.mockito:mockito-core:jar}</argLine>
