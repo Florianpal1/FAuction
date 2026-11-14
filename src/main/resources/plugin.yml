@@ -1,7 +1,7 @@
 name: FAuction
 main: fr.florianpal.fauction.FAuction
 author: florianpal
-version: 2.3.0
+version: 2.4.0
 api-version: 1.13
 folia-supported: true
 softdepend: [Vault]
