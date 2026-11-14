@@ -1,13 +1,23 @@
 name: Release
 
-# Publishing happens here, and only here: pushing a `v*` tag builds the plugin,
-# deploys it to GitHub Packages and attaches the shaded JAR to the GitHub Release.
+# Publishing happens here, and only here: publishing a GitHub Release builds the plugin at the
+# release tag, attaches the shaded JAR to that release and deploys it to GitHub Packages.
+# Tags may be written V_2.3.0, V2.3.0 or v2.3.0. `workflow_dispatch` re-attaches the JAR to an
+# existing release (e.g. one published before this workflow, or after a failed run).
 on:
-  push:
-    tags: [ 'v*' ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build and attach the JAR to (e.g. V_2.3.0)'
+        required: true
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
   release:
@@ -16,8 +26,12 @@ jobs:
     permissions:
       contents: write
       packages: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: refs/tags/${{ env.TAG }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v6
@@ -28,31 +42,28 @@ jobs:
 
       - name: Check that the tag matches the pom version
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
+          VERSION="$(echo "$TAG" | sed -E 's/^[vV]_?//')"
           POM="$(mvn -B -q -DforceStdout help:evaluate -Dexpression=project.version)"
-          echo "Tag: $TAG — pom: $POM"
-          if [ "$TAG" != "$POM" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match the pom version ($POM). Bump the pom or retag."
+          echo "Tag: $TAG (version $VERSION) — pom: $POM"
+          if [ "$VERSION" != "$POM" ]; then
+            echo "::error::Tag $TAG does not match the pom version ($POM). Bump the pom or retag."
             exit 1
           fi
 
       - name: Build with Maven
         run: mvn -B clean package --file pom.xml
 
-      - name: Publish to GitHub Packages
-        run: mvn -B -DskipTests deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create or update the GitHub Release
+      - name: Attach the JAR to the GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            gh release upload "$GITHUB_REF_NAME" target/fauction-*.jar --clobber
-          else
-            gh release create "$GITHUB_REF_NAME" target/fauction-*.jar \
-              --title "FAuction $GITHUB_REF_NAME" \
-              --generate-notes \
-              --verify-tag
-          fi
+          VERSION="$(echo "$TAG" | sed -E 's/^[vV]_?//')"
+          gh release upload "$TAG" "target/fauction-$VERSION.jar" --clobber
+
+      - name: Publish to GitHub Packages
+        # A version already in GitHub Packages cannot be overwritten: re-running on a release
+        # must not fail once the JAR is attached.
+        continue-on-error: true
+        run: mvn -B -DskipTests deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
