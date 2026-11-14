@@ -33,6 +33,7 @@
   - [Sorting](#sorting-sortyml)
   - [GUI Customization](#gui-customization)
   - [Languages](#languages)
+- [Importing data from another plugin](#importing-data-from-another-plugin)
 - [Integrations](#integrations)
   - [Vault](#vault)
   - [PlaceholderAPI](#placeholderapi)
@@ -129,6 +130,7 @@ of `config.yml` renames them and gives them as many aliases as you want — see
 | `/ah admin transfertToPaper`    | Migrate database items to Paper serialization |
 | `/ah admin transfertToBukkit`   | Migrate database items to Bukkit serialization |
 | `/ah admin migrate <version>`   | Run data migration for a specific version (tab-completes the versions it knows) |
+| `/ah admin import list\|run\|status\|cancel` | Import the data of another auction house plugin, see [Importing data](#importing-data-from-another-plugin) |
 
 ---
 
@@ -163,6 +165,7 @@ of `config.yml` renames them and gives them as many aliases as you want — see
 | `fauction.admin.purge.hictoric`     | Purge transaction history            | `op`    |
 | `fauction.admin.transfertBddToPaper`| Migrate DB serialization format      | `op`    |
 | `fauction.admin.migrate`            | Run version migrations               | `op`    |
+| `fauction.admin.import`             | Import the data of another plugin    | `op`    |
 
 ---
 
@@ -400,6 +403,17 @@ not translated fall back to the English texts.
 
 ---
 
+## Importing data from another plugin
+
+`/ah admin import` brings the data of another auction house plugin into FAuction: items on sale, items waiting to be collected, sales history and money owed to players. Every row is validated, written in transactional batches and recorded, so an import can be run again (after a crash, a cancellation or a fix) without duplicating anything; `--dry-run` shows what would be imported first.
+
+- **Requires MySQL, MariaDB or PostgreSQL**: the import is refused in SQLite mode.
+- Modules included: **Auction-House** (ElaineQheart) and **NexusAuctionHouse**. Other plugins can provide their own through the [Importer API](https://github.com/Florianpal1/FAuction/wiki/Importer-API).
+
+Step-by-step procedure, options and what each module imports: [wiki → Importing Data](https://github.com/Florianpal1/FAuction/wiki/Importing-Data).
+
+---
+
 ## Integrations
 
 ### Vault
@@ -445,6 +459,8 @@ Listen to these events using the standard Bukkit event system:
 | `ExpireRemoveEvent`        | A player collects an expired item          | Expired item details          |
 | `CacheReloadEvent`         | The auction cache is refreshed             | Updated auction list          |
 | `CacheHistoricReloadEvent` | The history cache is refreshed             | Updated history list          |
+| `ImportStartEvent`         | An import is about to start (cancellable)  | Module id, types, dry run     |
+| `ImportFinishEvent`        | An import finished (usually async)         | `ImportReport`                |
 
 **Example listener:**
 

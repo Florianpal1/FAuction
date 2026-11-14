@@ -14,6 +14,15 @@ import fr.florianpal.fauction.queries.AuctionQueries;
 import fr.florianpal.fauction.queries.CurrencyPendingQueries;
 import fr.florianpal.fauction.queries.ExpireQueries;
 import fr.florianpal.fauction.queries.HistoricQueries;
+import fr.florianpal.fauction.queries.ImportLogQueries;
+import fr.florianpal.fauction.api.importer.ImporterRegistry;
+import fr.florianpal.fauction.importers.auctionhouse.AuctionHouseImporter;
+import fr.florianpal.fauction.importers.nexus.NexusAuctionHouseImporter;
+import fr.florianpal.fauction.managers.importer.ImportManager;
+import fr.florianpal.fauction.managers.importer.ImporterRegistryImpl;
+import fr.florianpal.fauction.managers.importer.JdbcImportStore;
+import org.bukkit.plugin.ServicePriority;
+import java.time.Clock;
 import fr.florianpal.fauction.schedules.CacheSchedule;
 import fr.florianpal.fauction.schedules.CurrencyScheduler;
 import fr.florianpal.fauction.schedules.ExpireSchedule;
@@ -55,7 +64,15 @@ public class FAuction extends JavaPlugin {
     private CurrencyPendingQueries currencyPendingQueries;
 
     @Getter
+    private ImportLogQueries importLogQueries;
+
+    @Getter
     private CommandManager commandManager;
+
+    private ImporterRegistryImpl importerRegistry;
+
+    @Getter
+    private ImportManager importManager;
 
     @Getter
     private Lang lang;
@@ -168,11 +185,13 @@ public class FAuction extends JavaPlugin {
         expireQueries = new ExpireQueries(this);
         historicQueries = new HistoricQueries(this);
         currencyPendingQueries = new CurrencyPendingQueries(this);
+        importLogQueries = new ImportLogQueries(this);
 
         databaseManager.addRepository(expireQueries);
         databaseManager.addRepository(auctionQueries);
         databaseManager.addRepository(historicQueries);
         databaseManager.addRepository(currencyPendingQueries);
+        databaseManager.addRepository(importLogQueries);
         databaseManager.initializeTables();
 
         auctionCommandManager = new AuctionCommandManager(this);
@@ -182,6 +201,8 @@ public class FAuction extends JavaPlugin {
         spamManager = new SpamManager(this);
         claimManager = new ClaimManager();
         transfertManager = new TransfertManager(this);
+
+        initImport();
 
         commandManager.register(new AuctionCommand(this));
 
@@ -253,6 +274,10 @@ public class FAuction extends JavaPlugin {
         if (spamManager != null) {
             spamManager.shutdown();
         }
+        // Before the database closes : the batch in progress is finished, nothing after it.
+        if (importManager != null) {
+            importManager.shutdown();
+        }
 
         if (configurationManager.getDatabase().getSqlType().equals(SQLType.SQLite)) {
             auctionCommandManager.deleteAllOnlyOnDB();
@@ -264,6 +289,31 @@ public class FAuction extends JavaPlugin {
 
     public static FAuction getApi() {
         return api;
+    }
+
+    /**
+     * The import of the data of other auction house plugins : the registry other plugins add their
+     * modules to (through the ServicesManager), the manager running the imports, and the modules
+     * shipped with FAuction.
+     */
+    private void initImport() {
+        importerRegistry = new ImporterRegistryImpl(getLogger());
+        getServer().getServicesManager().register(ImporterRegistry.class, importerRegistry, this, ServicePriority.Normal);
+        getServer().getPluginManager().registerEvents(importerRegistry, this);
+
+        JdbcImportStore importStore = new JdbcImportStore(databaseManager::getConnection, auctionQueries, expireQueries,
+                historicQueries, currencyPendingQueries, importLogQueries, Clock.systemDefaultZone());
+        importManager = ImportManager.create(this, importerRegistry, importStore);
+
+        importerRegistry.register(this, new AuctionHouseImporter());
+        importerRegistry.register(this, new NexusAuctionHouseImporter());
+    }
+
+    /**
+     * The registry of the import modules, also available from the Bukkit {@code ServicesManager}.
+     */
+    public ImporterRegistry getImporterRegistry() {
+        return importerRegistry;
     }
 
     private void initChart() {
